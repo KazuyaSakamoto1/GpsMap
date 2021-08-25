@@ -63,7 +63,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>常に位置情報の利用を許可する理由/目的を書く</string>
+        <string>常に位置情報の利用を許可する</string>
         <key>NSLocationWhenInUseUsageDescription</key>
-        <string>アプリ起動時に位置情報の利用を許可する理由/目的を書く</string></dict>
+        <string>アプリ使用中のみ位置情報を利用します</string></dict>
 </plist>
