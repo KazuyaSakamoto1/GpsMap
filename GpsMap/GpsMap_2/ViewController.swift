@@ -126,21 +126,19 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
 
     func LocalSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
+        
+        mapView.removeAnnotations(searchAnnotationArray)
+        
         for searchLocation in (response?.mapItems)! {
+            
+            
             if error == nil {
-                let searchAnnotation = MKPointAnnotation()
+                let searchAnnotation = MKPointAnnotation() //ピンの生成
                 // ピンの座標
-                let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude)
-                searchAnnotation.coordinate = center
+                let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude) //座標インスタンスの生成
+                searchAnnotation.coordinate = center // ピンに座標を代入
 
-                let latStr = center.latitude.description
-                let lonStr = center.longitude.description
-
-                // 配列に検索した位置の緯度と経度をセット
-                searchAnnotationLatArray.append(latStr)
-                searchAnnotationLonArray.append(lonStr)
-
-                // タイトルに場所の名前を表示
+               //  タイトルに場所の名前を表示
                 searchAnnotation.title = searchLocation.placemark.name
                 // ピンを立てる
                 mapView.addAnnotation(searchAnnotation)
@@ -153,8 +151,18 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
             } else {
                 print("error")
             }
+            
         }
     
+        
+        
     }
+    
+    
+        
+    
+    
+    
+
 
 }
