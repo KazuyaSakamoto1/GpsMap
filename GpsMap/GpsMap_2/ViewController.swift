@@ -9,13 +9,38 @@ import UIKit
 import CoreLocation //位置情報を取得するためのフレームワーク
 import MapKit //地図表示のプログラム
 
-class ViewController: UIViewController , CLLocationManagerDelegate{
+class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldDelegate, UISearchBarDelegate{
+    
+    // class クラス名:スーパークラス名,プロトコル１,プロトコル
+    
     var myLock = NSLock()
     let up_goldenRatio = 1.618
     let down_goldenRatio = 2.0
     
     @IBOutlet var mapView: MKMapView!
+    @IBOutlet weak var serchBar: UISearchBar!
     var locationManager : CLLocationManager!
+   
+    var manager : CLLocationManager = CLLocationManager()
+    
+    var searchAnnotationArray = [MKPointAnnotation]()
+    var searchAnnotationTitleArray = [String]()
+    var searchAnnotationLatArray = [String]()
+    var searchAnnotationLonArray = [String]()
+    
+    //画面の初期位置の設定
+    func initMap() {
+            // 縮尺を設定
+            var region:MKCoordinateRegion = mapView.region
+            region.span.latitudeDelta = 0.005
+            region.span.longitudeDelta = 0.005
+            mapView.setRegion(region,animated:true)
+
+            // 現在位置表示の有効化
+            mapView.showsUserLocation = true
+            // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
+            mapView.userTrackingMode = .followWithHeading
+        }
     
     //拡大のボタン
     @IBAction func ZoomIn(_ sender: Any) {
@@ -48,6 +73,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate{
         myLock.unlock()
     }
     
+    
     //位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,11 +81,14 @@ class ViewController: UIViewController , CLLocationManagerDelegate{
         locationManager = CLLocationManager(); //変数を初期化
         locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
         
+        serchBar.delegate = self
         locationManager.startUpdatingLocation() //GPSの使用を開始する
         locationManager.requestWhenInUseAuthorization()// 位置情報取得の許可を得る
-        mapView.showsUserLocation = true
-        initMap()
+        mapView.showsUserLocation = true //ユーザーの位置を可視化
         
+        initMap() //画面の初期設定
+        
+    
     }
     
     
@@ -74,20 +103,58 @@ class ViewController: UIViewController , CLLocationManagerDelegate{
         mapView.setCenter((locations.last?.coordinate)!, animated: true) // 現在の位置情報を中心に表示（更新）
         myLock.unlock()
     }
-    
-    func initMap() {
-            // 縮尺を設定
-            var region:MKCoordinateRegion = mapView.region
-        region.span.latitudeDelta = 0.005
-        region.span.longitudeDelta = 0.005
-            mapView.setRegion(region,animated:true)
 
-            // 現在位置表示の有効化
-            mapView.showsUserLocation = true
-            // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
-            mapView.userTrackingMode = .followWithHeading
+    
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        //キーボードを閉じる。
+        serchBar.resignFirstResponder()
+        
+        //検索条件を作成する。
+        let searchRequest = MKLocalSearch.Request()
+        searchRequest.naturalLanguageQuery = searchBar.text
+        
+        //検索範囲はマップビューと同じにする。
+        searchRequest.region = mapView.region
+        
+        //ローカル検索を実行する。
+        let localSerch : MKLocalSearch = MKLocalSearch(request:  searchRequest)
+        localSerch.start(completionHandler: LocalSearchCompHandler(response:error:))
+            
+        }
+        
+
+    func LocalSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
+        for searchLocation in (response?.mapItems)! {
+            if error == nil {
+                let searchAnnotation = MKPointAnnotation()
+                // ピンの座標
+                let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude)
+                searchAnnotation.coordinate = center
+
+                let latStr = center.latitude.description
+                let lonStr = center.longitude.description
+
+                // 配列に検索した位置の緯度と経度をセット
+                searchAnnotationLatArray.append(latStr)
+                searchAnnotationLonArray.append(lonStr)
+
+                // タイトルに場所の名前を表示
+                searchAnnotation.title = searchLocation.placemark.name
+                // ピンを立てる
+                mapView.addAnnotation(searchAnnotation)
+
+                // 配列にピンをセット
+                searchAnnotationArray.append(searchAnnotation)
+                // 配列に場所の名前をセット
+                searchAnnotationTitleArray.append(searchAnnotation.title ?? "")
+
+            } else {
+                print("error")
+            }
         }
     
-
+    }
 
 }
