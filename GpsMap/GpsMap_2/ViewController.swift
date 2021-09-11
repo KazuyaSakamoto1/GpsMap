@@ -103,10 +103,18 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     
     // start(completionHandler:)の引数
     func LocalSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
-        
+      
+        //検索バーに何も入力されない時の処理
+        if response == nil {
+            serchBar.resignFirstResponder()
+            return
+        }
         mapView.removeAnnotations(searchAnnotationArray) //現在刺されているピンの削除
         self.mapView.removeOverlays(self.mapView.overlays) //現在表示されているルートを削除
         
+      
+        
+        //検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
             print("-----------------------ピンを表示。----------------------------------")
             
@@ -143,13 +151,13 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         self.mapView.removeOverlays(self.mapView.overlays)
         print("-----------------------ピンを押しました。----------------------------------")
         // 現在地と目的地のMKPlacemarkを生成
-        var fromPlacemark = MKPlacemark(coordinate:locationManager.location!.coordinate, addressDictionary:nil)
+        let fromPlacemark = MKPlacemark(coordinate:locationManager.location!.coordinate, addressDictionary:nil)
         print(fromPlacemark)
-        var toPlacemark   = MKPlacemark(coordinate:goalCoordinate, addressDictionary:nil)
+        let toPlacemark   = MKPlacemark(coordinate:goalCoordinate, addressDictionary:nil)
         print(toPlacemark)
         // MKPlacemark から MKMapItem を生成
-        var fromItem = MKMapItem(placemark:fromPlacemark)
-        var toItem   = MKMapItem(placemark:toPlacemark)
+        let fromItem = MKMapItem(placemark:fromPlacemark)
+        let toItem   = MKMapItem(placemark:toPlacemark)
         
         // MKMapItem をセットして MKDirectionsRequest を生成
         let request = MKDirections.Request()
@@ -167,7 +175,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
             
          //   response?.routes.count
             if (error != nil || response!.routes.isEmpty) {
-                print(error)
+                print(error!)
                 return
             }
             print("-------------------------succeed--------------------")
@@ -195,23 +203,23 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     {
         print("-------------地図範囲を出す")
         // 現在地と目的地を含む矩形を計算
-        var maxLat:Double = fmax(locationManager.location!.coordinate.latitude,  goalCoordinate.latitude)
-        var maxLon:Double = fmax(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
-        var minLat:Double = fmin(locationManager.location!.coordinate.latitude,  goalCoordinate.latitude)
-        var minLon:Double = fmin(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
+        let maxLat:Double = fmax(locationManager.location!.coordinate.latitude,  goalCoordinate.latitude)
+        let maxLon:Double = fmax(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
+        let minLat:Double = fmin(locationManager.location!.coordinate.latitude,  goalCoordinate.latitude)
+        let minLon:Double = fmin(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
 
         // 地図表示するときの緯度、経度の幅を計算
-        var mapMargin:Double = 1.5;  // 経路が入る幅(1.0)＋余白(0.5)
-        var leastCoordSpan:Double = 0.005;    // 拡大表示したときの最大値
-        var span_x:Double = fmax(leastCoordSpan, fabs(maxLat - minLat) * mapMargin);
-        var span_y:Double = fmax(leastCoordSpan, fabs(maxLon - minLon) * mapMargin);
+        let mapMargin:Double = 1.5;  // 経路が入る幅(1.0)＋余白(0.5)
+        let leastCoordSpan:Double = 0.005;    // 拡大表示したときの最大値
+        let span_x:Double = fmax(leastCoordSpan, fabs(maxLat - minLat) * mapMargin);
+        let span_y:Double = fmax(leastCoordSpan, fabs(maxLon - minLon) * mapMargin);
 
 
-        var span:MKCoordinateSpan = MKCoordinateSpan.init(latitudeDelta: span_x, longitudeDelta: span_y);
+        let _:MKCoordinateSpan = MKCoordinateSpan.init(latitudeDelta: span_x, longitudeDelta: span_y);
 
         // 現在地を目的地の中心を計算
-        var center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLon + minLon) / 2);
-        var region:MKCoordinateRegion = MKCoordinateRegion(center:center,latitudinalMeters: 1000,longitudinalMeters: 1000);
+        let center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLon + minLon) / 2);
+        let region:MKCoordinateRegion = MKCoordinateRegion(center:center,latitudinalMeters: 1000,longitudinalMeters: 1000);
 
         mapView.setRegion(mapView.regionThatFits(region), animated:true);
     }
@@ -223,9 +231,9 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     //ピンがタップされた際の処理
     func mapView(_ mapView:MKMapView, didSelect view: MKAnnotationView){
         
-        print(view.annotation?.coordinate)
-        print(view.annotation?.title)
-        print(view.annotation?.subtitle)
+        print(view.annotation!.coordinate)
+        print(view.annotation!.title as Any)
+        print(view.annotation!.subtitle as Any)
         getRoute(goalCoordinate:view.annotation!.coordinate)
         
     }
