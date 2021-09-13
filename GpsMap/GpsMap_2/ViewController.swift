@@ -20,6 +20,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     @IBOutlet var mapView: MKMapView!
     @IBOutlet weak var serchBar: UISearchBar!
     var locationManager : CLLocationManager!
+    var compassButton : MKCompassButton!
     
     var manager : CLLocationManager = CLLocationManager()
     
@@ -44,9 +45,12 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         mapView.showsUserLocation = true
         // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
         mapView.userTrackingMode = .followWithHeading
+        print("-----------------確認------------")
         
         
     }
+    
+    
     
     
     //位置情報の取得
@@ -54,6 +58,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         super.viewDidLoad()
         
         locationManager = CLLocationManager(); //変数を初期化
+        
+        
         locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
         
         serchBar.delegate = self
@@ -63,10 +69,14 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation //ナビゲーションアプリのための高い精度と追加のセンサーも使用する
         mapView.delegate = self
-        initMap() //画面の初期設定
-        
+        //initMap() //画面の初期設定
+        self.initMap()
+        //ユーザーのトラッキングと向きを出力
+        self.mapView.setUserTrackingMode(MKUserTrackingMode.followWithHeading, animated: true)
         
     }
+    
+    
     
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations:[CLLocation]){
@@ -103,16 +113,16 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     
     // start(completionHandler:)の引数
     func LocalSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
-      
+        
         //検索バーに何も入力されない時の処理
         if response == nil {
             serchBar.resignFirstResponder()
+            self.initMap()
             return
         }
+        
         mapView.removeAnnotations(searchAnnotationArray) //現在刺されているピンの削除
         self.mapView.removeOverlays(self.mapView.overlays) //現在表示されているルートを削除
-        
-      
         
         //検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
@@ -122,6 +132,25 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 let searchAnnotation = MKPointAnnotation() //ピンの生成
                 // ピンの座標
                 let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude) //座標インスタンスの生成
+                
+                
+                //表示範囲の設定
+                let userLatitude : Double = locationManager.location!.coordinate.latitude
+                
+                let userLongitude : Double = locationManager.location!.coordinate.longitude
+                
+                let goalLatitude : Double = searchLocation.placemark.coordinate.latitude
+                let goalLongitude : Double = searchLocation.placemark.coordinate.longitude
+                
+                let Center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude : userLatitude , longitude : userLongitude);
+                
+                let region:MKCoordinateRegion = MKCoordinateRegion(center:Center,latitudinalMeters:fabs((userLatitude-goalLatitude)*100000),longitudinalMeters:fabs((userLongitude-goalLongitude)*100000));
+                
+                mapView.setRegion(mapView.regionThatFits(region), animated:true);
+                
+                
+                
+                
                 searchAnnotation.coordinate = center // ピンに座標を代入
                 
                 //  タイトルに場所の名前を表示
@@ -142,7 +171,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         
         
+        
     }
+    
+    
     
     
     //目的地までのルートを取得
@@ -173,13 +205,13 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         directions.calculate() { response, error in
             
-         //   response?.routes.count
+            //   response?.routes.count
             if (error != nil || response!.routes.isEmpty) {
                 print(error!)
                 return
             }
             print("-------------------------succeed--------------------")
-         
+            
             let route: MKRoute = response!.routes[0] as MKRoute
             print("------------------------------")
             print(response!.routes)
@@ -198,7 +230,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
     }
     
-//    // 地図の表示範囲を計算
+    // 地図の表示範囲を計算
     func showUserAndDestinationOnMap(goalCoordinate:CLLocationCoordinate2D!)
     {
         print("-------------地図範囲を出す")
@@ -207,26 +239,26 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         let maxLon:Double = fmax(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
         let minLat:Double = fmin(locationManager.location!.coordinate.latitude,  goalCoordinate.latitude)
         let minLon:Double = fmin(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
-
+        
         // 地図表示するときの緯度、経度の幅を計算
         let mapMargin:Double = 1.5;  // 経路が入る幅(1.0)＋余白(0.5)
         let leastCoordSpan:Double = 0.005;    // 拡大表示したときの最大値
         let span_x:Double = fmax(leastCoordSpan, fabs(maxLat - minLat) * mapMargin);
         let span_y:Double = fmax(leastCoordSpan, fabs(maxLon - minLon) * mapMargin);
-
-
+        
+        
         let _:MKCoordinateSpan = MKCoordinateSpan.init(latitudeDelta: span_x, longitudeDelta: span_y);
-
+        
         // 現在地を目的地の中心を計算
         let center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLon + minLon) / 2);
-        let region:MKCoordinateRegion = MKCoordinateRegion(center:center,latitudinalMeters: 1000,longitudinalMeters: 1000);
-
+        let region:MKCoordinateRegion = MKCoordinateRegion(center:center,latitudinalMeters: 7500,longitudinalMeters: 7500);
+        
         mapView.setRegion(mapView.regionThatFits(region), animated:true);
     }
     
     
     
-   
+    
     
     //ピンがタップされた際の処理
     func mapView(_ mapView:MKMapView, didSelect view: MKAnnotationView){
@@ -249,6 +281,9 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         }
         return MKOverlayRenderer()
     }
+    
+    
+    
     
 }
 
