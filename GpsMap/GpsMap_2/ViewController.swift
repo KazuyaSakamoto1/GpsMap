@@ -32,6 +32,22 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     var userLocation: CLLocationCoordinate2D!
     var destLocation: CLLocationCoordinate2D!
     
+    @IBOutlet weak var switchLabel: UILabel!
+    @IBOutlet weak var switchButton: UISwitch!
+    
+    
+    @IBAction func onOffSwitch(_ sender: UISwitch) {
+        if sender.isOn{
+            self.switchLabel.text = "画面回転:ON"
+            self.mapView.allowsRotating = true //回転
+        }else{
+            self.switchLabel.text = "画面回転:OFF"
+            self.mapView.isRotateEnabled = false //回転
+        }
+    }
+    
+   
+    
     
     //画面の初期位置の設定
     func initMap() {
@@ -42,7 +58,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         mapView.setRegion(region,animated:true)
         
         // 現在位置表示の有効化
-        mapView.showsUserLocation = true
+        //mapView.showsUserLocation = true
         // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
         mapView.userTrackingMode = .followWithHeading
         print("-----------------確認------------")
@@ -74,7 +90,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         //initMap() //画面の初期設定
         
         self.initMap()
-        
+        self.mapView.userTrackingMode = .followWithHeading
     }
     
     
@@ -87,9 +103,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         print("[DBG]longitude : " + longitude)
         print("[DBG]longitude : " + latitude)
         
-        myLock.lock()
-        mapView.setCenter((locations.last?.coordinate)!, animated: true) // 現在の位置情報を中心に表示（更新）
-        myLock.unlock()
+        //  myLock.lock()
+        //mapView.setCenter((locations.last?.coordinate)!, animated: true) // 現在の位置情報を中心に表示（更新）
+        self.mapView.userTrackingMode = .followWithHeading
+        //myLock.unlock()
     }
     
     
@@ -110,6 +127,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         let localSerch : MKLocalSearch = MKLocalSearch(request:  searchRequest)
         localSerch.start(completionHandler: LocalSearchCompHandler(response:error:))
         
+       
+        
     }
     
     
@@ -125,14 +144,13 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         if response == nil {
             print("-----------------------検索バーに入力なし-------------------")
             serchBar.resignFirstResponder()
-           // self.initMap()
-            displaySearch(goalLatitude: locationManager.location!.coordinate.latitude, goalLongitude: locationManager.location!.coordinate.longitude, parm: 1000000)
+            
             return
         }
         
         mapView.removeAnnotations(searchAnnotationArray) //現在刺されているピンの削除
         self.mapView.removeOverlays(self.mapView.overlays) //現在表示されているルートを削除
-        
+        self.mapView.userTrackingMode = .none
         //検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
             print("-----------------------ピンを表示。----------------------------------")
@@ -141,7 +159,6 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 let searchAnnotation = MKPointAnnotation() //ピンの生成
                 // ピンの座標
                 let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude) //座標インスタンスの生成
-                
                 
                 //表示範囲の設定
                 print("------------------------search-----------------------")
@@ -159,14 +176,12 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 // 配列に場所の名前をセット
                 searchAnnotationTitleArray.append(searchAnnotation.title ?? "")
                 
+                
             } else {
                 print("error")
             }
             
         }
-        
-        
-        
         
     }
     
@@ -221,44 +236,18 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
             print(route.polyline)
             
             // 現在地と目的地を含む表示範囲を設定する
-            self.showUserAndDestinationOnMap(goalCoordinate:goalCoordinate)
-           
-            
+            print("-------------------------------呼び出し中")
+            self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude,parm: 250000)
+            self.mapView.userTrackingMode = .followWithHeading
         }
         
-        //displaySearch(goalLatitude: locationManager.location!.coordinate.latitude, goalLongitude: locationManager.location!.coordinate.longitude,parm: 100000)
+        
         
     }
     
-    // 地図の表示範囲を計算
-    func showUserAndDestinationOnMap(goalCoordinate:CLLocationCoordinate2D!)
-    {
-        print("-------------地図範囲を出す")
-        // 現在地と目的地を含む矩形を計算
-        let maxLat:Double = fmax(locationManager.location!.coordinate.latitude,  goalCoordinate.latitude)
-        let maxLon:Double = fmax(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
-        let minLat:Double = fmin(locationManager.location!.coordinate.latitude,  goalCoordinate.latitude)
-        let minLon:Double = fmin(locationManager.location!.coordinate.longitude, goalCoordinate.longitude)
-        
-        // 地図表示するときの緯度、経度の幅を計算
-        let mapMargin:Double = 1.5;  // 経路が入る幅(1.0)＋余白(0.5)
-        let leastCoordSpan:Double = 0.005;    // 拡大表示したときの最大値
-        let span_x:Double = fmax(leastCoordSpan, fabs(maxLat - minLat) * mapMargin);
-        let span_y:Double = fmax(leastCoordSpan, fabs(maxLon - minLon) * mapMargin);
-        
-        
-        let _:MKCoordinateSpan = MKCoordinateSpan.init(latitudeDelta: span_x, longitudeDelta: span_y);
-        
-        // 現在地を目的地の中心を計算
-        let center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLon + minLon) / 2);
-        let region:MKCoordinateRegion = MKCoordinateRegion(center:center,latitudinalMeters: 5000,longitudinalMeters: 7500);
-        
-        mapView.setRegion(mapView.regionThatFits(region), animated:true);
-    }
     
-   
     
-    //仮の表示範囲を出す関数
+    //検索後の表示範囲を出す関数
     func displaySearch(goalLatitude:Double,goalLongitude:Double,parm:Double){
         let userLatitude : Double = locationManager.location!.coordinate.latitude
         let userLongitude : Double = locationManager.location!.coordinate.longitude
@@ -271,17 +260,29 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
     }
     
-  
+    //目的地をタップ後の表示範囲を出す関数
+    func displaySearch2(goalLatitude:Double,goalLongitude:Double,parm:Double){
+        let userLatitude : Double = locationManager.location!.coordinate.latitude
+        let userLongitude : Double = locationManager.location!.coordinate.longitude
+        
+        let Center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude : (userLatitude + goalLatitude)/2 , longitude : (userLongitude + goalLongitude)/2);
+        
+        let region:MKCoordinateRegion = MKCoordinateRegion(center:Center,latitudinalMeters:fabs((userLatitude-goalLatitude)*parm),longitudinalMeters:fabs((userLongitude-goalLongitude)*parm));
+        
+        
+        mapView.setRegion(mapView.regionThatFits(region), animated:true);
+        
+    }
+    
+    
     
     //ピンがタップされた際の処理
     func mapView(_ mapView:MKMapView, didSelect view: MKAnnotationView){
         
-        print(view.annotation!.coordinate)
-        print(view.annotation!.title as Any)
-        print(view.annotation!.subtitle as Any)
         getRoute(goalCoordinate:view.annotation!.coordinate)
         print("-----------------表示範囲を変更--------------------")
         displaySearch(goalLatitude: view.annotation!.coordinate.latitude, goalLongitude: view.annotation!.coordinate.longitude, parm: 500)
+        self.mapView.userTrackingMode = .followWithHeading
         
     }
     
@@ -298,6 +299,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     }
     
     
+ 
+   
     
     
 }
