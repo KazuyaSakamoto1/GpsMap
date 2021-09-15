@@ -36,13 +36,16 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     @IBOutlet weak var switchButton: UISwitch!
     
     
+    //画面の回転の禁止をするか否かの設定（設定画面に移行予定）
     @IBAction func onOffSwitch(_ sender: UISwitch) {
         if sender.isOn{
-            self.switchLabel.text = "画面回転:ON"
-            self.mapView.allowsRotating = true //回転
+            self.switchLabel.text = "ON"
+            //https://developer.apple.com/documentation/mapkit/mkmapview/1452274-isrotateenabled
+            self.mapView.isRotateEnabled = true
+           
         }else{
-            self.switchLabel.text = "画面回転:OFF"
-            self.mapView.isRotateEnabled = false //回転
+            self.switchLabel.text = "OFF"
+            self.mapView.isRotateEnabled = false
         }
     }
     
@@ -103,19 +106,20 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         print("[DBG]longitude : " + longitude)
         print("[DBG]longitude : " + latitude)
         
-        //  myLock.lock()
-        //mapView.setCenter((locations.last?.coordinate)!, animated: true) // 現在の位置情報を中心に表示（更新）
-        self.mapView.userTrackingMode = .followWithHeading
-        //myLock.unlock()
+        //方角の出力
+       //self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
+       
     }
     
     
     //検索ボタンがクリックされた際の処理内容
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
+        //トラッキングモードを無効化
+        self.mapView.userTrackingMode = .none
+        self.mapView.removeOverlays(self.mapView.overlays) //現在表示されているルートを削除
         //キーボードを閉じる。
         serchBar.resignFirstResponder()
-        // self.mapView.setUserTrackingMode(MKUserTrackingMode.followWithHeading, animated: true)
+       
         //検索条件を作成する。
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
@@ -150,7 +154,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         mapView.removeAnnotations(searchAnnotationArray) //現在刺されているピンの削除
         self.mapView.removeOverlays(self.mapView.overlays) //現在表示されているルートを削除
-        self.mapView.userTrackingMode = .none
+        
         //検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
             print("-----------------------ピンを表示。----------------------------------")
@@ -282,7 +286,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         getRoute(goalCoordinate:view.annotation!.coordinate)
         print("-----------------表示範囲を変更--------------------")
         displaySearch(goalLatitude: view.annotation!.coordinate.latitude, goalLongitude: view.annotation!.coordinate.longitude, parm: 500)
-        self.mapView.userTrackingMode = .followWithHeading
+        self.mapView.userTrackingMode = .none
         
     }
     
