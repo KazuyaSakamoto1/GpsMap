@@ -56,9 +56,11 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     //位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("-----------------VIEWDIDLOAD--------------------------------")
         locationManager = CLLocationManager(); //変数を初期化
         
+        //ユーザーのトラッキングと向きを出力
+        self.mapView.setUserTrackingMode(MKUserTrackingMode.followWithHeading, animated: true)
         
         locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
         
@@ -70,9 +72,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation //ナビゲーションアプリのための高い精度と追加のセンサーも使用する
         mapView.delegate = self
         //initMap() //画面の初期設定
+        
         self.initMap()
-        //ユーザーのトラッキングと向きを出力
-        self.mapView.setUserTrackingMode(MKUserTrackingMode.followWithHeading, animated: true)
         
     }
     
@@ -97,7 +98,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         //キーボードを閉じる。
         serchBar.resignFirstResponder()
-        
+        // self.mapView.setUserTrackingMode(MKUserTrackingMode.followWithHeading, animated: true)
         //検索条件を作成する。
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
@@ -111,13 +112,21 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
     }
     
+    
+    
+    
+    
+    
+    
     // start(completionHandler:)の引数
     func LocalSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
         
         //検索バーに何も入力されない時の処理
         if response == nil {
+            print("-----------------------検索バーに入力なし-------------------")
             serchBar.resignFirstResponder()
-            self.initMap()
+           // self.initMap()
+            displaySearch(goalLatitude: locationManager.location!.coordinate.latitude, goalLongitude: locationManager.location!.coordinate.longitude, parm: 1000000)
             return
         }
         
@@ -135,21 +144,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 
                 
                 //表示範囲の設定
-                let userLatitude : Double = locationManager.location!.coordinate.latitude
-                
-                let userLongitude : Double = locationManager.location!.coordinate.longitude
-                
-                let goalLatitude : Double = searchLocation.placemark.coordinate.latitude
-                let goalLongitude : Double = searchLocation.placemark.coordinate.longitude
-                
-                let Center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude : userLatitude , longitude : userLongitude);
-                
-                let region:MKCoordinateRegion = MKCoordinateRegion(center:Center,latitudinalMeters:fabs((userLatitude-goalLatitude)*100000),longitudinalMeters:fabs((userLongitude-goalLongitude)*100000));
-                
-                mapView.setRegion(mapView.regionThatFits(region), animated:true);
-                
-                
-                
+                print("------------------------search-----------------------")
+                displaySearch(goalLatitude: searchLocation.placemark.coordinate.latitude, goalLongitude: searchLocation.placemark.coordinate.longitude,parm: 100000)
                 
                 searchAnnotation.coordinate = center // ピンに座標を代入
                 
@@ -182,6 +178,9 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     {
         self.mapView.removeOverlays(self.mapView.overlays)
         print("-----------------------ピンを押しました。----------------------------------")
+        
+        
+        
         // 現在地と目的地のMKPlacemarkを生成
         let fromPlacemark = MKPlacemark(coordinate:locationManager.location!.coordinate, addressDictionary:nil)
         print(fromPlacemark)
@@ -223,10 +222,11 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
             
             // 現在地と目的地を含む表示範囲を設定する
             self.showUserAndDestinationOnMap(goalCoordinate:goalCoordinate)
+           
             
         }
         
-        
+        //displaySearch(goalLatitude: locationManager.location!.coordinate.latitude, goalLongitude: locationManager.location!.coordinate.longitude,parm: 100000)
         
     }
     
@@ -251,14 +251,27 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         // 現在地を目的地の中心を計算
         let center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLon + minLon) / 2);
-        let region:MKCoordinateRegion = MKCoordinateRegion(center:center,latitudinalMeters: 7500,longitudinalMeters: 7500);
+        let region:MKCoordinateRegion = MKCoordinateRegion(center:center,latitudinalMeters: 5000,longitudinalMeters: 7500);
         
         mapView.setRegion(mapView.regionThatFits(region), animated:true);
     }
     
+   
     
+    //仮の表示範囲を出す関数
+    func displaySearch(goalLatitude:Double,goalLongitude:Double,parm:Double){
+        let userLatitude : Double = locationManager.location!.coordinate.latitude
+        let userLongitude : Double = locationManager.location!.coordinate.longitude
+        
+        let Center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude : userLatitude , longitude : userLongitude);
+        
+        let region:MKCoordinateRegion = MKCoordinateRegion(center:Center,latitudinalMeters:fabs((userLatitude-goalLatitude)*parm),longitudinalMeters:fabs((userLongitude-goalLongitude)*parm));
+        
+        mapView.setRegion(mapView.regionThatFits(region), animated:true);
+        
+    }
     
-    
+  
     
     //ピンがタップされた際の処理
     func mapView(_ mapView:MKMapView, didSelect view: MKAnnotationView){
@@ -267,6 +280,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         print(view.annotation!.title as Any)
         print(view.annotation!.subtitle as Any)
         getRoute(goalCoordinate:view.annotation!.coordinate)
+        print("-----------------表示範囲を変更--------------------")
+        displaySearch(goalLatitude: view.annotation!.coordinate.latitude, goalLongitude: view.annotation!.coordinate.longitude, parm: 500)
         
     }
     
