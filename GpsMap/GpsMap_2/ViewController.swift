@@ -42,14 +42,14 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
             self.switchLabel.text = "ON"
             //https://developer.apple.com/documentation/mapkit/mkmapview/1452274-isrotateenabled
             self.mapView.isRotateEnabled = true
-           
+            
         }else{
             self.switchLabel.text = "OFF"
             self.mapView.isRotateEnabled = false
         }
     }
     
-   
+    
     
     
     //画面の初期位置の設定
@@ -60,8 +60,6 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         region.span.longitudeDelta = 0.005
         mapView.setRegion(region,animated:true)
         
-        // 現在位置表示の有効化
-        //mapView.showsUserLocation = true
         // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
         mapView.userTrackingMode = .followWithHeading
         print("-----------------確認------------")
@@ -75,7 +73,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     //位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("-----------------VIEWDIDLOAD--------------------------------")
+        
         locationManager = CLLocationManager(); //変数を初期化
         
         //ユーザーのトラッキングと向きを出力
@@ -107,8 +105,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         print("[DBG]longitude : " + latitude)
         
         //方角の出力
-       //self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
-       
+        self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
+        
     }
     
     
@@ -119,7 +117,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         self.mapView.removeOverlays(self.mapView.overlays) //現在表示されているルートを削除
         //キーボードを閉じる。
         serchBar.resignFirstResponder()
-       
+        
         //検索条件を作成する。
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
@@ -131,7 +129,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         let localSerch : MKLocalSearch = MKLocalSearch(request:  searchRequest)
         localSerch.start(completionHandler: LocalSearchCompHandler(response:error:))
         
-       
+        
         
     }
     
@@ -291,7 +289,6 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     }
     
     // 経路を描画するときの色や線の太さを指定
-    
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if let polyline = overlay as? MKPolyline {
             let polylineRenderer = MKPolylineRenderer(polyline: polyline)
@@ -303,8 +300,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     }
     
     
- 
-   
+    
+    
     
     
 }
