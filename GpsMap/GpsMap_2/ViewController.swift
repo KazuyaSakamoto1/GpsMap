@@ -10,7 +10,6 @@ import CoreLocation //位置情報を取得するためのフレームワーク
 import MapKit //地図表示のプログラム
 
 class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldDelegate, UISearchBarDelegate,MKMapViewDelegate{
-    
     // class クラス名:スーパークラス名,プロトコル１,プロトコル
     
     var myLock = NSLock()
@@ -40,12 +39,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         if sender.isOn{
             self.switchLabel.text = "ON"
             //https://developer.apple.com/documentation/mapkit/mkmapview/1452274-isrotateenabled
-            
-            self.mapView.isRotateEnabled = true
-            
+            //            self.mapView.isRotateEnabled = true
+
         }else{
             self.switchLabel.text = "OFF"
-            
         }
     }
     
@@ -59,7 +56,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
         print("-----------------確認------------")
-        
+        self.mapView.isRotateEnabled = false
     }
     
     //位置情報の取得
@@ -67,18 +64,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         super.viewDidLoad()
         
         locationManager = CLLocationManager(); //変数を初期化
-        
-        //mapの見た目
-        //mapView.mapType = .standard
-        //mapView.mapType = .satellite  //航空表示
-        //mapView.mapType = .satelliteFlyover //立体的な航空表示
-        //mapView.mapType = .hybrid //航空表示に.standardのmapが表示
-        //mapView.mapType = .hybridFlyover //立体的な航空表示に.standardのmapが表示
-        
+                
         //ユーザーのトラッキングと向きを出力
-        self.mapView.setUserTrackingMode(MKUserTrackingMode.followWithHeading, animated: true)
-        
-        mapView.isRotateEnabled = false  //回らない
+        self.mapView.userTrackingMode = .followWithHeading
+        self.mapView.isRotateEnabled = false  //回らない
         locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
         
         serchBar.delegate = self
@@ -90,6 +79,15 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         mapView.delegate = self
         //画面の初期設定
         self.initMap()
+        print("--------------------------------------")
+        print(self.mapView.isRotateEnabled)
+        
+        //mapの見た目
+        //mapView.mapType = .standard
+        //mapView.mapType = .satellite  //航空表示
+        //mapView.mapType = .hybrid //航空表示に.standardのmapが表示
+        //mapView.mapType = .hybridFlyover //立体的な航空表示に.standardのmapが表示
+        mapView.mapType = .satelliteFlyover //立体的な航空表示
         
     }
     
@@ -102,7 +100,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         //方角の出力
         //self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
-        self.mapView.isRotateEnabled = false
+        print(self.mapView.isRotateEnabled)
+        
     }
     
     //検索ボタンがクリックされた際の処理内容
@@ -158,8 +157,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 
                 //表示範囲の設定
                 print("------------------------search-----------------------")
-                //displaySearch(goalLatitude: searchLocation.placemark.coordinate.latitude, goalLongitude: searchLocation.placemark.coordinate.longitude,parm: 100000) //いつも呼び出してたやつ
-                
+
                 searchAnnotation.coordinate = center // ピンに座標を代入
                 
                 //  タイトルに場所の名前を表示
@@ -179,11 +177,9 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 if longitude.count == 13 && latitude.count == 13 {
                     break
                 }
-                
             } else {
                 print("error")
             }
-            
         }
         
         print("----------------searchEND-----------------")
@@ -193,14 +189,10 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         var minLong : Double = 9999.0
         var maxLong : Double = -9999.0
         
-        
         print(longitude.count)
         print(latitude.count)
         
-        
-        
         for i in longitude {
-            
             //経度の最大最小を求める
             if minLong > i{
                 minLong = i;
@@ -215,7 +207,6 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
             if minLat > i{
                 minLat = i;
             }
-            
             if i > maxLat{
                 maxLat = i;
             }
@@ -265,6 +256,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 print(error!)
                 return
             }
+            
             print("-------------------------succeed--------------------")
             
             let route: MKRoute = response!.routes[0] as MKRoute
@@ -304,9 +296,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         let Center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude : (userLatitude + goalLatitude)/2 , longitude : (userLongitude + goalLongitude)/2);
         
         let region:MKCoordinateRegion = MKCoordinateRegion(center:Center,latitudinalMeters:fabs((userLatitude-goalLatitude)*parm),longitudinalMeters:fabs((userLongitude-goalLongitude)*parm));
-        
-        
-        mapView.setRegion(mapView.regionThatFits(region), animated:true);
+            mapView.setRegion(mapView.regionThatFits(region), animated:true);
         
     }
     
@@ -324,7 +314,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         if let polyline = overlay as? MKPolyline {
             let polylineRenderer = MKPolylineRenderer(polyline: polyline)
             polylineRenderer.strokeColor = .blue
-            polylineRenderer.lineWidth = 6.0
+            polylineRenderer.lineWidth = 4.0
             return polylineRenderer
         }
         return MKOverlayRenderer()
