@@ -8,23 +8,19 @@
 import Foundation
 import UIKit
 
-class ViewController2: UIViewController{
-    
+class ViewController2: UIViewController {
     @IBOutlet weak var switchLabel: UILabel!
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        //④新しく追加したい処理を書く
+        // 新しく追加したい処理を書く
     }
-    
     @IBAction func rotateSwitch(_ sender: UISwitch) {
-        if sender.isOn{
+        if sender.isOn {
             self.switchLabel.text = "ON"
             //https://developer.apple.com/documentation/mapkit/mkmapview/1452274-isrotateenabled
             //            self.mapView.isRotateEnabled = true
-        }else{
+        } else {
             self.switchLabel.text = "OFF"
         }
     }
-    
 }
