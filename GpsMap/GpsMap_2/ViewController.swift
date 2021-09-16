@@ -41,11 +41,12 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         if sender.isOn{
             self.switchLabel.text = "ON"
             //https://developer.apple.com/documentation/mapkit/mkmapview/1452274-isrotateenabled
+            
             self.mapView.isRotateEnabled = true
             
         }else{
             self.switchLabel.text = "OFF"
-            self.mapView.isRotateEnabled = false
+            
         }
     }
     
@@ -61,11 +62,11 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         mapView.setRegion(region,animated:true)
         
         // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
-        mapView.userTrackingMode = .followWithHeading
         print("-----------------確認------------")
         
         
     }
+    
     
     
     
@@ -76,9 +77,17 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         locationManager = CLLocationManager(); //変数を初期化
         
+        //mapの見た目
+        //        mapView.mapType = .standard
+        //     mapView.mapType = .satellite  //航空表示
+        // mapView.mapType = .satelliteFlyover //立体的な航空表示
+        // mapView.mapType = .hybrid //航空表示に.standardのmapが表示
+        //mapView.mapType = .hybridFlyover //立体的な航空表示に.standardのmapが表示
+        
         //ユーザーのトラッキングと向きを出力
         self.mapView.setUserTrackingMode(MKUserTrackingMode.followWithHeading, animated: true)
         
+        mapView.isRotateEnabled = false  //回らない
         locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
         
         serchBar.delegate = self
@@ -88,11 +97,15 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation //ナビゲーションアプリのための高い精度と追加のセンサーも使用する
         mapView.delegate = self
-        //initMap() //画面の初期設定
-        
+        //画面の初期設定
         self.initMap()
-        self.mapView.userTrackingMode = .followWithHeading
+        
+        
+        
+        
     }
+    
+    
     
     
     
@@ -105,8 +118,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         print("[DBG]longitude : " + latitude)
         
         //方角の出力
-        self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
-        
+        //self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
+        self.mapView.isRotateEnabled = false
     }
     
     
@@ -153,18 +166,29 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         mapView.removeAnnotations(searchAnnotationArray) //現在刺されているピンの削除
         self.mapView.removeOverlays(self.mapView.overlays) //現在表示されているルートを削除
         
+        
+        //緯度と軽度の情報を格納する配列
+        var longitude: [Double] = []
+        var latitude: [Double] = []
+        
         //検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
             print("-----------------------ピンを表示。----------------------------------")
+            
+            
             
             if error == nil {
                 let searchAnnotation = MKPointAnnotation() //ピンの生成
                 // ピンの座標
                 let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude) //座標インスタンスの生成
                 
+                let lat = searchLocation.placemark.coordinate.latitude
+                let long = searchLocation.placemark.coordinate.longitude
+                
+                
                 //表示範囲の設定
                 print("------------------------search-----------------------")
-                displaySearch(goalLatitude: searchLocation.placemark.coordinate.latitude, goalLongitude: searchLocation.placemark.coordinate.longitude,parm: 100000)
+                //displaySearch(goalLatitude: searchLocation.placemark.coordinate.latitude, goalLongitude: searchLocation.placemark.coordinate.longitude,parm: 100000) //いつも呼び出してたやつ
                 
                 searchAnnotation.coordinate = center // ピンに座標を代入
                 
@@ -178,12 +202,68 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
                 // 配列に場所の名前をセット
                 searchAnnotationTitleArray.append(searchAnnotation.title ?? "")
                 
+                //緯度と軽度の座標を格納
+                longitude.append(long)
+                latitude.append(lat)
+                
+                if longitude.count == 13 && latitude.count == 13 {
+                    break
+                }
+                
                 
             } else {
                 print("error")
             }
             
         }
+        
+        print("----------------searchEND-----------------")
+        
+        var minLat : Double = 9999.0
+        var maxLat : Double = -9999.0
+        var minLong : Double = 9999.0
+        var maxLong : Double = -9999.0
+        
+        
+        print(longitude.count)
+        print(latitude.count)
+        
+        
+        
+        for i in longitude {
+            
+            //経度の最大最小を求める
+            if minLong > i{
+                minLong = i;
+            }
+            if maxLong < i {
+                maxLong = i;
+            }
+            
+            
+        }
+        
+        for i in latitude {
+            //緯度の最大最小を求める
+            if minLat > i{
+                minLat = i;
+            }
+            
+            if i > maxLat{
+                maxLat = i;
+            }
+            
+        }
+        
+        print(minLat)
+        print(maxLat)
+        print(minLong)
+        print(maxLong)
+        
+        let Center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude : (maxLat + minLat)/2 , longitude : (maxLong + minLong)/2);
+        let region:MKCoordinateRegion = MKCoordinateRegion(center:Center,latitudinalMeters:fabs((maxLat-minLat)),longitudinalMeters:fabs((maxLong-minLong))*100000);
+        //横・縦
+        mapView.setRegion(mapView.regionThatFits(region), animated:true);
         
     }
     
@@ -240,7 +320,8 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
             // 現在地と目的地を含む表示範囲を設定する
             print("-------------------------------呼び出し中")
             self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude,parm: 250000)
-            self.mapView.userTrackingMode = .followWithHeading
+            
+            
         }
         
         
@@ -249,7 +330,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     
     
     
-    //検索後の表示範囲を出す関数
+    //検索後の表示範囲を出す関数(ユーザー中心)
     func displaySearch(goalLatitude:Double,goalLongitude:Double,parm:Double){
         let userLatitude : Double = locationManager.location!.coordinate.latitude
         let userLongitude : Double = locationManager.location!.coordinate.longitude
@@ -262,8 +343,21 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         
     }
     
-    //目的地をタップ後の表示範囲を出す関数
+    //目的地をタップ後の表示範囲を出す関数(ユーザーと目的地の中央)
     func displaySearch2(goalLatitude:Double,goalLongitude:Double,parm:Double){
+        let userLatitude : Double = locationManager.location!.coordinate.latitude
+        let userLongitude : Double = locationManager.location!.coordinate.longitude
+        
+        let Center:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude : (userLatitude + goalLatitude)/2 , longitude : (userLongitude + goalLongitude)/2);
+        
+        let region:MKCoordinateRegion = MKCoordinateRegion(center:Center,latitudinalMeters:fabs((userLatitude-goalLatitude)*parm),longitudinalMeters:fabs((userLongitude-goalLongitude)*parm));
+        
+        
+        mapView.setRegion(mapView.regionThatFits(region), animated:true);
+        
+    }
+    
+    func displaySearch3(goalLatitude:Double,goalLongitude:Double,parm:Double){
         let userLatitude : Double = locationManager.location!.coordinate.latitude
         let userLongitude : Double = locationManager.location!.coordinate.longitude
         
@@ -278,13 +372,15 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
     
     
     
+    
+    
     //ピンがタップされた際の処理
     func mapView(_ mapView:MKMapView, didSelect view: MKAnnotationView){
         
         getRoute(goalCoordinate:view.annotation!.coordinate)
         print("-----------------表示範囲を変更--------------------")
         displaySearch(goalLatitude: view.annotation!.coordinate.latitude, goalLongitude: view.annotation!.coordinate.longitude, parm: 500)
-        self.mapView.userTrackingMode = .none
+        self.mapView.userTrackingMode = .followWithHeading
         
     }
     
@@ -298,6 +394,7 @@ class ViewController: UIViewController , CLLocationManagerDelegate, UITextFieldD
         }
         return MKOverlayRenderer()
     }
+    
     
     
     
