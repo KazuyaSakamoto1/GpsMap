@@ -25,6 +25,58 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var destLocation: CLLocationCoordinate2D!
     @IBOutlet weak var switchLabel: UILabel!
     @IBOutlet weak var switchButton: UISwitch!
+    var camera: MKMapCamera = MKMapCamera()
+    // 位置情報の取得
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        locationManager = CLLocationManager() // 変数を初期化
+        camera = MKMapCamera()
+        // ユーザーのトラッキングと向きを出力
+        self.mapView.userTrackingMode = .followWithHeading
+        locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
+        locationManager.headingFilter = kCLHeadingFilterNone // 何度動いたら更新するか（デフォルトは1度）
+//        locationManager.headingOrientation = CLDeviceOrientation
+        serchBar.delegate = self
+        locationManager.startUpdatingLocation() // GPSの使用を開始する
+        locationManager.requestWhenInUseAuthorization()// 位置情報取得の許可を得る
+        mapView.showsUserLocation = true // ユーザーの位置を可視化
+        locationManager.startUpdatingHeading() // ヘディングイベントの開始
+        locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation // ナビゲーションアプリのための高い精度と追加のセンサーも使用する
+        mapView.delegate = self
+        // 画面の初期設定
+        self.initMap()
+        print("--------------------------------------")
+        print(self.mapView.isRotateEnabled)
+        // mapの見た目
+        // mapView.mapType = .standard
+        // mapView.mapType = .satellite  // 航空表示
+        // mapView.mapType = .hybrid // 航空表示に.standardのmapが表示
+        mapView.mapType = .hybridFlyover // 立体的な航空表示に.standardのmapが表示
+        // mapView.mapType = .satelliteFlyover // 立体的な航空表示
+    }
+    // アプリへの場所関連イベントの配信を開始および停止するために使用する
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let longitude = (locations.last?.coordinate.longitude.description)! // 経度
+        let latitude = (locations.last?.coordinate.latitude.description)!   // 緯度
+        print("[DBG]longitude : " + longitude)
+        print("[DBG]longitude : " + latitude)
+        // 方角の出力
+        // self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
+        print(self.mapView.isRotateEnabled)
+        camera = self.mapView.camera
+         // camera.heading = 30
+        print(locationManager.headingFilter)
+        self.mapView.setCamera(camera, animated: true)
+    }
+    // 磁気センサからユーザーの角度を取得
+//    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+//        var heading :CLLocationDirection
+//    }
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        var heading: CLLocationDirection
+        heading = newHeading.magneticHeading
+        print(heading)
+    }
     // 画面の回転の禁止をするか否かの設定（設定画面に移行予定）
     @IBAction func onOffSwitch(_ sender: UISwitch) {
         if sender.isOn {
@@ -45,41 +97,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         mapView.setRegion(region, animated: true)
         // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
         print("-----------------確認------------")
-        self.mapView.isRotateEnabled = false
-    }
-    // 位置情報の取得
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        locationManager = CLLocationManager(); // 変数を初期化
-        // ユーザーのトラッキングと向きを出力
-        self.mapView.userTrackingMode = .followWithHeading
-        self.mapView.isRotateEnabled = false  // 回らない
-        locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
-        serchBar.delegate = self
-        locationManager.startUpdatingLocation() // GPSの使用を開始する
-        locationManager.requestWhenInUseAuthorization()// 位置情報取得の許可を得る
-        mapView.showsUserLocation = true // ユーザーの位置を可視化
-        locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation // ナビゲーションアプリのための高い精度と追加のセンサーも使用する
-        mapView.delegate = self
-        // 画面の初期設定
-        self.initMap()
-        print("--------------------------------------")
-        print(self.mapView.isRotateEnabled)
-        // mapの見た目
-        // mapView.mapType = .standard
-        // mapView.mapType = .satellite  // 航空表示
-        // mapView.mapType = .hybrid // 航空表示に.standardのmapが表示
-        mapView.mapType = .hybridFlyover // 立体的な航空表示に.standardのmapが表示
-        // mapView.mapType = .satelliteFlyover // 立体的な航空表示
-    }
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let longitude = (locations.last?.coordinate.longitude.description)! // 経度
-        let latitude = (locations.last?.coordinate.latitude.description)!   // 緯度
-        print("[DBG]longitude : " + longitude)
-        print("[DBG]longitude : " + latitude)
-        // 方角の出力
-        // self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
-        print(self.mapView.isRotateEnabled)
+        // self.mapView.isRotateEnabled = false
     }
     // 検索ボタンがクリックされた際の処理内容
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
