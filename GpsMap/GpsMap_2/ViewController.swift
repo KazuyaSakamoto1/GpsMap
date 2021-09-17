@@ -69,8 +69,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         // mapView.mapType = .standard
         // mapView.mapType = .satellite  // 航空表示
         // mapView.mapType = .hybrid // 航空表示に.standardのmapが表示
-        // mapView.mapType = .hybridFlyover // 立体的な航空表示に.standardのmapが表示
-        mapView.mapType = .satelliteFlyover // 立体的な航空表示
+        mapView.mapType = .hybridFlyover // 立体的な航空表示に.standardのmapが表示
+        // mapView.mapType = .satelliteFlyover // 立体的な航空表示
     }
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let longitude = (locations.last?.coordinate.longitude.description)! // 経度
@@ -194,7 +194,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         request.requestsAlternateRoutes = false // 単独の経路を検索
         request.transportType = MKDirectionsTransportType.any
         let directions = MKDirections(request: request)
-        directions.calculate() { response, error in
+        directions.calculate { response, error in
             //   response?.routes.count
             if error != nil || response!.routes.isEmpty {
                 print(error!)
