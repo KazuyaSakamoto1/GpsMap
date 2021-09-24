@@ -27,9 +27,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     @IBOutlet weak var switchLabel: UILabel!
     @IBOutlet weak var switchButton: UISwitch!
     var camera: MKMapCamera = MKMapCamera()
+    // 現在地ボタン
+    @IBOutlet weak var currentLocation: UIImageView!
+    @IBAction func currentLocationButton(_ sender: Any) {
+        self.mapView.userTrackingMode = .followWithHeading
+    }
     // ---------------------マイクの処理（仮）------------------
-    @IBOutlet weak var microButton: UIButton! // マイクのボタン
-    @IBOutlet weak var microLabel: UILabel! // マイクのラベル
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
@@ -57,13 +60,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         // 画面の初期設定
         self.initMap()
         speechRecognizer.delegate = self // マイクのデリゲード
-        microButton.isEnabled = false // マイクボタンの状態
+        self.mapView.showsTraffic = true
         // mapの見た目
         // mapView.mapType = .standard
         // mapView.mapType = .satellite  // 航空表示
         // mapView.mapType = .hybrid // 航空表示に.standardのmapが表示
         // mapView.mapType = .hybridFlyover // 立体的な航空表示に.standardのmapが表示
         // mapView.mapType = .satelliteFlyover // 立体的な航空表示
+        // タップを定義
     }
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -88,18 +92,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 角度に関する関数
     func rotateManager(heading: CLLocationDirection) {
         self.mapView.camera.heading = heading
-    }
-    // 画面の回転の禁止をするか否かの設定（設定画面に移行予定）
-    @IBAction func onOffSwitch(_ sender: UISwitch) {
-        if sender.isOn {
-            self.switchLabel.text = "ON"
-//            var location: CLLocationManager = CLLocationManager()
-//            var heading :CLLocationDirection = location.heading?.magneticHeading
-//            self.rotateManager(heading: CLLocationDirection)
-            mapView.camera.heading = locationManager.heading!.magneticHeading
-        } else {
-            self.switchLabel.text = "OFF"
-        }
     }
     // 画面の初期位置の設定
     func initMap() {
@@ -212,9 +204,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print("-----------------------ピンを押しました。----------------------------------")
         // 現在地と目的地のMKPlacemarkを生成
         let fromPlacemark = MKPlacemark(coordinate: locationManager.location!.coordinate, addressDictionary: nil)
-        print(fromPlacemark)
         let toPlacemark   = MKPlacemark(coordinate: goalCoordinate, addressDictionary: nil)
-        print(toPlacemark)
         // MKPlacemark から MKMapItem を生成
         let fromItem = MKMapItem(placemark: fromPlacemark)
         let toItem   = MKMapItem(placemark: toPlacemark)
@@ -223,7 +213,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         request.source = fromItem
         request.destination = toItem
         request.requestsAlternateRoutes = false // 単独の経路を検索
-        request.transportType = MKDirectionsTransportType.any
+        request.transportType = MKDirectionsTransportType.walking
         let directions = MKDirections(request: request)
         directions.calculate { response, error in
             //   response?.routes.count
@@ -281,42 +271,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
 }
 // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
-    // 音声認識の可否が変更したときに呼ばれるdelegate
-    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
-        if available {
-            microButton.isEnabled = true
-            microButton.setTitle("音声認識スタート", for: [])
-        } else {
-            microButton.isEnabled = false
-            microButton.setTitle("音声認識ストップ", for: .disabled)
-        }
-    }
     // 認証の処理（ここで関数が呼び出されている）
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // requestRecognizerAuthorization()
-    }
-    // 認証の処理
-    private func requestRecognizerAuthorization() {
-        // 認証処理
-        SFSpeechRecognizer.requestAuthorization { authStatus in
-            // メインスレッドで処理したい内容のため、OperationQueue.main.addOperationを使う
-            OperationQueue.main.addOperation { [weak self] in
-                guard let `self` = self else { return }
-                switch authStatus {
-                case .authorized:
-                    self.microButton.isEnabled = true
-                case .denied:
-                    self.microButton.isEnabled = false
-                    self.microButton.setTitle("音声認識へのアクセスが拒否されています。", for: .disabled)
-                case .restricted:
-                    self.microButton.isEnabled = false
-                    self.microButton.setTitle("この端末で音声認識はできません。", for: .disabled)
-                case .notDetermined:
-                    self.microButton.isEnabled = false
-                    self.microButton.setTitle("音声認識はまだ許可されていません。", for: .disabled)
-                }
-            }
-        }
     }
 }
