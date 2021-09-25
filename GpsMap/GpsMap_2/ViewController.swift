@@ -24,9 +24,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var searchAnnotationLonArray = [String]()
     var userLocation: CLLocationCoordinate2D!
     var destLocation: CLLocationCoordinate2D!
-    @IBOutlet weak var switchLabel: UILabel!
-    @IBOutlet weak var switchButton: UISwitch!
     var camera: MKMapCamera = MKMapCamera()
+    var count = 0
+    @IBAction func mapChangeButton(_ sender: Any) {
+        count += 1
+        if count%5 == 0 {
+            self.mapView.mapType = .standard
+        }
+        if count%5 == 1 {
+            self.mapView.mapType = .hybrid
+        }
+        if count%5 == 2 {
+            self.mapView.mapType = .satellite
+        }
+        if count%5 == 3 {
+            self.mapView.mapType = .hybridFlyover
+        }
+        if count%5 == 4 {
+            self.mapView.mapType = .satelliteFlyover
+        }
+    }
     // 現在地ボタン
     @IBOutlet weak var currentLocation: UIImageView!
     @IBAction func currentLocationButton(_ sender: Any) {
@@ -61,14 +78,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.initMap()
         speechRecognizer.delegate = self // マイクのデリゲード
         self.mapView.showsTraffic = true
-        // mapの見た目
-        // mapView.mapType = .standard
-        // mapView.mapType = .satellite  // 航空表示
-        // mapView.mapType = .hybrid // 航空表示に.standardのmapが表示
-        // mapView.mapType = .hybridFlyover // 立体的な航空表示に.standardのmapが表示
-        // mapView.mapType = .satelliteFlyover // 立体的な航空表示
-        // タップを定義
+        //----------------------------------
+        
     }
+
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let longitude = (locations.last?.coordinate.longitude.description)! // 経度

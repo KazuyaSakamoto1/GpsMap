@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import MapKit
 
-class ViewController2: UIViewController, MKMapViewDelegate {
+class Setting: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var switchLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
