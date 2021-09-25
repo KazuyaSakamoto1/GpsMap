@@ -281,6 +281,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         return MKOverlayRenderer()
     }
+    // setting画面遷移のコード
+    @IBAction func nextSetting(_ sender: Any) {
+        let storyboard: UIStoryboard = self.storyboard!
+        // ②遷移先ViewControllerのインスタンス取得
+        let nextView = storyboard.instantiateViewController(withIdentifier: "settingID") as? Setting
+        // ③画面遷移
+        self.present(nextView!, animated: true, completion: nil)
+    }
 }
 // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {

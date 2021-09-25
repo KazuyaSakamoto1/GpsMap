@@ -33,6 +33,16 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <items>
                                     <navigationItem id="pb6-Bo-4r7">
+                                        <barButtonItem key="leftBarButtonItem" style="plain" id="sHt-XP-KPn">
+                                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" id="1Hf-AL-w6E">
+                                                <rect key="frame" x="20" y="7" width="48" height="30"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                <state key="normal" title="setting"/>
+                                                <connections>
+                                                    <action selector="nextSetting:" destination="BYZ-38-t0r" eventType="touchDown" id="XMJ-Vo-OSX"/>
+                                                </connections>
+                                            </button>
+                                        </barButtonItem>
                                         <barButtonItem key="rightBarButtonItem" title="設定" id="r8y-tV-IUD">
                                             <connections>
                                                 <segue destination="Iss-L8-XXQ" kind="presentation" id="tbU-tP-yUp"/>
@@ -80,10 +90,20 @@
         <!--Setting-->
         <scene sceneID="a4O-Aw-LBb">
             <objects>
-                <viewController storyboardIdentifier="setting" useStoryboardIdentifierAsRestorationIdentifier="YES" id="oak-8k-3CP" customClass="Setting" customModule="GpsMap_2" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="settingID" useStoryboardIdentifierAsRestorationIdentifier="YES" id="oak-8k-3CP" customClass="Setting" customModule="GpsMap_2" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8Nu-gx-DZE">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xIb-4f-jrY">
+                                <rect key="frame" x="173" y="470" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="(仮)"/>
+                                <connections>
+                                    <action selector="example:" destination="oak-8k-3CP" eventType="touchDown" id="C55-27-NhI"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="tPc-ma-ARt"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>

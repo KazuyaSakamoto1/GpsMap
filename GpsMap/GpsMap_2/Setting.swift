@@ -24,8 +24,12 @@ class Setting: UIViewController, MKMapViewDelegate {
             self.switchLabel.text = "OFF"
         }
     }
-    //地図の表示変更
+    // 地図の表示変更
     @IBAction func satelliteButton(_ sender: Any) {
-        ViewController().mapView.mapType = .satellite //mapViewでnilが見つかると言われる。
+        ViewController().mapView.mapType = .satellite // mapViewでnilが見つかると言われる。
+    }
+    // 仮のボタン
+    @IBAction func example(_ sender: Any) {
+        ViewController().mapView.mapType = .satellite // mapViewでnilが見つかると言われる。
     }
 }
