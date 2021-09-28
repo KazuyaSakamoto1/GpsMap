@@ -1,6 +1,7 @@
 included:
-  - Source
-  - Tests
+  - GpsMap_2
+  - GpsMap_2Tests
+  - GpsMap_2UITests
 excluded:
   - Tests/SwiftLintFrameworkTests/Resources
 opt_in_rules:
@@ -21,7 +22,9 @@ opt_in_rules:
   - number_separator
   - prohibited_super_call
   - fatal_error_message
-
+severity: warning
 line_length: 120
 number_separator:
   minimum_length: 5
+disabled_rules:
+  - force_cast

@@ -116,14 +116,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         mapView.setRegion(region, animated: true)
     }
     // setting画面遷移のコード
-    @IBAction func nextSetting(_ sender: Any) {
-        let storyboard: UIStoryboard = self.storyboard!
-        // ②遷移先ViewControllerのインスタンス取得
-        let nextView = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
-        // ③画面遷移
-        self.present(nextView!, animated: true, completion: nil)
-//        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "settingsViewController") as! SettingsViewController
+//    @IBAction func nextSetting(_ sender: Any) {
+//        let storyboard: UIStoryboard = self.storyboard!
+////        // ②遷移先ViewControllerのインスタンス取得
+////        let nextView = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
+////        // ③画面遷移
+////        self.present(nextView!, animated: true, completion: nil)
+//        let nextVC = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
+//        navigationController?.pushViewController(nextVC! as UIViewController, animated: true)
+//    }
+    @IBAction func settingsButtonAction(_ sender: Any) {
+//        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
+//        mapView.delegate = settingsViewController
 //        self.present(settingsViewController, animated: true, completion: nil)
+        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
+        self.present(settingsViewController, animated: true, completion: nil)
     }
 }
 // マイクに関する処理

@@ -40,7 +40,7 @@
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <state key="normal" title="設定"/>
                                                 <connections>
-                                                    <action selector="nextSetting:" destination="BYZ-38-t0r" eventType="touchDown" id="XMJ-Vo-OSX"/>
+                                                    <action selector="settingsButtonAction:" destination="BYZ-38-t0r" eventType="touchDown" id="0r1-Oh-3oj"/>
                                                 </connections>
                                             </button>
                                         </barButtonItem>
@@ -96,7 +96,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="(仮)"/>
                                 <connections>
-                                    <action selector="example:" destination="oak-8k-3CP" eventType="touchDown" id="I1C-PZ-Qp6"/>
+                                    <action selector="example:" destination="oak-8k-3CP" eventType="touchDown" id="rhU-9o-DPx"/>
                                 </connections>
                             </button>
                         </subviews>
