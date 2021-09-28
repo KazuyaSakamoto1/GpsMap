@@ -119,9 +119,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     @IBAction func nextSetting(_ sender: Any) {
         let storyboard: UIStoryboard = self.storyboard!
         // ②遷移先ViewControllerのインスタンス取得
-        let nextView = storyboard.instantiateViewController(withIdentifier: "settingID") as? Setting
+        let nextView = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
         // ③画面遷移
         self.present(nextView!, animated: true, completion: nil)
+//        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "settingsViewController") as! SettingsViewController
+//        self.present(settingsViewController, animated: true, completion: nil)
     }
 }
 // マイクに関する処理

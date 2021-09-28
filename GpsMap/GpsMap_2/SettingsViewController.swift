@@ -15,6 +15,19 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         // 新しく追加したい処理を書く
     }
+    @IBAction func rotateSwitch(_ sender: UISwitch) {
+        if sender.isOn {
+            self.switchLabel.text = "ON"
+            //https://developer.apple.com/documentation/mapkit/mkmapview/1452274-isrotateenabled
+            //            self.mapView.isRotateEnabled = true
+        } else {
+            self.switchLabel.text = "OFF"
+        }
+    }
+    // 地図の表示変更
+    @IBAction func satelliteButton(_ sender: Any) {
+        ViewController().mapView.mapType = .satellite // mapViewでnilが見つかると言われる。
+    }
     // 仮のボタン
     @IBAction func example(_ sender: Any) {
         ViewController().mapView.mapType = .satellite // mapViewでnilが見つかると言われる。
