@@ -6,12 +6,14 @@
 //
 
 import UIKit
-import CoreLocation //　位置情報を取得するためのフレームワーク
-import MapKit // 地図表示のプログラム
-import Speech //　音声用のフレームワーク
-
+//　位置情報を取得するためのフレームワーク
+import CoreLocation
+// 地図表示のプログラム
+import MapKit
+//　音声用のフレームワーク
+import Speech
+// class クラス名:スーパークラス名,プロトコル１,プロトコル
 class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, UISearchBarDelegate, MKMapViewDelegate {
-    // class クラス名:スーパークラス名,プロトコル１,プロトコル
     var myLock = NSLock()
     @IBOutlet var mapView: MKMapView!
     @IBOutlet weak var serchBar: UISearchBar!
@@ -28,20 +30,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var count = 0
     @IBAction func mapChangeButton(_ sender: Any) {
         count += 1
-        if count%5 == 0 {
+        switch count%5 {
+        case 0:
             self.mapView.mapType = .standard
-        }
-        if count%5 == 1 {
+        case 1:
             self.mapView.mapType = .hybrid
-        }
-        if count%5 == 2 {
+        case 2:
             self.mapView.mapType = .satellite
-        }
-        if count%5 == 3 {
+        case 3:
             self.mapView.mapType = .hybridFlyover
-        }
-        if count%5 == 4 {
+        case 4:
             self.mapView.mapType = .satelliteFlyover
+        default:
+            print("ERROR")
         }
     }
     // 現在地ボタン
@@ -49,37 +50,41 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     @IBAction func currentLocationButton(_ sender: Any) {
         self.mapView.userTrackingMode = .followWithHeading
     }
-    // ---------------------マイクの処理（仮）------------------
+    // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
-    // -----------------------------------------------------
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
-        locationManager = CLLocationManager() // 変数を初期化
+        // 変数を初期化
+        locationManager = CLLocationManager()
         camera = MKMapCamera()
         // ユーザーのトラッキングと向きを出力
         self.mapView.userTrackingMode = .followWithHeading
-        print("-------------------------------------")
         print(self.mapView.userTrackingMode)
-        locationManager.delegate = self // delegateとしてself(自インスタンス)を設定
-        locationManager.headingFilter = kCLHeadingFilterNone // 何度動いたら更新するか（デフォルトは1度）
+        // delegateとしてself(自インスタンス)を設定
+        locationManager.delegate = self
+        // 何度動いたら更新するか（デフォルトは1度）
+        locationManager.headingFilter = kCLHeadingFilterNone
 //        locationManager.headingOrientation = CLDeviceOrientation
         serchBar.delegate = self
-        locationManager.startUpdatingLocation() // GPSの使用を開始する
-        locationManager.requestWhenInUseAuthorization()// 位置情報取得の許可を得る
-        mapView.showsUserLocation = true // ユーザーの位置を可視化
-        locationManager.startUpdatingHeading() // ヘディングイベントの開始
-        locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation // ナビゲーションアプリのための高い精度と追加のセンサーも使用する
+        // GPSの使用を開始する
+        locationManager.startUpdatingLocation()
+        // 位置情報取得の許可を得る
+        locationManager.requestWhenInUseAuthorization()
+        // ユーザーの位置を可視化
+        mapView.showsUserLocation = true
+        // ヘディングイベントの開始
+        locationManager.startUpdatingHeading()
+        // ナビゲーションアプリのための高い精度と追加のセンサーも使用する
+        locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         mapView.delegate = self
         // 画面の初期設定
         self.initMap()
         speechRecognizer.delegate = self // マイクのデリゲード
         self.mapView.showsTraffic = true
-        //----------------------------------
-        
     }
 
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
@@ -88,9 +93,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let latitude = (locations.last?.coordinate.latitude.description)!   // 緯度
         print("[DBG]longitude : " + longitude)
         print("[DBG]longitude : " + latitude)
-        // 方角の出力
-//        self.mapView.userTrackingMode = .followWithHeading //これを入れると画面がユーザーしか表示しなくなる、逆に入れないと検索後、方角マーカーを表示しない
-        print(locationManager.headingFilter)
     }
 //    // 磁気センサからユーザーの角度を取得
 //    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -113,15 +115,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         region.span.latitudeDelta = 0.005
         region.span.longitudeDelta = 0.005
         mapView.setRegion(region, animated: true)
-        // 現在位置設定（デバイスの動きとしてこの時の一回だけ中心位置が現在位置で更新される）
-        print("-----------------確認------------")
-        // self.mapView.isRotateEnabled = false
     }
     // 検索ボタンがクリックされた際の処理内容
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // トラッキングモードを無効化
         self.mapView.userTrackingMode = .none
-        self.mapView.removeOverlays(self.mapView.overlays) // 現在表示されているルートを削除
+        // 現在表示されているルートを削除
+        self.mapView.removeOverlays(self.mapView.overlays)
         // キーボードを閉じる。
         serchBar.resignFirstResponder()
         // 検索条件を作成する。
@@ -137,27 +137,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func localSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
         // 検索バーに何も入力されない時の処理
         if response == nil {
-            print("-----------------------検索バーに入力なし-------------------")
             serchBar.resignFirstResponder()
             return
         }
-        mapView.removeAnnotations(searchAnnotationArray) // 現在刺されているピンの削除
-        self.mapView.removeOverlays(self.mapView.overlays) // 現在表示されているルートを削除
+        // 現在刺されているピンの削除
+        mapView.removeAnnotations(searchAnnotationArray)
+        // 現在表示されているルートを削除
+        self.mapView.removeOverlays(self.mapView.overlays)
         // 緯度と軽度の情報を格納する配列
         var longitude: [Double] = []
         var latitude: [Double] = []
         // 検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
-            print("-----------------------ピンを表示。----------------------------------")
             if error == nil {
                 let searchAnnotation = MKPointAnnotation() // ピンの生成
                 // ピンの座標
-                let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude) // 座標インスタンスの生成
+                // 座標インスタンスの生成
+                let center = CLLocationCoordinate2DMake(searchLocation.placemark.coordinate.latitude, searchLocation.placemark.coordinate.longitude)
                 let lat = searchLocation.placemark.coordinate.latitude
                 let long = searchLocation.placemark.coordinate.longitude
                 // 表示範囲の設定
-                print("------------------------search-----------------------")
-
                 searchAnnotation.coordinate = center // ピンに座標を代入
                 //  タイトルに場所の名前を表示
                 searchAnnotation.title = searchLocation.placemark.name
@@ -177,13 +176,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 print("error")
             }
         }
-        print("----------------searchEND-----------------")
         var minLat: Double = 9999.0
         var maxLat: Double = -9999.0
         var minLong: Double = 9999.0
         var maxLong: Double = -9999.0
-        print(longitude.count)
-        print(latitude.count)
         for long in longitude {
             // 経度の最大最小を求める
             if minLong > long {
@@ -202,10 +198,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 maxLat = lat
             }
         }
-        print(minLat)
-        print(maxLat)
-        print(minLong)
-        print(maxLong)
         let point: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat)/2, longitude: (maxLong + minLong)/2)
         let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((maxLat-minLat)), longitudinalMeters: fabs((maxLong-minLong))*100000)
         // 横・縦
@@ -214,7 +206,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 目的地までのルートを取得
     func getRoute(goalCoordinate: CLLocationCoordinate2D!) {
         self.mapView.removeOverlays(self.mapView.overlays)
-        print("-----------------------ピンを押しました。----------------------------------")
         // 現在地と目的地のMKPlacemarkを生成
         let fromPlacemark = MKPlacemark(coordinate: locationManager.location!.coordinate, addressDictionary: nil)
         let toPlacemark   = MKPlacemark(coordinate: goalCoordinate, addressDictionary: nil)
@@ -236,15 +227,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
             print("-------------------------succeed--------------------")
             let route: MKRoute = response!.routes[0] as MKRoute
-            print("------------------------------")
-            print(response!.routes)
             // 経路を描画
-            print(route)
             self.mapView.addOverlay(route.polyline)
-            print("------------------")
-            print(route.polyline)
             // 現在地と目的地を含む表示範囲を設定する
-            print("-------------------------------呼び出し中")
             self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
         }
     }
@@ -267,7 +252,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // ピンがタップされた際の処理
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         getRoute(goalCoordinate: view.annotation!.coordinate)
-        print("-----------------表示範囲を変更--------------------")
         displaySearch(goalLatitude: view.annotation!.coordinate.latitude, goalLongitude: view.annotation!.coordinate.longitude, parm: 500)
         self.mapView.userTrackingMode = .followWithHeading
     }
