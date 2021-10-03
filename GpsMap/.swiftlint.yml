@@ -23,7 +23,7 @@ opt_in_rules:
   - prohibited_super_call
   - fatal_error_message
 severity: warning
-line_length: 120
+line_length: 250
 number_separator:
   minimum_length: 5
 disabled_rules:

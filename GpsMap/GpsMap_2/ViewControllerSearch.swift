@@ -92,8 +92,8 @@ extension ViewController: UISearchBarDelegate {
                 maxLat = lat
             }
         }
-        let point: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat)/2, longitude: (maxLong + minLong)/2)
-        let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((maxLat-minLat)), longitudinalMeters: fabs((maxLong-minLong))*100000)
+        let point: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLong + minLong) / 2)
+        let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((maxLat - minLat)), longitudinalMeters: fabs((maxLong - minLong)) * 100000)
         // 横・縦
         mapView.setRegion(mapView.regionThatFits(region), animated: true)
     }
@@ -139,8 +139,8 @@ extension ViewController: UISearchBarDelegate {
     func displaySearch2(goalLatitude: Double, goalLongitude: Double, parm: Double) {
         let userLatitude: Double = locationManager.location!.coordinate.latitude
         let userLongitude: Double = locationManager.location!.coordinate.longitude
-        let point: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (userLatitude + goalLatitude)/2, longitude: (userLongitude + goalLongitude)/2)
-        let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((userLatitude-goalLatitude)*parm), longitudinalMeters: fabs((userLongitude-goalLongitude)*parm))
+        let point: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (userLatitude + goalLatitude) / 2, longitude: (userLongitude + goalLongitude) / 2)
+        let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((userLatitude - goalLatitude) * parm), longitudinalMeters: fabs((userLongitude-goalLongitude)*parm))
             mapView.setRegion(mapView.regionThatFits(region), animated: true)
     }
     // ピンがタップされた際の処理

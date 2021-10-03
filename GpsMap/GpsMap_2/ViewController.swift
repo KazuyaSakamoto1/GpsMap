@@ -29,7 +29,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var count = 0
     @IBAction func mapChangeButton(_ sender: Any) {
         count += 1
-        switch count%5 {
+        switch count % 5 {
         case 0:
             self.mapView.mapType = .standard
         case 1:
@@ -118,10 +118,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // setting画面遷移のコード
 //    @IBAction func nextSetting(_ sender: Any) {
 //        let storyboard: UIStoryboard = self.storyboard!
-////        // ②遷移先ViewControllerのインスタンス取得
-////        let nextView = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
-////        // ③画面遷移
-////        self.present(nextView!, animated: true, completion: nil)
+//         // ②遷移先ViewControllerのインスタンス取得
+//        let nextView = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
+//        // ③画面遷移
+//       self.present(nextView!, animated: true, completion: nil)
 //        let nextVC = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
 //        navigationController?.pushViewController(nextVC! as UIViewController, animated: true)
 //    }
