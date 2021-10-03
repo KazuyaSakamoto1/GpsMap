@@ -93,16 +93,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print("[DBG]longitude : " + longitude)
         print("[DBG]longitude : " + latitude)
     }
-//    // 磁気センサからユーザーの角度を取得
-//    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-//        let camera: MKMapCamera = self.mapView.camera
+    // 磁気センサからユーザーの角度を取得
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        let camera: MKMapCamera = self.mapView.camera
 //        camera.heading = newHeading.magneticHeading
-//        print("カメラ角度")
-//        print(mapView.camera.heading)
-//        print("-------------------------------------")
-//        print(self.mapView.userTrackingMode)
+        print("カメラ角度")
+        print(mapView.camera.heading)
+        print("-------------------------------------")
+        print(self.mapView.userTrackingMode)
 //        self.mapView.setCamera(camera, animated: true)
-//    }
+    }
     // 角度に関する関数
     func rotateManager(heading: CLLocationDirection) {
         self.mapView.camera.heading = heading
