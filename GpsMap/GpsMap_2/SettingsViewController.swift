@@ -7,8 +7,9 @@
 
 import Foundation
 import UIKit
+import MapKit
 
-class ViewController2: UIViewController {
+class SettingsViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var switchLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,5 +23,13 @@ class ViewController2: UIViewController {
         } else {
             self.switchLabel.text = "OFF"
         }
+    }
+    // 地図の表示変更
+    @IBAction func satelliteButton(_ sender: Any) {
+        ViewController().mapView.mapType = .satellite // mapViewでnilが見つかると言われる。
+    }
+    // 仮のボタン
+    @IBAction func example(_ sender: Any) {
+        ViewController().mapView.mapType = .satellite // mapViewでnilが見つかると言われる。
     }
 }

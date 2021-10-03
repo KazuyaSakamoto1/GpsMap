@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		68841AA526F3DD9000BBFAB9 /* ViewController2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68841AA426F3DD9000BBFAB9 /* ViewController2.swift */; };
+		68841AA526F3DD9000BBFAB9 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68841AA426F3DD9000BBFAB9 /* Setting.swift */; };
 		C5691A3526C5050500609600 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3426C5050500609600 /* AppDelegate.swift */; };
 		C5691A3726C5050500609600 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3626C5050500609600 /* SceneDelegate.swift */; };
 		C5691A3926C5050500609600 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3826C5050500609600 /* ViewController.swift */; };
@@ -18,6 +18,7 @@
 		C5691A4F26C5050600609600 /* GpsMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A4E26C5050600609600 /* GpsMapTests.swift */; };
 		C5691A5A26C5050600609600 /* GpsMapUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A5926C5050600609600 /* GpsMapUITests.swift */; };
 		C5691A6926C50EFE00609600 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5691A6826C50EFE00609600 /* MapKit.framework */; };
+		C582D5E82702CE6400497AA1 /* ViewControllerSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,7 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		68841AA426F3DD9000BBFAB9 /* ViewController2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController2.swift; sourceTree = "<group>"; };
+		68841AA426F3DD9000BBFAB9 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
 		C5691A3126C5050500609600 /* GpsMap_2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GpsMap_2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5691A3426C5050500609600 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5691A3626C5050500609600 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -55,6 +56,7 @@
 		C5691A5926C5050600609600 /* GpsMapUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GpsMapUITests.swift; sourceTree = "<group>"; };
 		C5691A5B26C5050600609600 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5691A6826C50EFE00609600 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerSearch.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,9 +113,10 @@
 				C5691A3626C5050500609600 /* SceneDelegate.swift */,
 				C5691A3826C5050500609600 /* ViewController.swift */,
 				C5691A3A26C5050500609600 /* Main.storyboard */,
+				C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */,
 				C5691A4026C5050600609600 /* Assets.xcassets */,
 				C5691A4226C5050600609600 /* LaunchScreen.storyboard */,
-				68841AA426F3DD9000BBFAB9 /* ViewController2.swift */,
+				68841AA426F3DD9000BBFAB9 /* Setting.swift */,
 				C5691A4526C5050600609600 /* Info.plist */,
 				C5691A3D26C5050500609600 /* GpsMap_2.xcdatamodeld */,
 			);
@@ -297,10 +300,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68841AA526F3DD9000BBFAB9 /* ViewController2.swift in Sources */,
+				68841AA526F3DD9000BBFAB9 /* Setting.swift in Sources */,
 				C5691A3926C5050500609600 /* ViewController.swift in Sources */,
 				C5691A3526C5050500609600 /* AppDelegate.swift in Sources */,
 				C5691A3F26C5050500609600 /* GpsMap_2.xcdatamodeld in Sources */,
+				C582D5E82702CE6400497AA1 /* ViewControllerSearch.swift in Sources */,
 				C5691A3726C5050500609600 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
