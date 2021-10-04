@@ -27,6 +27,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var destLocation: CLLocationCoordinate2D!
     var camera: MKMapCamera = MKMapCamera()
     var count = 0
+    var timer = Timer()
+    var step: MKRoute!
+    var userCurrentLocation: [CLLocation]!
+    // mapの見た目を変更するボタン
     @IBAction func mapChangeButton(_ sender: Any) {
         count += 1
         switch count % 5 {
@@ -90,8 +94,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let longitude = (locations.last?.coordinate.longitude.description)! // 経度
         let latitude = (locations.last?.coordinate.latitude.description)!   // 緯度
+        self.userCurrentLocation = locations
         print("[DBG]longitude : " + longitude)
-        print("[DBG]longitude : " + latitude)
+        print("[DBG]latitude : " + latitude)
     }
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -132,12 +137,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
     }
+    // 緯度経度から目的地までの距離を出す
+    func distanceCalculation() {
+        
+    }
 }
-// マイクに関する処理
+    // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
     // 認証の処理（ここで関数が呼び出されている）
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // requestRecognizerAuthorization()
     }
+    // 音声ガイドに関する処理
 }

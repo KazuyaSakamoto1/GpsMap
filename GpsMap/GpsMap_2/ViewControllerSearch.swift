@@ -121,10 +121,19 @@ extension ViewController: UISearchBarDelegate {
             }
             print("-------------------------succeed--------------------")
             let route: MKRoute = response!.routes[0] as MKRoute
+            self.step = route
             // 経路を描画
             self.mapView.addOverlay(route.polyline)
             // 現在地と目的地を含む表示範囲を設定する
             self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
+            print("------------------------------------")
+//            print(self.step.steps.pat)
+            for i in 0..<self.step.steps.count {
+                let step = route.steps[i]
+                print(step.instructions)
+                print(step.distance)
+//                print(step.path) //エラー　Value of type 'MKRoute.Step' has no member 'path'
+            }
         }
     }
     // 検索後の表示範囲を出す関数(ユーザー中心)
@@ -148,6 +157,7 @@ extension ViewController: UISearchBarDelegate {
         getRoute(goalCoordinate: view.annotation!.coordinate)
         displaySearch(goalLatitude: view.annotation!.coordinate.latitude, goalLongitude: view.annotation!.coordinate.longitude, parm: 500)
         self.mapView.userTrackingMode = .followWithHeading
+        print("----------------確認")
     }
     // 経路を描画するときの色や線の太さを指定
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
