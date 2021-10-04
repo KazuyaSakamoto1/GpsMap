@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import MapKit
+import AVFoundation
 //　検索に関する処理
 extension ViewController: UISearchBarDelegate {
     // 検索ボタンがクリックされた際の処理内容
@@ -103,6 +104,14 @@ extension ViewController: UISearchBarDelegate {
         // 現在地と目的地のMKPlacemarkを生成
         let fromPlacemark = MKPlacemark(coordinate: locationManager.location!.coordinate, addressDictionary: nil)
         let toPlacemark   = MKPlacemark(coordinate: goalCoordinate, addressDictionary: nil)
+        // --------------試作
+        let sourcePlacemark = MKPlacemark(coordinate: currentCoordinate)
+        let sourceMapItem = MKMapItem(placemark: sourcePlacemark)
+        
+        let directionsRequest = MKDirections.Request()
+        directionsRequest.source = sourceMapItem
+        
+        // --------------------
         // MKPlacemark から MKMapItem を生成
         let fromItem = MKMapItem(placemark: fromPlacemark)
         let toItem   = MKMapItem(placemark: toPlacemark)
@@ -126,14 +135,24 @@ extension ViewController: UISearchBarDelegate {
             self.mapView.addOverlay(route.polyline)
             // 現在地と目的地を含む表示範囲を設定する
             self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
-            print("------------------------------------")
-//            print(self.step.steps.pat)
+        
             for i in 0..<self.step.steps.count {
                 let step = route.steps[i]
                 print(step.instructions)
                 print(step.distance)
-//                print(step.path) //エラー　Value of type 'MKRoute.Step' has no member 'path'
+                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 20, identifier: "\(i)")
+                self.locationManager.startMonitoring(for: region)
+                let circle = MKCircle(center: region.center, radius: region.radius)
+                self.mapView.addOverlay(circle)
             }
+            
+//            let initialMessage = "\(self.step.steps[0].distance) メートル , \(self.step.steps[0].instructions) まで \(self.step.steps[1].distance)　メートル, \(self.step.steps[1].instructions)."
+            
+            let initialMessage = "\(self.step.steps[1].distance)　メートル, \(self.step.steps[1].instructions)."
+            let speechUtterance = AVSpeechUtterance(string: initialMessage)
+            self.speech.speak(speechUtterance)
+            self.stepCount += 1
+            
         }
     }
     // 検索後の表示範囲を出す関数(ユーザー中心)
@@ -165,6 +184,14 @@ extension ViewController: UISearchBarDelegate {
             let polylineRenderer = MKPolylineRenderer(polyline: polyline)
             polylineRenderer.strokeColor = .blue
             polylineRenderer.lineWidth = 4.0
+            return polylineRenderer
+        }
+        
+        if let polyline = overlay as? MKCircle {
+            let polylineRenderer = MKCircleRenderer(overlay: polyline)
+            polylineRenderer.strokeColor = .red
+            polylineRenderer.fillColor = .red
+            polylineRenderer.alpha = 0.5
             return polylineRenderer
         }
         return MKOverlayRenderer()

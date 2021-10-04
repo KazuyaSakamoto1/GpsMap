@@ -29,3 +29,4 @@ number_separator:
 disabled_rules:
   - force_cast
   - identifier_name
+  - trailing_whitespace

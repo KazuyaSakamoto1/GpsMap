@@ -12,6 +12,8 @@ import CoreLocation
 import MapKit
 //　音声用のフレームワーク
 import Speech
+import AVFoundation
+
 class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate {
     var myLock = NSLock()
     @IBOutlet var mapView: MKMapView!
@@ -30,6 +32,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var timer = Timer()
     var step: MKRoute!
     var userCurrentLocation: [CLLocation]!
+    var currentCoordinate: CLLocationCoordinate2D!
+    let speech = AVSpeechSynthesizer()
+    var stepCount = 0
     // mapの見た目を変更するボタン
     @IBAction func mapChangeButton(_ sender: Any) {
         count += 1
@@ -95,6 +100,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let longitude = (locations.last?.coordinate.longitude.description)! // 経度
         let latitude = (locations.last?.coordinate.latitude.description)!   // 緯度
         self.userCurrentLocation = locations
+        // ユーザの位置をメンバ変数に格納
+        guard let currentLocation = locations.first else { return }
+        currentCoordinate = currentLocation.coordinate
         print("[DBG]longitude : " + longitude)
         print("[DBG]latitude : " + latitude)
     }
@@ -120,6 +128,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         region.span.longitudeDelta = 0.005
         mapView.setRegion(region, animated: true)
     }
+    
     // setting画面遷移のコード
 //    @IBAction func nextSetting(_ sender: Any) {
 //        let storyboard: UIStoryboard = self.storyboard!
@@ -137,9 +146,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
     }
-    // 緯度経度から目的地までの距離を出す
-    func distanceCalculation() {
-        
+   
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        print("succeed")
+        self.stepCount += 1
+        if self.stepCount < self.step.steps.count {
+            let currnetStep = self.step.steps[stepCount]
+            let message = "\(currnetStep.distance) メートル, \(currnetStep.instructions)"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+        } else {
+            let message = "到着しました。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            
+            stepCount = 0
+            
+            locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
+        }
     }
 }
     // マイクに関する処理
