@@ -66,6 +66,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // 変数を初期化
         locationManager = CLLocationManager()
         camera = MKMapCamera()
@@ -93,8 +94,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.initMap()
         speechRecognizer.delegate = self // マイクのデリゲード
         self.mapView.showsTraffic = true
+        
+        
     }
-
+    
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         let longitude = (locations.last?.coordinate.longitude.description)! // 経度
@@ -146,13 +149,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
     }
-   
+
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        print("succeed")
+        print("-------------Exit-------------")
         self.stepCount += 1
-        if self.stepCount < self.step.steps.count {
-            let currnetStep = self.step.steps[stepCount]
-            let message = "\(currnetStep.distance) メートル, \(currnetStep.instructions)"
+        if self.stepCount < self.step.steps.count { // self.stepのstepでエラー　Thread 1: Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value
+            let currentStep = self.step.steps[stepCount]
+            let message = "\(currentStep.distance) メートル先, \(currentStep.instructions)　です。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
         } else {

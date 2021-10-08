@@ -104,14 +104,14 @@ extension ViewController: UISearchBarDelegate {
         // 現在地と目的地のMKPlacemarkを生成
         let fromPlacemark = MKPlacemark(coordinate: locationManager.location!.coordinate, addressDictionary: nil)
         let toPlacemark   = MKPlacemark(coordinate: goalCoordinate, addressDictionary: nil)
-        // --------------試作
-        let sourcePlacemark = MKPlacemark(coordinate: currentCoordinate)
-        let sourceMapItem = MKMapItem(placemark: sourcePlacemark)
-        
-        let directionsRequest = MKDirections.Request()
-        directionsRequest.source = sourceMapItem
-        
-        // --------------------
+//        // --------------試作
+//        let sourcePlacemark = MKPlacemark(coordinate: currentCoordinate)
+//        let sourceMapItem = MKMapItem(placemark: sourcePlacemark)
+//
+//        let directionsRequest = MKDirections.Request()
+//        directionsRequest.source = sourceMapItem
+//
+//        // --------------------
         // MKPlacemark から MKMapItem を生成
         let fromItem = MKMapItem(placemark: fromPlacemark)
         let toItem   = MKMapItem(placemark: toPlacemark)
@@ -135,24 +135,23 @@ extension ViewController: UISearchBarDelegate {
             self.mapView.addOverlay(route.polyline)
             // 現在地と目的地を含む表示範囲を設定する
             self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
-        
+            
+            // この部分の処理がうまくできていない？
             for i in 0..<self.step.steps.count {
                 let step = route.steps[i]
                 print(step.instructions)
                 print(step.distance)
-                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 20, identifier: "\(i)")
-                self.locationManager.startMonitoring(for: region)
+                print(step.notice  as Any)
+                print(step.polyline.coordinate)
+                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 5, identifier: "\(i)")
+                self.locationManager.startMonitoring(for: region) // 引数で受け取った範囲を監視する
                 let circle = MKCircle(center: region.center, radius: region.radius)
                 self.mapView.addOverlay(circle)
             }
-            
-//            let initialMessage = "\(self.step.steps[0].distance) メートル , \(self.step.steps[0].instructions) まで \(self.step.steps[1].distance)　メートル, \(self.step.steps[1].instructions)."
-            
-            let initialMessage = "\(self.step.steps[1].distance)　メートル, \(self.step.steps[1].instructions)."
+            let initialMessage = "\(self.step.steps[1].distance)　メートル先, \(self.step.steps[1].instructions)　です."
             let speechUtterance = AVSpeechUtterance(string: initialMessage)
             self.speech.speak(speechUtterance)
             self.stepCount += 1
-            
         }
     }
     // 検索後の表示範囲を出す関数(ユーザー中心)
