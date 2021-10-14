@@ -40,6 +40,8 @@
 
 /* Begin PBXFileReference section */
 		68841AA426F3DD9000BBFAB9 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
+		C566F3962716F284003C9B52 /* Miyadai2MaxValue.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Miyadai2MaxValue.gpx; sourceTree = "<group>"; };
+		C566F3972716FCFA003C9B52 /* miyadai.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = miyadai.gpx; sourceTree = "<group>"; };
 		C5691A3126C5050500609600 /* GpsMap_2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GpsMap_2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5691A3426C5050500609600 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5691A3626C5050500609600 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -88,6 +90,8 @@
 		C5691A2826C5050500609600 = {
 			isa = PBXGroup;
 			children = (
+				C566F3972716FCFA003C9B52 /* miyadai.gpx */,
+				C566F3962716F284003C9B52 /* Miyadai2MaxValue.gpx */,
 				C5691A3326C5050500609600 /* GpsMap_2 */,
 				C5691A4D26C5050600609600 /* GpsMap_2Tests */,
 				C5691A5826C5050600609600 /* GpsMap_2UITests */,
@@ -488,7 +492,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-2";
+				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -507,7 +511,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-2";
+				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
