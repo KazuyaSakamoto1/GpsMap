@@ -178,9 +178,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
 //        navigationController?.pushViewController(nextVC! as UIViewController, animated: true)
 //    }
     @IBAction func settingsButtonAction(_ sender: Any) {
-//        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
-//        mapView.delegate = settingsViewController
-//        self.present(settingsViewController, animated: true, completion: nil)
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
     }
