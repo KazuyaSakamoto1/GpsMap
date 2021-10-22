@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<gpx version="1.1" creator="Xcode">
+    
+    <!--
+    Provide one or more waypoints containing a latitude/longitude pair. If you provide one
+    waypoint, Xcode will simulate that specific location. If you provide multiple waypoints,
+    Xcode will simulate a route visiting each waypoint.
+    -->
+    
+    <wpt lat="31.82956732033399" lon="131.41312966415938">
+        <time>1970-01-01T00:00:00Z</time>
+    </wpt>
+    
+    <wpt lat="31.8298590139673" lon="131.41311893532333">
+        <time>1970-01-01T00:00:06Z</time>
+    </wpt>
+    
+    <wpt lat="31.83027832195023" lon="131.41299018929058">
+        <time>1970-01-01T00:00:12Z</time>
+    </wpt>
+    
+    <wpt lat="31.830497090576433" lon="131.41212115356976">
+        <time>1970-01-01T00:00:18Z</time>
+    </wpt>
+    
+    <wpt lat="31.83074320466113" lon="131.41132721970132">
+        <time>1970-01-01T00:00:24Z</time>
+    </wpt>
+    
+    <wpt lat="31.831171623909697" lon="131.4112950331931">
+        <time>1970-01-01T00:00:30Z</time>
+    </wpt>
+    
+    <wpt lat="31.831609156408923" lon="131.41132721970132">
+        <time>1970-01-01T00:00:36Z</time>
+    </wpt>
+    
+    <wpt lat="31.831618271647248" lon="131.41222844193035">
+        <time>1970-01-01T00:00:42Z</time>
+    </wpt>
+    
+    <wpt lat="31.831600041169654" lon="131.41437420914232">
+        <time>1970-01-01T00:00:48Z</time>
+    </wpt>
+    
+    <wpt lat="31.831618271647248" lon="131.41471753189626">
+        <time>1970-01-01T00:00:54Z</time>
+    </wpt>
+    
+    <wpt lat="31.831782345783495" lon="131.41473898956835">
+        <time>1970-01-01T00:00:60Z</time>
+    </wpt>
+   
+   <wpt lat="31.831964650037246" lon="131.41481409142077">
+       <time>1970-01-01T00:00:27Z</time>
+   </wpt>
+   
+   <wpt lat="31.831718539209618" lon="131.41604790756764">
+       <time>1970-01-01T00:00:27Z</time>
+   </wpt>
+   
+   <wpt lat="31.83134481410531" lon="131.4184726245172">
+       <time>1970-01-01T00:00:27Z</time>
+   </wpt>
+   
+   <wpt lat="31.83140862093758" lon="131.42002830574586">
+       <time>1970-01-01T00:00:27Z</time>
+   </wpt>
+   
+   <wpt lat="31.830706743356643" lon="131.42002830574586">
+       <time>1970-01-01T00:00:27Z</time>
+   </wpt>
+  
+</gpx>

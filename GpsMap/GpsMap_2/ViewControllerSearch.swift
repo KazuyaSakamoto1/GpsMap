@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 import MapKit
+import AVFoundation
+
 //　検索に関する処理
 extension ViewController: UISearchBarDelegate {
     // 検索ボタンがクリックされた際の処理内容
@@ -121,12 +123,31 @@ extension ViewController: UISearchBarDelegate {
             }
             print("-------------------------succeed--------------------")
             let route: MKRoute = response!.routes[0] as MKRoute
+            self.step = route
             // 経路を描画
             self.mapView.addOverlay(route.polyline)
+            print(route.polyline.coordinate)
             // 現在地と目的地を含む表示範囲を設定する
             self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
+            // この部分の処理がうまくできていない？
+            for i in 0..<self.step.steps.count {
+                let step = route.steps[i]
+                print(step.instructions)
+                print(step.distance)
+                print(step.notice  as Any)
+                print(step.polyline.coordinate)
+                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 10, identifier: "\(i)")
+                self.locationManager.startMonitoring(for: region) // 引数で受け取った範囲を監視する
+                let circle = MKCircle(center: region.center, radius: region.radius)
+                self.mapView.addOverlay(circle)
+            }
+            let initialMessage = "\(round(self.step.steps[1].distance))　メートル先, \(self.step.steps[1].instructions)です。"
+            let speechUtterance = AVSpeechUtterance(string: initialMessage)
+            self.speech.speak(speechUtterance)
+            self.stepCount += 1
         }
     }
+    
     // 検索後の表示範囲を出す関数(ユーザー中心)
     func displaySearch(goalLatitude: Double, goalLongitude: Double, parm: Double) {
         let userLatitude: Double = locationManager.location!.coordinate.latitude
@@ -135,6 +156,7 @@ extension ViewController: UISearchBarDelegate {
         let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((userLatitude-goalLatitude)*parm), longitudinalMeters: fabs((userLongitude-goalLongitude)*parm))
         mapView.setRegion(mapView.regionThatFits(region), animated: true)
     }
+    
     // 目的地をタップ後の表示範囲を出す関数(ユーザーと目的地の中央)
     func displaySearch2(goalLatitude: Double, goalLongitude: Double, parm: Double) {
         let userLatitude: Double = locationManager.location!.coordinate.latitude
@@ -143,18 +165,28 @@ extension ViewController: UISearchBarDelegate {
         let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((userLatitude - goalLatitude) * parm), longitudinalMeters: fabs((userLongitude-goalLongitude)*parm))
             mapView.setRegion(mapView.regionThatFits(region), animated: true)
     }
+    
     // ピンがタップされた際の処理
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         getRoute(goalCoordinate: view.annotation!.coordinate)
         displaySearch(goalLatitude: view.annotation!.coordinate.latitude, goalLongitude: view.annotation!.coordinate.longitude, parm: 500)
-        self.mapView.userTrackingMode = .followWithHeading
+        print("----------------確認")
     }
+    
     // 経路を描画するときの色や線の太さを指定
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         if let polyline = overlay as? MKPolyline {
             let polylineRenderer = MKPolylineRenderer(polyline: polyline)
             polylineRenderer.strokeColor = .blue
             polylineRenderer.lineWidth = 4.0
+            return polylineRenderer
+        }
+        
+        if let polyline = overlay as? MKCircle {
+            let polylineRenderer = MKCircleRenderer(overlay: polyline)
+            polylineRenderer.strokeColor = .red
+            polylineRenderer.fillColor = .red
+            polylineRenderer.alpha = 0.5
             return polylineRenderer
         }
         return MKOverlayRenderer()

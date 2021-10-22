@@ -12,6 +12,9 @@ import CoreLocation
 import MapKit
 //　音声用のフレームワーク
 import Speech
+import AVFoundation
+import AudioToolbox
+
 class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate {
     var myLock = NSLock()
     @IBOutlet var mapView: MKMapView!
@@ -27,6 +30,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var destLocation: CLLocationCoordinate2D!
     var camera: MKMapCamera = MKMapCamera()
     var count = 0
+    var timer = Timer()
+    var step: MKRoute!
+    var userCurrentLocation: [CLLocation]!
+    var currentCoordinate: CLLocationCoordinate2D!
+    let speech = AVSpeechSynthesizer()
+    var stepCount = 0
+
+    // mapの見た目を変更するボタン
     @IBAction func mapChangeButton(_ sender: Any) {
         count += 1
         switch count % 5 {
@@ -42,6 +53,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             self.mapView.mapType = .satelliteFlyover
         default:
             print("ERROR")
+            return
         }
     }
     // 現在地ボタン
@@ -57,6 +69,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // 変数を初期化
         locationManager = CLLocationManager()
         camera = MKMapCamera()
@@ -84,29 +97,67 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.initMap()
         speechRecognizer.delegate = self // マイクのデリゲード
         self.mapView.showsTraffic = true
+        
     }
-
+    
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let longitude = (locations.last?.coordinate.longitude.description)! // 経度
-        let latitude = (locations.last?.coordinate.latitude.description)!   // 緯度
-        print("[DBG]longitude : " + longitude)
-        print("[DBG]longitude : " + latitude)
+        let longitude = (locations.last?.coordinate.longitude)! // 経度
+        let latitude = (locations.last?.coordinate.latitude)!   // 緯度
+//        self.currentCoordinate.latitude = latitude
+//        self.currentCoordinate.longitude = longitude
+        // ユーザの位置をメンバ変数に格納
+        guard let currentLocation = locations.first else { return }
+        currentCoordinate = currentLocation.coordinate
+        print("[DBG]longitude : \(longitude)")
+        print("[DBG]latitude : \(latitude)")
     }
-//    // 磁気センサからユーザーの角度を取得
-//    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
-//        let camera: MKMapCamera = self.mapView.camera
-//        camera.heading = newHeading.magneticHeading
-//        print("カメラ角度")
-//        print(mapView.camera.heading)
-//        print("-------------------------------------")
-//        print(self.mapView.userTrackingMode)
+    // 磁気センサからユーザーの角度を取得
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        // ユーザの向いている方向
+        let userDirection = self.degToRad(degrees:(self.mapView.camera.heading))
+        // 次の地点
+        if (self.step == nil){
+            return
+        }
+        let nextLocation = self.step.steps[self.stepCount]
+        // 現在地から次の地点までの角度
+        var resultRadian = self.angle(current: self.currentCoordinate, target: nextLocation.polyline.coordinate)
+        print("カメラ角度")
+        print(mapView.camera.heading)
+        print("-------------------------------------")
+        print(resultRadian)
 //        self.mapView.setCamera(camera, animated: true)
-//    }
+    }
+    
     // 角度に関する関数
     func rotateManager(heading: CLLocationDirection) {
         self.mapView.camera.heading = heading
     }
+    
+    // 角度をラジアンに変換する
+    func degToRad(degrees: CGFloat) -> CGFloat {
+        return degrees * CGFloat.pi / 180
+    }
+    
+    // 現在地から次の地点までの各位を計算
+    func angle(current: CLLocationCoordinate2D, target: CLLocationCoordinate2D) -> Float{
+        let currentLatitude     = degToRad(degrees: current.latitude)
+        let currentLongitude    = degToRad(degrees: current.longitude)
+        let targetLatitude      = degToRad(degrees: target.latitude)
+        let targetLongitude     = degToRad(degrees: target.longitude)
+        
+        let difLongitude = targetLongitude - currentLongitude
+        let y = sin(difLongitude)
+        let x = cos(currentLatitude) * tan(targetLatitude) - sin(currentLatitude) * cos(difLongitude)
+        let p = atan2(y, x) * 180 / CGFloat.pi
+        
+        if p < 0 {
+            return Float(360 + atan2(y, x) * 180 / CGFloat.pi)
+        }
+        return Float(atan2(y, x) * 180 / CGFloat.pi)
+    }
+    
     // 画面の初期位置の設定
     func initMap() {
         // 縮尺を設定
@@ -115,6 +166,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         region.span.longitudeDelta = 0.005
         mapView.setRegion(region, animated: true)
     }
+    
     // setting画面遷移のコード
 //    @IBAction func nextSetting(_ sender: Any) {
 //        let storyboard: UIStoryboard = self.storyboard!
@@ -126,18 +178,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
 //        navigationController?.pushViewController(nextVC! as UIViewController, animated: true)
 //    }
     @IBAction func settingsButtonAction(_ sender: Any) {
-//        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
-//        mapView.delegate = settingsViewController
-//        self.present(settingsViewController, animated: true, completion: nil)
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
     }
+
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        print("-------------Exit-------------")
+        self.stepCount += 1
+        if self.step == nil {
+            return
+        }
+        if self.stepCount < self.step.steps.count { // self.stepのstepでエラー　Thread 1: Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value
+            let currentStep = self.step.steps[stepCount]
+            let message = "\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+        } else {
+            let message = "到着しました。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            
+            stepCount = 0
+            
+            locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
+        }
+    }
 }
-// マイクに関する処理
+    // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
     // 認証の処理（ここで関数が呼び出されている）
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // requestRecognizerAuthorization()
     }
+    // 音声ガイドに関する処理
 }
