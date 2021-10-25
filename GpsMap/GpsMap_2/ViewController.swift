@@ -122,7 +122,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         let nextLocation = self.step.steps[self.stepCount]
         // 現在地から次の地点までの角度
-        var resultRadian = self.angle(current: self.currentCoordinate, target: nextLocation.polyline.coordinate)
+        let resultRadian = self.angle(current: self.currentCoordinate, target: nextLocation.polyline.coordinate)
         print("カメラ角度")
         print(mapView.camera.heading)
         print("-------------------------------------")
@@ -141,7 +141,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     }
     
     // 現在地から次の地点までの各位を計算
-    func angle(current: CLLocationCoordinate2D, target: CLLocationCoordinate2D) -> Float{
+    func angle(current: CLLocationCoordinate2D, target: CLLocationCoordinate2D) -> Float {
         let currentLatitude     = degToRad(degrees: current.latitude)
         let currentLongitude    = degToRad(degrees: current.longitude)
         let targetLatitude      = degToRad(degrees: target.latitude)
@@ -181,13 +181,40 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
     }
-
+    
+    // 領域内に侵入した時
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        print("-------------Exit-------------")
-        self.stepCount += 1
+        
         if self.step == nil {
             return
         }
+        
+        print("Enter \(self.stepCount)")
+        
+        if self.stepCount < self.step.steps.count {
+            let currentStep = self.step.steps[stepCount]
+            let message = "まもなく \(currentStep.instructions)　です。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            self.stepCount += 1
+        } else {
+            let message = "到着しました。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            
+            stepCount = 0
+            
+            locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
+        }
+    }
+    
+    // 領域外に外れた時
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        if self.step == nil {
+            return
+        }
+        print("Enter \(self.stepCount)")
+        
         if self.stepCount < self.step.steps.count { // self.stepのstepでエラー　Thread 1: Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value
             let currentStep = self.step.steps[stepCount]
             let message = "\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
@@ -202,6 +229,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
             locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
         }
+        
     }
 }
     // マイクに関する処理
@@ -213,3 +241,4 @@ extension ViewController: SFSpeechRecognizerDelegate {
     }
     // 音声ガイドに関する処理
 }
+
