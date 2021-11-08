@@ -36,26 +36,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var currentCoordinate: CLLocationCoordinate2D!
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
-
-    // mapの見た目を変更するボタン
-    @IBAction func mapChangeButton(_ sender: Any) {
-        count += 1
-        switch count % 5 {
-        case 0:
-            self.mapView.mapType = .standard
-        case 1:
-            self.mapView.mapType = .hybrid
-        case 2:
-            self.mapView.mapType = .satellite
-        case 3:
-            self.mapView.mapType = .hybridFlyover
-        case 4:
-            self.mapView.mapType = .satelliteFlyover
-        default:
-            print("ERROR")
-            return
-        }
-    }
+    
+    
     // 現在地ボタン
     @IBOutlet weak var currentLocation: UIImageView!
     @IBAction func currentLocationButton(_ sender: Any) {
@@ -102,32 +84,60 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let longitude = (locations.last?.coordinate.longitude)! // 経度
-        let latitude = (locations.last?.coordinate.latitude)!   // 緯度
-//        self.currentCoordinate.latitude = latitude
-//        self.currentCoordinate.longitude = longitude
+        let longitude = (locations.last?.coordinate.longitude)!
+        let latitude = (locations.last?.coordinate.latitude)!
+        var coordinateInfo :[CLLocationCoordinate2D] = []
         // ユーザの位置をメンバ変数に格納
-        guard let currentLocation = locations.first else { return }
-        currentCoordinate = currentLocation.coordinate
+//        guard let currentLocation = locations.first else { return }
+//        let currentLocation = locations.compactMap { $0 }
+//        self.currentCoordinate = currentLocation[currentLocation.count - 1].coordinate
         print("[DBG]longitude : \(longitude)")
         print("[DBG]latitude : \(latitude)")
+//        print("要素\(currentLocation.count)　　　\(currentLocation)")
+        // 位置情報を常に格納する
+        
+//        coordinateInfo.append(currentLocation[currentLocation.count - 1].coordinate)
+//
+//        let a = coordinateInfo.count
+//        print("要素数\(a)")
+//
+//        if self.step == nil {
+//            return
+//        } else {
+//            // 現在地から次の地点までの目標角度
+//            let nextLocation = self.step.steps[self.stepCount]
+//            let targetRadian = self.angle(coordinate: self.currentCoordinate, coordinate2: nextLocation.polyline.coordinate)
+//            if coordinateInfo.count > 1{
+//                // 実際に移動した角度
+//                let userRadian = self.angle(coordinate: coordinateInfo[coordinateInfo.count - 1], coordinate2: coordinateInfo[coordinateInfo.count - 2])
+//                // 比較の計算
+//                if userRadian > (targetRadian + 10) || userRadian < (targetRadian - 10) {
+//
+//                    let message = "方向が違います。確認してください。"
+//                    print("違う")
+//                    let speechUtterance = AVSpeechUtterance(string: message)
+//                    self.speech.speak(speechUtterance)
+//                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+//
+//                } else {
+//
+//                    let message = "正しい方向です。"
+//                    print("正しい")
+//                    let speechUtterance = AVSpeechUtterance(string: message)
+//                    self.speech.speak(speechUtterance)
+//
+//                }
+//                return
+//            }
+//        }
     }
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
-        let userDirection = self.degToRad(degrees:(self.mapView.camera.heading))
-        // 次の地点
-        if (self.step == nil){
-            return
-        }
-        let nextLocation = self.step.steps[self.stepCount]
-        // 現在地から次の地点までの角度
-        let resultRadian = self.angle(current: self.currentCoordinate, target: nextLocation.polyline.coordinate)
+        _ = self.degToRad(degrees: (self.mapView.camera.heading))
         print("カメラ角度")
         print(mapView.camera.heading)
         print("-------------------------------------")
-        print(resultRadian)
-//        self.mapView.setCamera(camera, animated: true)
     }
     
     // 角度に関する関数
@@ -140,12 +150,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         return degrees * CGFloat.pi / 180
     }
     
-    // 現在地から次の地点までの各位を計算
-    func angle(current: CLLocationCoordinate2D, target: CLLocationCoordinate2D) -> Float {
-        let currentLatitude     = degToRad(degrees: current.latitude)
-        let currentLongitude    = degToRad(degrees: current.longitude)
-        let targetLatitude      = degToRad(degrees: target.latitude)
-        let targetLongitude     = degToRad(degrees: target.longitude)
+    // 各位を計算
+    func angle(coordinate: CLLocationCoordinate2D, coordinate2: CLLocationCoordinate2D) -> Float {
+        let currentLatitude     = degToRad(degrees: coordinate.latitude)
+        let currentLongitude    = degToRad(degrees: coordinate.longitude)
+        let targetLatitude      = degToRad(degrees: coordinate2.latitude)
+        let targetLongitude     = degToRad(degrees: coordinate2.longitude)
         
         let difLongitude = targetLongitude - currentLongitude
         let y = sin(difLongitude)
@@ -237,8 +247,5 @@ extension ViewController: SFSpeechRecognizerDelegate {
     // 認証の処理（ここで関数が呼び出されている）
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        // requestRecognizerAuthorization()
     }
-    // 音声ガイドに関する処理
 }
-
