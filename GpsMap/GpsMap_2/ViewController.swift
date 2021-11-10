@@ -36,7 +36,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var currentCoordinate: CLLocationCoordinate2D!
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
-    
+    var prevCoordinateInfo: CLLocation? = nil
     
     // 現在地ボタン
     @IBOutlet weak var currentLocation: UIImageView!
@@ -84,52 +84,44 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let longitude = (locations.last?.coordinate.longitude)!
-        let latitude = (locations.last?.coordinate.latitude)!
-        var coordinateInfo :[CLLocationCoordinate2D] = []
-        // ユーザの位置をメンバ変数に格納
-//        guard let currentLocation = locations.first else { return }
-//        let currentLocation = locations.compactMap { $0 }
-//        self.currentCoordinate = currentLocation[currentLocation.count - 1].coordinate
-        print("[DBG]longitude : \(longitude)")
-        print("[DBG]latitude : \(latitude)")
-//        print("要素\(currentLocation.count)　　　\(currentLocation)")
-        // 位置情報を常に格納する
+//        let longitude = (locations.last?.coordinate.longitude)!
+//        let latitude = (locations.last?.coordinate.latitude)!
         
-//        coordinateInfo.append(currentLocation[currentLocation.count - 1].coordinate)
-//
-//        let a = coordinateInfo.count
-//        print("要素数\(a)")
-//
-//        if self.step == nil {
-//            return
-//        } else {
-//            // 現在地から次の地点までの目標角度
-//            let nextLocation = self.step.steps[self.stepCount]
-//            let targetRadian = self.angle(coordinate: self.currentCoordinate, coordinate2: nextLocation.polyline.coordinate)
-//            if coordinateInfo.count > 1{
-//                // 実際に移動した角度
-//                let userRadian = self.angle(coordinate: coordinateInfo[coordinateInfo.count - 1], coordinate2: coordinateInfo[coordinateInfo.count - 2])
-//                // 比較の計算
-//                if userRadian > (targetRadian + 10) || userRadian < (targetRadian - 10) {
-//
-//                    let message = "方向が違います。確認してください。"
-//                    print("違う")
-//                    let speechUtterance = AVSpeechUtterance(string: message)
-//                    self.speech.speak(speechUtterance)
-//                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-//
-//                } else {
-//
-//                    let message = "正しい方向です。"
-//                    print("正しい")
-//                    let speechUtterance = AVSpeechUtterance(string: message)
-//                    self.speech.speak(speechUtterance)
-//
-//                }
-//                return
-//            }
-//        }
+        if prevCoordinateInfo == nil {
+            prevCoordinateInfo = locations.last
+            print("位置情報\(prevCoordinateInfo)")
+            return
+        }
+        if self.step == nil {
+            return
+        }
+            // 現在地から次の地点までの目標角度
+        print("count: \(self.step.steps.count)")
+        if self.step.steps.count == self.stepCount {
+            self.stepCount = 0
+            let message = "到着しました。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            return
+        }
+        
+        let nextLocation = self.step.steps[self.stepCount]
+        let targetRadian = self.angle(coordinate: locations.last!.coordinate, coordinate2: nextLocation.polyline.coordinate)
+            
+        // 実際に移動した角度
+        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate)
+                // 比較の計算
+                if userRadian > (targetRadian + 20) || userRadian < (targetRadian - 20) {
+
+                    let message = "方向が違います。確認してください。"
+                    print("違う")
+                    let speechUtterance = AVSpeechUtterance(string: message)
+                    self.speech.speak(speechUtterance)
+                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+
+                }
+        
+        
     }
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -225,7 +217,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         print("Enter \(self.stepCount)")
         
-        if self.stepCount < self.step.steps.count { // self.stepのstepでエラー　Thread 1: Fatal error: Unexpectedly found nil while implicitly unwrapping an Optional value
+        if self.stepCount < self.step.steps.count { 
             let currentStep = self.step.steps[stepCount]
             let message = "\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
             let speechUtterance = AVSpeechUtterance(string: message)
