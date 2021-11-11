@@ -106,12 +106,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
         let nextLocation = self.step.steps[self.stepCount]
-        let targetRadian = self.angle(coordinate: locations.last!.coordinate, coordinate2: nextLocation.polyline.coordinate)
-            
+        // 目標角度
+        let targetRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
         // 実際に移動した角度
-        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate)
+        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2:locations.last!.coordinate )
+        
+        if userRadian == 0 || targetRadian == 0 {
+            return
+        }
+        
+        print("前回の位置座標\(prevCoordinateInfo!.coordinate)")
+        print("現在の位置座標\(locations.last!.coordinate)")
+        print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
+        print("ユーザの角度: \(userRadian)  目標角度: \(targetRadian)")
+        
                 // 比較の計算
-                if userRadian > (targetRadian + 20) || userRadian < (targetRadian - 20) {
+                if userRadian > (targetRadian + 25) || userRadian < (targetRadian - 25) {
 
                     let message = "方向が違います。確認してください。"
                     print("違う")
@@ -119,6 +129,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                     self.speech.speak(speechUtterance)
                     AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
 
+                } else {
+                    print("正しい")
                 }
         
         
@@ -198,12 +210,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             let message = "まもなく \(currentStep.instructions)　です。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
+            AudioServicesPlaySystemSound(1520)
             self.stepCount += 1
         } else {
             let message = "到着しました。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
-            
+            AudioServicesPlaySystemSound(1520)
             stepCount = 0
             
             locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
