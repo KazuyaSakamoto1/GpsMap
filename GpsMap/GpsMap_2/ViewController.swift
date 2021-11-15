@@ -37,7 +37,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
-    
+    let setAngle: Float = 25.0
     // 現在地ボタン
     @IBOutlet weak var currentLocation: UIImageView!
     @IBAction func currentLocationButton(_ sender: Any) {
@@ -120,20 +120,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
         print("ユーザの角度: \(userRadian)  目標角度: \(targetRadian)")
         
-                // 比較の計算
-                if userRadian > (targetRadian + 25) || userRadian < (targetRadian - 25) {
-
-                    let message = "方向が違います。確認してください。"
-                    print("違う")
-                    let speechUtterance = AVSpeechUtterance(string: message)
-                    self.speech.speak(speechUtterance)
-                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-
-                } else {
-                    print("正しい")
-                }
-        
-        
+        if targetRadian - setAngle < 0 || targetRadian + setAngle > 360 {
+            
+            self.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
+            
+        } else {
+            
+            self.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
+            
+        }
     }
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -170,6 +165,80 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return Float(360 + atan2(y, x) * 180 / CGFloat.pi)
         }
         return Float(atan2(y, x) * 180 / CGFloat.pi)
+    }
+    
+    // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたぐとき）
+    func compareAngle(targetRadian: Float, userRadian: Float){
+     
+        // １つ目の計算用変数の角度調整
+        var calculationRadian = targetRadian + setAngle
+        
+        if calculationRadian > 360  {
+            
+            calculationRadian -= 360
+            
+        }
+        
+        // ２つ目の計算用変数の角度調整
+        var calculationRadian2 = targetRadian - setAngle
+        
+        if calculationRadian2 < 0 {
+            
+            calculationRadian2 += 360
+            
+        }
+            
+        if userRadian < calculationRadian || userRadian > calculationRadian2 {
+            
+            print("正しい")
+            
+        } else {
+            
+            let message = "方向が違います。確認してください。"
+            print("違う")
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            
+        }
+        
+    }
+    
+    // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたがいないとき)
+    func compareAngle2(targetRadian: Float, userRadian: Float){
+     
+        // １つ目の計算用変数の角度調整
+        var calculationRadian = targetRadian + setAngle
+        
+        if calculationRadian > 360  {
+            
+            calculationRadian -= 360
+            
+        }
+        
+        // ２つ目の計算用変数の角度調整
+        var calculationRadian2 = targetRadian - setAngle
+        
+        if calculationRadian2 < 0 {
+            
+            calculationRadian2 += 360
+            
+        }
+            
+        if userRadian < calculationRadian && userRadian > calculationRadian2 {
+            
+            print("正しい")
+            
+        } else {
+            
+            let message = "方向が違います。確認してください。"
+            print("違う")
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            
+        }
+        
     }
     
     // 画面の初期位置の設定
