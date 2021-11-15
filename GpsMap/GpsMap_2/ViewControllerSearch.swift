@@ -124,19 +124,23 @@ extension ViewController: UISearchBarDelegate {
             print("-------------------------succeed--------------------")
             let route: MKRoute = response!.routes[0] as MKRoute
             self.step = route
+            let time = route.expectedTravelTime
+            let timeMessage = "到着予定時間は約\(ceil(time/60))分です。"
+            let speech = AVSpeechUtterance(string: timeMessage)
+            self.speech.speak(speech)
             // 経路を描画
             self.mapView.addOverlay(route.polyline)
             print(route.polyline.coordinate)
             // 現在地と目的地を含む表示範囲を設定する
             self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
-            // この部分の処理がうまくできていない？
+            
             for i in 0..<self.step.steps.count {
                 let step = route.steps[i]
                 print(step.instructions)
                 print(step.distance)
                 print(step.notice  as Any)
                 print(step.polyline.coordinate)
-                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 10, identifier: "\(i)")
+                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 3, identifier: "\(i)")
                 self.locationManager.startMonitoring(for: region) // 引数で受け取った範囲を監視する
                 let circle = MKCircle(center: region.center, radius: region.radius)
                 self.mapView.addOverlay(circle)
