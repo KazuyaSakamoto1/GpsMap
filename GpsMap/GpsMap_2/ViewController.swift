@@ -26,14 +26,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var searchAnnotationTitleArray = [String]()
     var searchAnnotationLatArray = [String]()
     var searchAnnotationLonArray = [String]()
-    var userLocation: CLLocationCoordinate2D!
-    var destLocation: CLLocationCoordinate2D!
+//    var userLocation: CLLocationCoordinate2D!
+//    var destLocation: CLLocationCoordinate2D!
     var camera: MKMapCamera = MKMapCamera()
     var count = 0
     var timer = Timer()
     var step: MKRoute!
-    var userCurrentLocation: [CLLocation]!
-    var currentCoordinate: CLLocationCoordinate2D!
+//    var userCurrentLocation: [CLLocation]!
+    var currentCoordinate = CLLocationCoordinate2D()
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
@@ -94,6 +94,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
 //        let longitude = (locations.last?.coordinate.longitude)!
 //        let latitude = (locations.last?.coordinate.latitude)!
+        
+        guard let location = locations.first else { return }
+        
+        self.currentCoordinate.latitude = location.coordinate.latitude
+        self.currentCoordinate.longitude = location.coordinate.longitude
         
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
