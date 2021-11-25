@@ -54,6 +54,7 @@
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9dD-d5-8x9">
                                 <rect key="frame" x="318" y="697" width="63" height="62"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <accessibility key="accessibilityConfiguration" hint="画面の位置をユーザー中心にします" label="現在地を示すボタン"/>
                                 <connections>
                                     <action selector="currentLocationButton:" destination="BYZ-38-t0r" eventType="touchDown" id="qd1-P8-TqQ"/>
                                 </connections>

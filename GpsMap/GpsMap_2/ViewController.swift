@@ -42,6 +42,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     @IBOutlet weak var currentLocation: UIImageView!
     @IBAction func currentLocationButton(_ sender: Any) {
         self.mapView.userTrackingMode = .followWithHeading
+        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
+        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+            guard let placemark = placemarks?.first, error == nil else { return }
+            let message = placemark.name
+            print(message)
+            let speechUtterance = AVSpeechUtterance(string: message!)
+            self.speech.speak(speechUtterance)
+        }
     }
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
