@@ -19,7 +19,7 @@ extension ViewController: UISearchBarDelegate {
         // 現在表示されているルートを削除
         self.mapView.removeOverlays(self.mapView.overlays)
         // キーボードを閉じる。
-        serchBar.resignFirstResponder()
+        serchBar!.resignFirstResponder()
         // 検索条件を作成する。
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
@@ -33,7 +33,7 @@ extension ViewController: UISearchBarDelegate {
     func localSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
         // 検索バーに何も入力されない時の処理
         if response == nil {
-            serchBar.resignFirstResponder()
+            serchBar!.resignFirstResponder()
             return
         }
         // 現在刺されているピンの削除
