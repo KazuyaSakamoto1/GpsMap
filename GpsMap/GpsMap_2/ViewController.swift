@@ -39,19 +39,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var prevCoordinateInfo: CLLocation? = nil
     let setAngle: Float = 25.0
     // 現在地ボタン
-    @IBOutlet weak var currentLocation: UIImageView!
-    @IBOutlet weak var locationButton: UIButton!
-    @IBAction func locationButton(_ sender: Any) {
-        self.mapView.userTrackingMode = .followWithHeading
-        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
-        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-            guard let placemark = placemarks?.first, error == nil else { return }
-            let message = placemark.name
-            let speechUtterance = AVSpeechUtterance(string: message!)
-            self.speech.speak(speechUtterance)
-        }
-      }
     
+
+    var button2 = UIButton()
+    let image = UIImage(named: "hoge")
+    
+    @IBOutlet var button: [UIButton]!
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -60,7 +53,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // 変数を初期化
         locationManager = CLLocationManager()
         camera = MKMapCamera()
@@ -92,11 +84,41 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.serchBar!.isAccessibilityElement = true
         self.serchBar!.accessibilityLabel = "検索フィールド"
         self.serchBar!.accessibilityHint = "目的地の検索を行う"
-        // 現在地ボタンのアクセシビリティ
-        self.locationButton!.isAccessibilityElement = true
-        self.locationButton!.accessibilityLabel = "現在地を示すボタン"
-        self.locationButton!.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
         
+        
+        self.button2 = UIButton(type: .custom)
+        self.button2.setImage(self.image, for: .normal)
+        self.view.addSubview(button2)
+        self.button2.frame = CGRect(x: 290, y: 530, width: 40, height: 40)
+        button2.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
+        
+        // 現在地ボタンのアクセシビリティ
+        self.button2.isAccessibilityElement = true
+        self.button2.accessibilityLabel = "現在地を示す"
+        self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
+        
+    }
+    
+    func onClick(sender:UIButton){
+        self.mapView.userTrackingMode = .followWithHeading
+        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
+        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+            guard let placemark = placemarks?.first, error == nil else { return }
+            let message = placemark.name
+            let speechUtterance = AVSpeechUtterance(string: message!)
+            self.speech.speak(speechUtterance)
+        }
+    }
+    
+    @objc func tapButton(_ sender: UIButton){
+        self.mapView.userTrackingMode = .followWithHeading
+        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
+        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+            guard let placemark = placemarks?.first, error == nil else { return }
+            let message = placemark.name
+            let speechUtterance = AVSpeechUtterance(string: message!)
+            self.speech.speak(speechUtterance)
+        }
     }
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
@@ -343,11 +365,30 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
     }
+    
 }
     // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
     // 認証の処理（ここで関数が呼び出されている）
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+    }
+}
+
+extension UIImage {
+    // resize image
+    func reSizeImage(reSize:CGSize)->UIImage {
+        //UIGraphicsBeginImageContext(reSize);
+        UIGraphicsBeginImageContextWithOptions(reSize,false,UIScreen.main.scale);
+        self.draw(in: CGRect(x: 0, y: 0, width: reSize.width, height: reSize.height));
+        let reSizeImage:UIImage! = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        return reSizeImage;
+    }
+
+    // scale the image at rates
+    func scaleImage(scaleSize:CGFloat)->UIImage {
+        let reSize = CGSize(width: self.size.width * scaleSize, height: self.size.height * scaleSize)
+        return reSizeImage(reSize: reSize)
     }
 }
