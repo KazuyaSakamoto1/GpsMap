@@ -37,7 +37,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
-    let setAngle: Float = 25.0
+    let setAngle: Float = 40.0
     // 現在地ボタン
     
 
@@ -85,7 +85,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.serchBar!.accessibilityLabel = "検索フィールド"
         self.serchBar!.accessibilityHint = "目的地の検索を行う"
         
-        
+        // 現在地ボタンを作成
         self.button2 = UIButton(type: .custom)
         self.button2.setImage(self.image, for: .normal)
         self.view.addSubview(button2)
@@ -97,17 +97,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.button2.accessibilityLabel = "現在地を示す"
         self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
         
-    }
-    
-    func onClick(sender:UIButton){
-        self.mapView.userTrackingMode = .followWithHeading
-        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
-        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-            guard let placemark = placemarks?.first, error == nil else { return }
-            let message = placemark.name
-            let speechUtterance = AVSpeechUtterance(string: message!)
-            self.speech.speak(speechUtterance)
-        }
     }
     
     @objc func tapButton(_ sender: UIButton){
@@ -125,15 +114,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
 //        let longitude = (locations.last?.coordinate.longitude)!
 //        let latitude = (locations.last?.coordinate.latitude)!
-        
+        var Flag :Bool = false
         guard let location = locations.first else { return }
         
         self.currentCoordinate.latitude = location.coordinate.latitude
         self.currentCoordinate.longitude = location.coordinate.longitude
-        
+        print("緯度：\(self.currentCoordinate.longitude)")
+        print("経度：\(self.currentCoordinate.latitude)")
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
-            print("位置情報\(prevCoordinateInfo)")
+            print("位置情報\(String(describing: prevCoordinateInfo))")
             return
         }
         if self.step == nil {
@@ -159,13 +149,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let nextLocation = self.step.steps[self.stepCount]
         // 目標角度
         let targetRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
+        let targetRadian2 = self.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         // 実際に移動した角度
-        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2:locations.last!.coordinate )
+        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate )
+        let userRadian2 = self.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         
         print("前回の位置座標\(prevCoordinateInfo!.coordinate)")
         print("現在の位置座標\(locations.last!.coordinate)")
         print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
         print("ユーザの角度: \(userRadian)  目標角度: \(targetRadian)")
+        print("ユーザの角度: \(userRadian2)  目標角度: \(targetRadian2)")
         
         if userRadian == targetRadian {
             print("位置が動いてません")
@@ -174,13 +167,36 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         if targetRadian - setAngle < 0 || targetRadian + setAngle > 360 {
             
-            self.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
-            
+           Flag = Flag || self.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
+           Flag = Flag || self.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
         } else {
             
-            self.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
-            
+           Flag = Flag || self.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
+           Flag = Flag || self.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
         }
+        
+        if targetRadian2 - setAngle < 0 || targetRadian2 + setAngle > 360 {
+            
+           Flag = Flag || self.compareAngle(targetRadian: targetRadian2, userRadian: userRadian2)
+            Flag = Flag || self.compareAngle(targetRadian: userRadian2, userRadian: targetRadian2)
+        } else {
+            
+           Flag = Flag || self.compareAngle2(targetRadian: targetRadian2, userRadian: userRadian2)
+           Flag = Flag || self.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
+        }
+        
+        if Flag {
+            
+            print("正しい")
+            
+        }else{
+            let message = "方向が違います。確認してください。"
+            print("違う")
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
+        }
+        
     }
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -220,7 +236,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     }
     
     // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたぐとき）
-    func compareAngle(targetRadian: Float, userRadian: Float){
+    func compareAngle(targetRadian: Float, userRadian: Float) -> Bool{
         // １つ目の計算用変数の角度調整
         var calculationRadian = targetRadian + setAngle
         
@@ -240,32 +256,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
             
         if userRadian < calculationRadian || userRadian > calculationRadian2 {
-            
-            print("正しい")
+            let a :Bool = true
+            return a
             
         } else {
-            
-            let message = "方向が違います。確認してください。"
-            print("違う")
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            let a :Bool = false
+            return a
+
             
         }
     }
     
     // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたがいないとき)
-    func compareAngle2(targetRadian: Float, userRadian: Float){
+    func compareAngle2(targetRadian: Float, userRadian: Float) -> Bool {
      
         // １つ目の計算用変数の角度調整
         var calculationRadian = targetRadian + setAngle
         
-        if calculationRadian > 360  {
+        if calculationRadian > 360 {
             
             calculationRadian -= 360
             
         }
-        
         // ２つ目の計算用変数の角度調整
         var calculationRadian2 = targetRadian - setAngle
         
@@ -277,18 +289,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
         if userRadian < calculationRadian && userRadian > calculationRadian2 {
             
-            print("正しい")
+    
+            let a: Bool = true
         
-        }else {
+            return a
             
-            let message = "方向が違います。確認してください。"
-            print("違う")
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+        } else {
+            let a: Bool = false
             
+            return a
+//            print("違う")
+//            let message = "方向が違います。確認してください。"
+//            let speechUtterance = AVSpeechUtterance(string: message)
+//            self.speech.speak(speechUtterance)
+//            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
+//
         }
-        
     }
     
     // 画面の初期位置の設定
@@ -324,21 +340,35 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         print("Enter \(self.stepCount)")
         
+        if self.stepCount == 0 {
+            let currentStep = self.step.steps[stepCount]
+            let nextStep = self.step.steps[stepCount + 1]
+            let message = " \(currentStep.instructions)　です。\(round(nextStep.distance)) メートル先, \(nextStep.instructions)　です。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            self.stepCount += 1
+        }
+        
         if self.stepCount < self.step.steps.count {
             let currentStep = self.step.steps[stepCount]
             let message = "まもなく \(currentStep.instructions)　です。"
+            print("領域内に侵入：\(message)")
+            print(self.stepCount)
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(1520)
             self.stepCount += 1
         } else {
             let message = "到着しました。"
             let speechUtterance = AVSpeechUtterance(string: message)
+            print("領域内に侵入：\(message)")
             self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(1520)
             stepCount = 0
+            // 現在刺されているピンの削除
+            mapView.removeAnnotations(searchAnnotationArray)
+            // 現在表示されているルートを削除
+            self.mapView.removeOverlays(self.mapView.overlays)
             
-            locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
+            locationManager.monitoredRegions.forEach( { self.locationManager.stopMonitoring(for: $0)})
         }
     }
     
@@ -349,46 +379,37 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         print("Enter \(self.stepCount)")
         
+        if self.stepCount == 1 {
+            return
+        }
+        
         if self.stepCount < self.step.steps.count { 
             let currentStep = self.step.steps[stepCount]
-            let message = "\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
+            let prevStep = self.step.steps[stepCount - 1]
+            let message = "\(prevStep.instructions)です。その先、\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
+            print("領域外：\(message)")
         } else {
             let message = "到着しました。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
-            
+            print("領域外：\(message)")
             stepCount = 0
+            
+            // 現在刺されているピンの削除
+            mapView.removeAnnotations(searchAnnotationArray)
+            // 現在表示されているルートを削除
+            self.mapView.removeOverlays(self.mapView.overlays)
             
             locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
         }
-        
     }
-    
 }
     // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
     // 認証の処理（ここで関数が呼び出されている）
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-    }
-}
-
-extension UIImage {
-    // resize image
-    func reSizeImage(reSize:CGSize)->UIImage {
-        //UIGraphicsBeginImageContext(reSize);
-        UIGraphicsBeginImageContextWithOptions(reSize,false,UIScreen.main.scale);
-        self.draw(in: CGRect(x: 0, y: 0, width: reSize.width, height: reSize.height));
-        let reSizeImage:UIImage! = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        return reSizeImage;
-    }
-
-    // scale the image at rates
-    func scaleImage(scaleSize:CGFloat)->UIImage {
-        let reSize = CGSize(width: self.size.width * scaleSize, height: self.size.height * scaleSize)
-        return reSizeImage(reSize: reSize)
     }
 }

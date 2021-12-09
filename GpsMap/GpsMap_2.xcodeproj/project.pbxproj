@@ -44,7 +44,7 @@
 		C566F3972716FCFA003C9B52 /* miyadai.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = miyadai.gpx; sourceTree = "<group>"; };
 		C566F39827264C2D003C9B52 /* kibana2seven.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = kibana2seven.gpx; sourceTree = "<group>"; };
 		C566F39927264C96003C9B52 /* kibana.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = kibana.gpx; sourceTree = "<group>"; };
-		C5691A3126C5050500609600 /* GpsMap_2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GpsMap_2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5691A3126C5050500609600 /* ブラインドマップ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ブラインドマップ.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5691A3426C5050500609600 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5691A3626C5050500609600 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		C5691A3826C5050500609600 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -107,7 +107,7 @@
 		C5691A3226C5050500609600 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C5691A3126C5050500609600 /* GpsMap_2.app */,
+				C5691A3126C5050500609600 /* ブラインドマップ.app */,
 				C5691A4A26C5050600609600 /* GpsMap_2Tests.xctest */,
 				C5691A5526C5050600609600 /* GpsMap_2UITests.xctest */,
 			);
@@ -160,9 +160,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C5691A3026C5050500609600 /* GpsMap_2 */ = {
+		C5691A3026C5050500609600 /* ブラインドマップ */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "GpsMap_2" */;
+			buildConfigurationList = C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "ブラインドマップ" */;
 			buildPhases = (
 				C5691A2D26C5050500609600 /* Sources */,
 				C5691A2E26C5050500609600 /* Frameworks */,
@@ -173,9 +173,9 @@
 			);
 			dependencies = (
 			);
-			name = GpsMap_2;
+			name = "ブラインドマップ";
 			productName = GpsMap_2;
-			productReference = C5691A3126C5050500609600 /* GpsMap_2.app */;
+			productReference = C5691A3126C5050500609600 /* ブラインドマップ.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C5691A4926C5050600609600 /* GpsMap_2Tests */ = {
@@ -249,7 +249,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C5691A3026C5050500609600 /* GpsMap_2 */,
+				C5691A3026C5050500609600 /* ブラインドマップ */,
 				C5691A4926C5050600609600 /* GpsMap_2Tests */,
 				C5691A5426C5050600609600 /* GpsMap_2UITests */,
 			);
@@ -338,12 +338,12 @@
 /* Begin PBXTargetDependency section */
 		C5691A4C26C5050600609600 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C5691A3026C5050500609600 /* GpsMap_2 */;
+			target = C5691A3026C5050500609600 /* ブラインドマップ */;
 			targetProxy = C5691A4B26C5050600609600 /* PBXContainerItemProxy */;
 		};
 		C5691A5726C5050600609600 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C5691A3026C5050500609600 /* GpsMap_2 */;
+			target = C5691A3026C5050500609600 /* ブラインドマップ */;
 			targetProxy = C5691A5626C5050600609600 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -496,7 +496,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-1";
+				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -515,7 +515,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-1";
+				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -614,7 +614,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "GpsMap_2" */ = {
+		C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "ブラインドマップ" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C5691A5F26C5050600609600 /* Debug */,
