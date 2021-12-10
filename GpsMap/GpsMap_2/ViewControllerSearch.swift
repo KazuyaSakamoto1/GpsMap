@@ -125,8 +125,10 @@ extension ViewController: UISearchBarDelegate {
             let route: MKRoute = response!.routes[0] as MKRoute
             self.step = route
             let time = route.expectedTravelTime
-            let timeMessage = "到着予定時間は約\(ceil(time/60))分です。"
-            let speech = AVSpeechUtterance(string: timeMessage)
+            let firstStep = self.step.steps[0]
+            let secondStpes = self.step.steps[1]
+            let Message = "\(firstStep.instructions)。到着予定時間は約\(ceil(time/60))分です。\(secondStpes.instructions)です。"
+            let speech = AVSpeechUtterance(string: Message)
             self.speech.speak(speech)
             // 経路を描画
             self.mapView.addOverlay(route.polyline)

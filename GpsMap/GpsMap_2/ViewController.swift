@@ -37,7 +37,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
-    let setAngle: Float = 40.0
+    let setAngle: Float = 30.0
     // 現在地ボタン
     
 
@@ -101,6 +101,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     @objc func tapButton(_ sender: UIButton){
         self.mapView.userTrackingMode = .followWithHeading
+        AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
         let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
         CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
             guard let placemark = placemarks?.first, error == nil else { return }
@@ -136,11 +137,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return
         }
     
-        // 現在地から次の地点までの目標角度
-        print("count: \(self.step.steps.count)")
+        // 到着時のアナウンス
+        print("到着：count: \(self.step.steps.count)")
         if self.step.steps.count == self.stepCount {
             self.stepCount = 0
-            let message = "到着しました。"
+            let message = "到着しました。お疲れさまでした。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
             return
@@ -256,11 +257,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
             
         if userRadian < calculationRadian || userRadian > calculationRadian2 {
-            let a :Bool = true
+            let a  = true
             return a
             
         } else {
-            let a :Bool = false
+            let a  = false
             return a
 
             
@@ -289,21 +290,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
         if userRadian < calculationRadian && userRadian > calculationRadian2 {
             
-    
-            let a: Bool = true
+            let a = true
         
             return a
             
         } else {
-            let a: Bool = false
+            let a = false
             
             return a
-//            print("違う")
-//            let message = "方向が違います。確認してください。"
-//            let speechUtterance = AVSpeechUtterance(string: message)
-//            self.speech.speak(speechUtterance)
-//            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
-//
         }
     }
     
@@ -338,17 +332,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return
         }
         
-        print("Enter \(self.stepCount)")
+        print("Enter （領域内）\(self.stepCount)")
         
-        if self.stepCount == 0 {
-            let currentStep = self.step.steps[stepCount]
-            let nextStep = self.step.steps[stepCount + 1]
-            let message = " \(currentStep.instructions)　です。\(round(nextStep.distance)) メートル先, \(nextStep.instructions)　です。"
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            self.stepCount += 1
-        }
-        
+//        if self.stepCount == 0 {
+//            let currentStep = self.step.steps[stepCount]
+//            let nextStep = self.step.steps[stepCount + 1]
+//            let message = " \(currentStep.instructions)　です。\(round(nextStep.distance)) メートル先, \(nextStep.instructions)　です。"
+//            let speechUtterance = AVSpeechUtterance(string: message)
+//            self.speech.speak(speechUtterance)
+//            self.stepCount += 1
+//        }
+//
         if self.stepCount < self.step.steps.count {
             let currentStep = self.step.steps[stepCount]
             let message = "まもなく \(currentStep.instructions)　です。"
@@ -358,7 +352,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             self.speech.speak(speechUtterance)
             self.stepCount += 1
         } else {
-            let message = "到着しました。"
+            let message = "到着しました。お疲れ様でした。"
             let speechUtterance = AVSpeechUtterance(string: message)
             print("領域内に侵入：\(message)")
             self.speech.speak(speechUtterance)
@@ -377,7 +371,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if self.step == nil {
             return
         }
-        print("Enter \(self.stepCount)")
+        print("Enter （領域外）\(self.stepCount)")
         
         if self.stepCount == 1 {
             return
@@ -390,18 +384,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
             print("領域外：\(message)")
-        } else {
-            let message = "到着しました。"
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            print("領域外：\(message)")
-            stepCount = 0
-            
-            // 現在刺されているピンの削除
-            mapView.removeAnnotations(searchAnnotationArray)
-            // 現在表示されているルートを削除
-            self.mapView.removeOverlays(self.mapView.overlays)
-            
+        }
+        else {
+//            let message = "到着しました。お疲れ様でした。"
+//            let speechUtterance = AVSpeechUtterance(string: message)
+//            self.speech.speak(speechUtterance)
+//            print("領域外：\(message)")
+//            stepCount = 0
+//
+//            // 現在刺されているピンの削除
+//            mapView.removeAnnotations(searchAnnotationArray)
+//            // 現在表示されているルートを削除
+//            self.mapView.removeOverlays(self.mapView.overlays)
+//
             locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
         }
     }
