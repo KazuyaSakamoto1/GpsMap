@@ -26,13 +26,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var searchAnnotationTitleArray = [String]()
     var searchAnnotationLatArray = [String]()
     var searchAnnotationLonArray = [String]()
-//    var userLocation: CLLocationCoordinate2D!
-//    var destLocation: CLLocationCoordinate2D!
     var camera: MKMapCamera = MKMapCamera()
     var timer = Timer()
     var step: MKRoute!
     var count = 0
-//    var userCurrentLocation: [CLLocation]!
     var currentCoordinate = CLLocationCoordinate2D()
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
@@ -101,7 +98,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     @objc func tapButton(_ sender: UIButton){
         self.mapView.userTrackingMode = .followWithHeading
-        AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
         let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
         CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
             guard let placemark = placemarks?.first, error == nil else { return }
@@ -122,6 +118,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.currentCoordinate.longitude = location.coordinate.longitude
         print("緯度：\(self.currentCoordinate.longitude)")
         print("経度：\(self.currentCoordinate.latitude)")
+        
+        //
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
             print("位置情報\(String(describing: prevCoordinateInfo))")
@@ -144,6 +142,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             let message = "到着しました。お疲れさまでした。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
+            // 現在刺されているピンの削除
+            mapView.removeAnnotations(searchAnnotationArray)
+            // 現在表示されているルートを削除
+            self.mapView.removeOverlays(self.mapView.overlays)
             return
         }
         
@@ -166,6 +168,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return
         }
         
+        // 角度の評価を行う
         if targetRadian - setAngle < 0 || targetRadian + setAngle > 360 {
             
            Flag = Flag || self.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
@@ -186,15 +189,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
            Flag = Flag || self.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
         }
         
+        // 距離の評価を行う
+        let currentDistance = self.distance(current: ( currentCoordinate.latitude, currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude, nextLocation.polyline.coordinate.longitude))
+        let targetDistance = nextLocation.distance
+        
+        if currentDistance  > targetDistance + 5.0 {
+            Flag = false
+        }
+        
+        print("現在地から次地点までの距離\(currentDistance)")
+        print("予測距離\(targetDistance)")
+        
+        // 判定を行う
         if Flag {
-            
             print("正しい")
-            
         }else{
             let message = "方向が違います。確認してください。"
             print("違う")
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
+            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
             AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
         }
         
@@ -206,6 +220,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print("カメラ角度")
         print(mapView.camera.heading)
         print("-------------------------------------")
+    }
+    
+    // 座標から距離を求める関数（三角球面法）
+    func distance(current: (la: Double, lo: Double), target: (la: Double, lo: Double)) -> Double {
+        
+        // 緯度経度をラジアンに変換
+        let currentLa   = current.la * Double.pi / 180
+        let currentLo   = current.lo * Double.pi / 180
+        let targetLa    = target.la * Double.pi / 180
+        let targetLo    = target.lo * Double.pi / 180
+
+        // 赤道半径
+        let equatorRadius = 6378137.0
+        
+        // 算出
+        let averageLat = (currentLa - targetLa) / 2
+        let averageLon = (currentLo - targetLo) / 2
+        let distance = equatorRadius * 2 * asin(sqrt(pow(sin(averageLat), 2) + cos(currentLa) * cos(targetLa) * pow(sin(averageLon), 2)))
+        return distance
     }
     
     // 角度に関する関数
@@ -257,14 +290,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
             
         if userRadian < calculationRadian || userRadian > calculationRadian2 {
+            
             let a  = true
             return a
             
         } else {
             let a  = false
             return a
-
-            
         }
     }
     
@@ -291,13 +323,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if userRadian < calculationRadian && userRadian > calculationRadian2 {
             
             let a = true
-        
             return a
             
         } else {
-            let a = false
             
+            let a = false
             return a
+            
         }
     }
     
@@ -320,6 +352,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
 //        let nextVC = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
 //        navigationController?.pushViewController(nextVC! as UIViewController, animated: true)
 //    }
+    
     @IBAction func settingsButtonAction(_ sender: Any) {
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
