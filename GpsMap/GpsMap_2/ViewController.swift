@@ -35,7 +35,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
-    let setAngle: Float = 20.0
+    let setAngle: Float = 15.0
     // 現在地ボタン
     var button2 = UIButton()
     let image = UIImage(named: "arrow")
@@ -79,6 +79,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.initMap()
         // 音声認識の初期化
         speechRecognizer.delegate = self
+        
         self.mapView.showsTraffic = true
         // 検索バーのアクセシビリティ
         self.serchBar!.isAccessibilityElement = true
@@ -156,6 +157,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             mapView.removeAnnotations(searchAnnotationArray)
             // 現在表示されているルートを削除
             self.mapView.removeOverlays(self.mapView.overlays)
+            self.step = nil
             return
         }
         
