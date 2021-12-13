@@ -19,7 +19,7 @@ extension ViewController: UISearchBarDelegate {
         // 現在表示されているルートを削除
         self.mapView.removeOverlays(self.mapView.overlays)
         // キーボードを閉じる。
-        serchBar.resignFirstResponder()
+        serchBar!.resignFirstResponder()
         // 検索条件を作成する。
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
@@ -33,7 +33,7 @@ extension ViewController: UISearchBarDelegate {
     func localSearchCompHandler(response: MKLocalSearch.Response?, error: Error?) -> Void {
         // 検索バーに何も入力されない時の処理
         if response == nil {
-            serchBar.resignFirstResponder()
+            serchBar!.resignFirstResponder()
             return
         }
         // 現在刺されているピンの削除
@@ -125,8 +125,10 @@ extension ViewController: UISearchBarDelegate {
             let route: MKRoute = response!.routes[0] as MKRoute
             self.step = route
             let time = route.expectedTravelTime
-            let timeMessage = "到着予定時間は約\(ceil(time/60))分です。"
-            let speech = AVSpeechUtterance(string: timeMessage)
+            let firstStep = self.step.steps[0]
+            let secondStpes = self.step.steps[1]
+            let Message = "\(firstStep.instructions)。到着予定時間は約\(ceil(time/60))分です。\(secondStpes.instructions)です。"
+            let speech = AVSpeechUtterance(string: Message)
             self.speech.speak(speech)
             // 経路を描画
             self.mapView.addOverlay(route.polyline)
@@ -140,14 +142,12 @@ extension ViewController: UISearchBarDelegate {
                 print(step.distance)
                 print(step.notice  as Any)
                 print(step.polyline.coordinate)
-                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 3, identifier: "\(i)")
+                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 45, identifier: "\(i)")
                 self.locationManager.startMonitoring(for: region) // 引数で受け取った範囲を監視する
                 let circle = MKCircle(center: region.center, radius: region.radius)
                 self.mapView.addOverlay(circle)
             }
-            let initialMessage = "\(round(self.step.steps[1].distance))　メートル先, \(self.step.steps[1].instructions)です。"
-            let speechUtterance = AVSpeechUtterance(string: initialMessage)
-            self.speech.speak(speechUtterance)
+
             self.stepCount += 1
         }
     }

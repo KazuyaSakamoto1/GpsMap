@@ -14,11 +14,13 @@ import MapKit
 import Speech
 import AVFoundation
 import AudioToolbox
+import SwiftSMTP
 
 class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate {
     var myLock = NSLock()
     @IBOutlet var mapView: MKMapView!
-    @IBOutlet weak var serchBar: UISearchBar!
+    // 検索バー
+    @IBOutlet weak var serchBar = UISearchBar()
     var locationManager: CLLocationManager!
     var compassButton: MKCompassButton!
     var manager: CLLocationManager = CLLocationManager()
@@ -26,23 +28,23 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var searchAnnotationTitleArray = [String]()
     var searchAnnotationLatArray = [String]()
     var searchAnnotationLonArray = [String]()
-    var userLocation: CLLocationCoordinate2D!
-    var destLocation: CLLocationCoordinate2D!
     var camera: MKMapCamera = MKMapCamera()
-    var count = 0
     var timer = Timer()
     var step: MKRoute!
-    var userCurrentLocation: [CLLocation]!
-    var currentCoordinate: CLLocationCoordinate2D!
+    var count = 0
+    var currentCoordinate = CLLocationCoordinate2D()
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
-    let setAngle: Float = 25.0
+    let setAngle: Float = 15.0
     // 現在地ボタン
-    @IBOutlet weak var currentLocation: UIImageView!
-    @IBAction func currentLocationButton(_ sender: Any) {
-        self.mapView.userTrackingMode = .followWithHeading
-    }
+    var button2 = UIButton()
+    let image = UIImage(named: "arrow")
+    // 音声テキストボタン
+    var button3 = UIButton()
+    let image2 = UIImage(named: "mic")
+   
+//    @IBOutlet var button: [UIButton]!
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -51,7 +53,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // 変数を初期化
         locationManager = CLLocationManager()
         camera = MKMapCamera()
@@ -63,7 +64,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         // 何度動いたら更新するか（デフォルトは1度）
         locationManager.headingFilter = kCLHeadingFilterNone
 //        locationManager.headingOrientation = CLDeviceOrientation
-        serchBar.delegate = self
+        serchBar?.delegate = self
         // GPSの使用を開始する
         locationManager.startUpdatingLocation()
         // 位置情報取得の許可を得る
@@ -77,58 +78,179 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         mapView.delegate = self
         // 画面の初期設定
         self.initMap()
-        speechRecognizer.delegate = self // マイクのデリゲード
-        self.mapView.showsTraffic = true
+        // 音声認識の初期化
+        speechRecognizer.delegate = self
         
+        self.mapView.showsTraffic = true
+        // 検索バーのアクセシビリティ
+        self.serchBar!.isAccessibilityElement = true
+        self.serchBar!.accessibilityLabel = "検索フィールド"
+        self.serchBar!.accessibilityHint = "目的地の検索を行う"
+        
+        // 現在地ボタンを作成
+        self.button2 = UIButton(type: .custom)
+        self.button2.setImage(self.image, for: .normal)
+        self.view.addSubview(button2)
+        self.button2.frame = CGRect(x: 290, y: 500, width: 60, height: 60)
+        button2.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
+        
+        // 現在地ボタンのアクセシビリティ
+        self.button2.isAccessibilityElement = true
+        self.button2.accessibilityLabel = "現在地を示す"
+        self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
+//
+        // 音声テキストボタンを作成
+        self.button3 = UIButton(type: .custom)
+        self.button3.setImage(self.image2, for: .normal)
+        self.view.addSubview(button3)
+        self.button3.frame = CGRect(x: 290, y: 430, width: 60, height: 60)
+        button3.addTarget(self, action: #selector(self.sendMail(_:)), for: .touchUpInside)
+        
+    }
+    
+    @objc func tapButton(_ sender: UIButton){
+        self.mapView.userTrackingMode = .followWithHeading
+        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
+        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+            guard let placemark = placemarks?.first, error == nil else { return }
+            let message = placemark.name
+            let speechUtterance = AVSpeechUtterance(string: message!)
+            self.speech.speak(speechUtterance)
+        }
+    }
+
+    // メールを自動で送信する関数
+    @objc func sendMail(_ sender: UIButton){
+        print("ボタンを押しました")
+        let smtp = SMTP(
+            hostname: "smtp.gmail.com",     // SMTP server address
+            email: "@gmail.com",        // メールアドレスを入力
+            password: ""            // password to login
+        )
+        
+        let drLight = Mail.User(name: "Dr. Light", email: "@gmail.com")
+        let megaman = Mail.User(name: "Megaman", email: "@yahoo.co.jp")
+
+        let mail = Mail(
+            from: drLight,
+            to: [megaman],
+            subject: "Humans and robots living together in harmony and equality.",
+            text: "That was my ultimate wish."
+        )
+
+        smtp.send(mail){ (error) in
+            if let error = error {
+                print("エラーがおきました\(error)")
+            }
+        }
     }
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
 //        let longitude = (locations.last?.coordinate.longitude)!
 //        let latitude = (locations.last?.coordinate.latitude)!
+        var Flag :Bool = false
+        guard let location = locations.first else { return }
         
+        self.currentCoordinate.latitude = location.coordinate.latitude
+        self.currentCoordinate.longitude = location.coordinate.longitude
+        print("緯度：\(self.currentCoordinate.longitude)")
+        print("経度：\(self.currentCoordinate.latitude)")
+        
+        //
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
-            print("位置情報\(prevCoordinateInfo)")
+            print("位置情報\(String(describing: prevCoordinateInfo))")
             return
         }
         if self.step == nil {
             return
         }
-            // 現在地から次の地点までの目標角度
-        print("count: \(self.step.steps.count)")
+    
+        // 位置座標が変更していないとき
+        if prevCoordinateInfo?.coordinate.latitude == currentCoordinate.latitude && prevCoordinateInfo?.coordinate.longitude == currentCoordinate.longitude {
+            print("位置座標が変わってません")
+            return
+        }
+    
+        // 到着時のアナウンス
+        print("到着：count: \(self.step.steps.count)")
         if self.step.steps.count == self.stepCount {
             self.stepCount = 0
-            let message = "到着しました。"
+            let message = "到着しました。お疲れさまでした。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
+            // 現在刺されているピンの削除
+            mapView.removeAnnotations(searchAnnotationArray)
+            // 現在表示されているルートを削除
+            self.mapView.removeOverlays(self.mapView.overlays)
+            self.step = nil
             return
         }
         
         let nextLocation = self.step.steps[self.stepCount]
         // 目標角度
         let targetRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
+        let targetRadian2 = self.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         // 実際に移動した角度
-        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2:locations.last!.coordinate )
-        
-        if userRadian == 0 || targetRadian == 0 {
-            return
-        }
+        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate )
+        let userRadian2 = self.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         
         print("前回の位置座標\(prevCoordinateInfo!.coordinate)")
         print("現在の位置座標\(locations.last!.coordinate)")
         print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
         print("ユーザの角度: \(userRadian)  目標角度: \(targetRadian)")
+        print("ユーザの角度: \(userRadian2)  目標角度: \(targetRadian2)")
         
+        if userRadian == targetRadian {
+            print("位置が動いてません")
+            return
+        }
+        
+        // 角度の評価を行う
         if targetRadian - setAngle < 0 || targetRadian + setAngle > 360 {
             
-            self.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
-            
+           Flag = Flag || self.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
+           Flag = Flag || self.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
         } else {
             
-            self.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
-            
+           Flag = Flag || self.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
+           Flag = Flag || self.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
         }
+        
+        if targetRadian2 - setAngle < 0 || targetRadian2 + setAngle > 360 {
+            
+           Flag = Flag || self.compareAngle(targetRadian: targetRadian2, userRadian: userRadian2)
+            Flag = Flag || self.compareAngle(targetRadian: userRadian2, userRadian: targetRadian2)
+        } else {
+            
+           Flag = Flag || self.compareAngle2(targetRadian: targetRadian2, userRadian: userRadian2)
+           Flag = Flag || self.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
+        }
+        
+        // 距離の評価を行う
+        let currentDistance = self.distance(current: ( currentCoordinate.latitude, currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude, nextLocation.polyline.coordinate.longitude))
+        let targetDistance = nextLocation.distance
+        
+        if currentDistance  > targetDistance + 5.0 {
+            Flag = false
+        }
+        
+        print("現在地から次地点までの距離\(currentDistance)")
+        print("予測距離\(targetDistance)")
+        
+        // 判定を行う
+        if Flag {
+            print("正しい")
+        }else{
+            let message = "方向が違います。確認してください。"
+            print("違う")
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
+            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
+        }
+        
     }
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
@@ -137,6 +259,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print("カメラ角度")
         print(mapView.camera.heading)
         print("-------------------------------------")
+    }
+    
+    // 座標から距離を求める関数（三角球面法）
+    func distance(current: (la: Double, lo: Double), target: (la: Double, lo: Double)) -> Double {
+        
+        // 緯度経度をラジアンに変換
+        let currentLa   = current.la * Double.pi / 180
+        let currentLo   = current.lo * Double.pi / 180
+        let targetLa    = target.la * Double.pi / 180
+        let targetLo    = target.lo * Double.pi / 180
+
+        // 赤道半径
+        let equatorRadius = 6378137.0
+        
+        // 算出
+        let averageLat = (currentLa - targetLa) / 2
+        let averageLon = (currentLo - targetLo) / 2
+        let distance = equatorRadius * 2 * asin(sqrt(pow(sin(averageLat), 2) + cos(currentLa) * cos(targetLa) * pow(sin(averageLon), 2)))
+        return distance
     }
     
     // 角度に関する関数
@@ -168,8 +309,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     }
     
     // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたぐとき）
-    func compareAngle(targetRadian: Float, userRadian: Float){
-     
+    func compareAngle(targetRadian: Float, userRadian: Float) -> Bool{
         // １つ目の計算用変数の角度調整
         var calculationRadian = targetRadian + setAngle
         
@@ -190,32 +330,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
         if userRadian < calculationRadian || userRadian > calculationRadian2 {
             
-            print("正しい")
+            let a  = true
+            return a
             
         } else {
-            
-            let message = "方向が違います。確認してください。"
-            print("違う")
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-            
+            let a  = false
+            return a
         }
-        
     }
     
     // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたがいないとき)
-    func compareAngle2(targetRadian: Float, userRadian: Float){
+    func compareAngle2(targetRadian: Float, userRadian: Float) -> Bool {
      
         // １つ目の計算用変数の角度調整
         var calculationRadian = targetRadian + setAngle
         
-        if calculationRadian > 360  {
+        if calculationRadian > 360 {
             
             calculationRadian -= 360
             
         }
-        
         // ２つ目の計算用変数の角度調整
         var calculationRadian2 = targetRadian - setAngle
         
@@ -227,18 +361,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
         if userRadian < calculationRadian && userRadian > calculationRadian2 {
             
-            print("正しい")
+            let a = true
+            return a
             
         } else {
             
-            let message = "方向が違います。確認してください。"
-            print("違う")
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            let a = false
+            return a
             
         }
-        
     }
     
     // 画面の初期位置の設定
@@ -260,6 +391,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
 //        let nextVC = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
 //        navigationController?.pushViewController(nextVC! as UIViewController, animated: true)
 //    }
+    
     @IBAction func settingsButtonAction(_ sender: Any) {
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
@@ -272,23 +404,37 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return
         }
         
-        print("Enter \(self.stepCount)")
+        print("Enter （領域内）\(self.stepCount)")
         
+//        if self.stepCount == 0 {
+//            let currentStep = self.step.steps[stepCount]
+//            let nextStep = self.step.steps[stepCount + 1]
+//            let message = " \(currentStep.instructions)　です。\(round(nextStep.distance)) メートル先, \(nextStep.instructions)　です。"
+//            let speechUtterance = AVSpeechUtterance(string: message)
+//            self.speech.speak(speechUtterance)
+//            self.stepCount += 1
+//        }
+//
         if self.stepCount < self.step.steps.count {
             let currentStep = self.step.steps[stepCount]
             let message = "まもなく \(currentStep.instructions)　です。"
+            print("領域内に侵入：\(message)")
+            print(self.stepCount)
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(1520)
             self.stepCount += 1
         } else {
-            let message = "到着しました。"
+            let message = "到着しました。お疲れ様でした。"
             let speechUtterance = AVSpeechUtterance(string: message)
+            print("領域内に侵入：\(message)")
             self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(1520)
             stepCount = 0
+            // 現在刺されているピンの削除
+            mapView.removeAnnotations(searchAnnotationArray)
+            // 現在表示されているルートを削除
+            self.mapView.removeOverlays(self.mapView.overlays)
             
-            locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
+            locationManager.monitoredRegions.forEach( { self.locationManager.stopMonitoring(for: $0)})
         }
     }
     
@@ -297,24 +443,36 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if self.step == nil {
             return
         }
-        print("Enter \(self.stepCount)")
+        print("Enter （領域外）\(self.stepCount)")
+        
+        if self.stepCount == 1 {
+            return
+        }
         
         if self.stepCount < self.step.steps.count { 
             let currentStep = self.step.steps[stepCount]
-            let message = "\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
+            let prevStep = self.step.steps[stepCount - 1]
+            let message = "\(prevStep.instructions)です。その先、\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
-        } else {
-            let message = "到着しました。"
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            
-            stepCount = 0
-            
+            print("領域外：\(message)")
+        }
+        else {
+//            let message = "到着しました。お疲れ様でした。"
+//            let speechUtterance = AVSpeechUtterance(string: message)
+//            self.speech.speak(speechUtterance)
+//            print("領域外：\(message)")
+//            stepCount = 0
+//
+//            // 現在刺されているピンの削除
+//            mapView.removeAnnotations(searchAnnotationArray)
+//            // 現在表示されているルートを削除
+//            self.mapView.removeOverlays(self.mapView.overlays)
+//
             locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
         }
-        
     }
+    
 }
     // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
