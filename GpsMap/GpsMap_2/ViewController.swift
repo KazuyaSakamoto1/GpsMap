@@ -14,6 +14,7 @@ import MapKit
 import Speech
 import AVFoundation
 import AudioToolbox
+import SwiftSMTP
 
 class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate {
     var myLock = NSLock()
@@ -42,7 +43,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 音声テキストボタン
     var button3 = UIButton()
     let image2 = UIImage(named: "mic")
-    
+   
 //    @IBOutlet var button: [UIButton]!
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
@@ -103,7 +104,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.button3.setImage(self.image2, for: .normal)
         self.view.addSubview(button3)
         self.button3.frame = CGRect(x: 290, y: 430, width: 60, height: 60)
-        button3.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
+        button3.addTarget(self, action: #selector(self.sendMail(_:)), for: .touchUpInside)
         
     }
     
@@ -115,6 +116,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             let message = placemark.name
             let speechUtterance = AVSpeechUtterance(string: message!)
             self.speech.speak(speechUtterance)
+        }
+    }
+
+    // メールを自動で送信する関数
+    @objc func sendMail(_ sender: UIButton){
+        print("ボタンを押しました")
+        let smtp = SMTP(
+            hostname: "smtp.gmail.com",     // SMTP server address
+            email: "@gmail.com",        // メールアドレスを入力
+            password: ""            // password to login
+        )
+        
+        let drLight = Mail.User(name: "Dr. Light", email: "@gmail.com")
+        let megaman = Mail.User(name: "Megaman", email: "@yahoo.co.jp")
+
+        let mail = Mail(
+            from: drLight,
+            to: [megaman],
+            subject: "Humans and robots living together in harmony and equality.",
+            text: "That was my ultimate wish."
+        )
+
+        smtp.send(mail){ (error) in
+            if let error = error {
+                print("エラーがおきました\(error)")
+            }
         }
     }
     
@@ -445,6 +472,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
         }
     }
+    
 }
     // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {

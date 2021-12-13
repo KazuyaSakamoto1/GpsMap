@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		68841AA526F3DD9000BBFAB9 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68841AA426F3DD9000BBFAB9 /* Setting.swift */; };
+		C567AA2327675EB3003336C0 /* SwiftSMTP in Frameworks */ = {isa = PBXBuildFile; productRef = C567AA2227675EB3003336C0 /* SwiftSMTP */; };
 		C5691A3526C5050500609600 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3426C5050500609600 /* AppDelegate.swift */; };
 		C5691A3726C5050500609600 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3626C5050500609600 /* SceneDelegate.swift */; };
 		C5691A3926C5050500609600 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3826C5050500609600 /* ViewController.swift */; };
@@ -68,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C567AA2327675EB3003336C0 /* SwiftSMTP in Frameworks */,
 				C5691A6926C50EFE00609600 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -174,6 +176,9 @@
 			dependencies = (
 			);
 			name = "ブラインドマップ";
+			packageProductDependencies = (
+				C567AA2227675EB3003336C0 /* SwiftSMTP */,
+			);
 			productName = GpsMap_2;
 			productReference = C5691A3126C5050500609600 /* ブラインドマップ.app */;
 			productType = "com.apple.product-type.application";
@@ -245,6 +250,9 @@
 				Base,
 			);
 			mainGroup = C5691A2826C5050500609600;
+			packageReferences = (
+				C567AA2127675EB3003336C0 /* XCRemoteSwiftPackageReference "Swift-SMTP" */,
+			);
 			productRefGroup = C5691A3226C5050500609600 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -642,6 +650,26 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C567AA2127675EB3003336C0 /* XCRemoteSwiftPackageReference "Swift-SMTP" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Kitura/Swift-SMTP.git";
+			requirement = {
+				kind = versionRange;
+				maximumVersion = 6.0.0;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C567AA2227675EB3003336C0 /* SwiftSMTP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C567AA2127675EB3003336C0 /* XCRemoteSwiftPackageReference "Swift-SMTP" */;
+			productName = SwiftSMTP;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		C5691A3D26C5050500609600 /* GpsMap_2.xcdatamodeld */ = {
