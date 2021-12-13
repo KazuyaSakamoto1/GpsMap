@@ -147,9 +147,7 @@ extension ViewController: UISearchBarDelegate {
                 let circle = MKCircle(center: region.center, radius: region.radius)
                 self.mapView.addOverlay(circle)
             }
-//            let initialMessage = "\(round(self.step.steps[1].distance))　メートル先, \(self.step.steps[1].instructions)です。"
-//            let speechUtterance = AVSpeechUtterance(string: initialMessage)
-//            self.speech.speak(speechUtterance)
+
             self.stepCount += 1
         }
     }

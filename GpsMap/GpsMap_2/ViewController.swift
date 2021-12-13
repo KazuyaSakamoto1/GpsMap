@@ -18,6 +18,7 @@ import AudioToolbox
 class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate {
     var myLock = NSLock()
     @IBOutlet var mapView: MKMapView!
+    // 検索バー
     @IBOutlet weak var serchBar = UISearchBar()
     var locationManager: CLLocationManager!
     var compassButton: MKCompassButton!
@@ -34,14 +35,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
-    let setAngle: Float = 30.0
+    let setAngle: Float = 20.0
     // 現在地ボタン
-    
-
     var button2 = UIButton()
-    let image = UIImage(named: "hoge")
+    let image = UIImage(named: "arrow")
+    // 音声テキストボタン
+    var button3 = UIButton()
+    let image2 = UIImage(named: "mic")
     
-    @IBOutlet var button: [UIButton]!
+//    @IBOutlet var button: [UIButton]!
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -75,7 +77,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         mapView.delegate = self
         // 画面の初期設定
         self.initMap()
-        speechRecognizer.delegate = self // マイクのデリゲード
+        // 音声認識の初期化
+        speechRecognizer.delegate = self
         self.mapView.showsTraffic = true
         // 検索バーのアクセシビリティ
         self.serchBar!.isAccessibilityElement = true
@@ -86,13 +89,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.button2 = UIButton(type: .custom)
         self.button2.setImage(self.image, for: .normal)
         self.view.addSubview(button2)
-        self.button2.frame = CGRect(x: 290, y: 530, width: 40, height: 40)
+        self.button2.frame = CGRect(x: 290, y: 500, width: 60, height: 60)
         button2.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
         
         // 現在地ボタンのアクセシビリティ
         self.button2.isAccessibilityElement = true
         self.button2.accessibilityLabel = "現在地を示す"
         self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
+//
+        // 音声テキストボタンを作成
+        self.button3 = UIButton(type: .custom)
+        self.button3.setImage(self.image2, for: .normal)
+        self.view.addSubview(button3)
+        self.button3.frame = CGRect(x: 290, y: 430, width: 60, height: 60)
+        button3.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
         
     }
     
