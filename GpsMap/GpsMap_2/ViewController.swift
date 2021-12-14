@@ -194,7 +194,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             text: "That was my ultimate wish."
         )
 
-        smtp.send(mail){ (error) in
+        smtp.send(mail) { (error) in
             if let error = error {
                 print("エラーがおきました\(error)")
             }
@@ -203,9 +203,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-//        let longitude = (locations.last?.coordinate.longitude)!
-//        let latitude = (locations.last?.coordinate.latitude)!
-        var Flag :Bool = false
+        var Flag: Bool = false
         guard let location = locations.first else { return }
         
         self.currentCoordinate.latitude = location.coordinate.latitude
@@ -288,7 +286,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let currentDistance = self.distance(current: ( currentCoordinate.latitude, currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude, nextLocation.polyline.coordinate.longitude))
         var targetDistance = nextLocation.distance
         
-        if currentDistance  > targetDistance + 5.0 {
+        if currentDistance > targetDistance + 5.0 {
             Flag = false
             targetDistance = currentDistance
         }
@@ -299,7 +297,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         // 判定を行う
         if Flag {
             print("正しい")
-        }else{
+        } else {
             let message = "方向が違います。確認してください。"
             print("違う")
             let speechUtterance = AVSpeechUtterance(string: message)
@@ -365,32 +363,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     }
     
     // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたぐとき）
-    func compareAngle(targetRadian: Float, userRadian: Float) -> Bool{
+    func compareAngle(targetRadian: Float, userRadian: Float) -> Bool {
         // １つ目の計算用変数の角度調整
         var calculationRadian = targetRadian + setAngle
         
-        if calculationRadian > 360  {
-            
+        if calculationRadian > 360 {
             calculationRadian -= 360
-            
         }
-        
         // ２つ目の計算用変数の角度調整
         var calculationRadian2 = targetRadian - setAngle
         
         if calculationRadian2 < 0 {
-            
             calculationRadian2 += 360
-            
         }
             
         if userRadian < calculationRadian || userRadian > calculationRadian2 {
-            
-            let a  = true
+            let a = true
             return a
-            
         } else {
-            let a  = false
+            let a = false
             return a
         }
     }
@@ -504,8 +495,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             let speechUtterance = AVSpeechUtterance(string: message)
             self.speech.speak(speechUtterance)
             print("領域外：\(message)")
-        }
-        else {
+        } else {
 //            let message = "到着しました。お疲れ様でした。"
 //            let speechUtterance = AVSpeechUtterance(string: message)
 //            self.speech.speak(speechUtterance)
@@ -531,37 +521,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 micButton.isEnabled = false
                 micButton.setTitle("Stopping", for: .disabled)
                 
-                //録音が停止した！
+                // 録音が停止した！
                 print("録音停止")
                 
-                //入力された文字列の入った文字列を表示
-                showStrAlert(str: self.voiceStr)
-
+                let searchRequest = MKLocalSearch.Request()
+                searchRequest.naturalLanguageQuery = self.voiceStr
+                
+                // 検索範囲はマップビューと同じにする。
+                searchRequest.region = mapView.region
+                // ローカル検索を実行する。
+                let localSerch: MKLocalSearch = MKLocalSearch(request: searchRequest)
+                localSerch.start(completionHandler: localSearchCompHandler(response:error:))
+                
             } else {
                 try? startRecording()
                 micButton.setTitle("Stop recording", for: [])
+                
             }
         }
     
-    //渡された文字列が入ったアラートを表示する
-        func showStrAlert(str: String){
-            
-            // UIAlertControllerを作成する.
-            let myAlert: UIAlertController = UIAlertController(title: "音声認識結果", message: str, preferredStyle: .alert)
-            
-            // OKのアクションを作成する.
-            let myOkAction = UIAlertAction(title: "OK", style: .default) { action in
-                print("Action OK!!")
-            }
-            
-            // OKのActionを追加する.
-            myAlert.addAction(myOkAction)
-            
-            // UIAlertを発動する.
-            present(myAlert, animated: true, completion: nil)
-        }
-    
-    //録音を開始する
+    // 録音を開始する
     private func startRecording() throws {
         
         // Cancel the previous task if it's running.
@@ -579,7 +558,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
 //        guard
             let inputNode = audioEngine.inputNode
-        //else { fatalError("Audio engine has no input node") }
+        // else { fatalError("Audio engine has no input node") }
         guard let recognitionRequest = recognitionRequest else { fatalError("Unable to created a SFSpeechAudioBufferRecognitionRequest object") }
         
         // Configure request so that results are returned before audio recording is finished
@@ -591,8 +570,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             var isFinal = false
             
             if let result = result {
-                
-                //音声認識の区切りの良いところで実行される。
+                // 音声認識の区切りの良いところで実行される。
                 self.voiceStr = result.bestTranscription.formattedString
                 print(result.bestTranscription.formattedString)
                 isFinal = result.isFinal
@@ -621,7 +599,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     }
     
     // MARK: SFSpeechRecognizerDelegate
-        //speechRecognizerが使用可能かどうかでボタンのisEnabledを変更する
+        // speechRecognizerが使用可能かどうかでボタンのisEnabledを変更する
         public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
             if available {
                 micButton.isEnabled = true
@@ -641,5 +619,4 @@ extension ViewController: SFSpeechRecognizerDelegate {
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
-
 }

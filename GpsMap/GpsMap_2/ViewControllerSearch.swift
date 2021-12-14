@@ -23,6 +23,7 @@ extension ViewController: UISearchBarDelegate {
         // 検索条件を作成する。
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
+        
         // 検索範囲はマップビューと同じにする。
         searchRequest.region = mapView.region
         // ローカル検索を実行する。
