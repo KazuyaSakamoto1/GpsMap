@@ -41,15 +41,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var button2 = UIButton()
     let image = UIImage(named: "arrow")
     // 音声テキストボタン
-    var button3 = UIButton()
+    var micButton = UIButton()
     let image2 = UIImage(named: "mic")
-   
-//    @IBOutlet var button: [UIButton]!
+    var voiceStr = ""
+
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
+    
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,11 +101,40 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
 //
         // 音声テキストボタンを作成
-        self.button3 = UIButton(type: .custom)
-        self.button3.setImage(self.image2, for: .normal)
-        self.view.addSubview(button3)
-        self.button3.frame = CGRect(x: 290, y: 430, width: 60, height: 60)
-        button3.addTarget(self, action: #selector(self.sendMail(_:)), for: .touchUpInside)
+        self.micButton = UIButton(type: .custom)
+        self.micButton.setImage(self.image2, for: .normal)
+        self.view.addSubview(micButton)
+        self.micButton.frame = CGRect(x: 290, y: 430, width: 60, height: 60)
+        micButton.addTarget(self, action: #selector(self.recordButtonTapped(sender:)), for: .touchUpInside)
+        micButton.setTitle("Start Recording", for: [])
+        micButton.isEnabled = false
+        
+        // ユーザーに音声認識の許可を求める
+        SFSpeechRecognizer.requestAuthorization { authStatus in
+            
+            OperationQueue.main.addOperation {
+                switch authStatus {
+                case .authorized:
+                    // ユーザが音声認識の許可を出した時
+                    self.micButton.isEnabled = true
+                    
+                case .denied:
+                    // ユーザが音声認識を拒否した時
+                    self.micButton.isEnabled = false
+                    self.micButton.setTitle("User denied access to speech recognition", for: .disabled)
+                    
+                case .restricted:
+                    // 端末が音声認識に対応していない場合
+                    self.micButton.isEnabled = false
+                    self.micButton.setTitle("Speech recognition restricted on this device", for: .disabled)
+                    
+                case .notDetermined:
+                    // ユーザが音声認識をまだ認証していない時
+                    self.micButton.isEnabled = false
+                    self.micButton.setTitle("Speech recognition not yet authorized", for: .disabled)
+                }
+            }
+        }
         
     }
     
@@ -119,8 +149,34 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
     }
 
-    // メールを自動で送信する関数
+    // メールを自動で送信する関数(動作確認用)
     @objc func sendMail(_ sender: UIButton){
+        print("ボタンを押しました")
+        let smtp = SMTP(
+            hostname: "smtp.gmail.com",     // SMTP server address
+            email: "@gmail.com",        // メールアドレスを入力
+            password: ""            // password to login
+        )
+        
+        let drLight = Mail.User(name: "Dr. Light", email: "@gmail.com")
+        let megaman = Mail.User(name: "Megaman", email: "@yahoo.co.jp")
+
+        let mail = Mail(
+            from: drLight,
+            to: [megaman],
+            subject: "Humans and robots living together in harmony and equality.",
+            text: "That was my ultimate wish."
+        )
+
+        smtp.send(mail){ (error) in
+            if let error = error {
+                print("エラーがおきました\(error)")
+            }
+        }
+    }
+    
+    //メールを自動で送信する関数 https://github.com/Kitura/Swift-SMTP
+    func sendMail() {
         print("ボタンを押しました")
         let smtp = SMTP(
             hostname: "smtp.gmail.com",     // SMTP server address
@@ -230,10 +286,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         // 距離の評価を行う
         let currentDistance = self.distance(current: ( currentCoordinate.latitude, currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude, nextLocation.polyline.coordinate.longitude))
-        let targetDistance = nextLocation.distance
+        var targetDistance = nextLocation.distance
         
         if currentDistance  > targetDistance + 5.0 {
             Flag = false
+            targetDistance = currentDistance
         }
         
         print("現在地から次地点までの距離\(currentDistance)")
@@ -258,7 +315,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         _ = self.degToRad(degrees: (self.mapView.camera.heading))
         print("カメラ角度")
         print(mapView.camera.heading)
-        print("-------------------------------------")
     }
     
     // 座標から距離を求める関数（三角球面法）
@@ -405,15 +461,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
         print("Enter （領域内）\(self.stepCount)")
-        
-//        if self.stepCount == 0 {
-//            let currentStep = self.step.steps[stepCount]
-//            let nextStep = self.step.steps[stepCount + 1]
-//            let message = " \(currentStep.instructions)　です。\(round(nextStep.distance)) メートル先, \(nextStep.instructions)　です。"
-//            let speechUtterance = AVSpeechUtterance(string: message)
-//            self.speech.speak(speechUtterance)
-//            self.stepCount += 1
-//        }
+    
 //
         if self.stepCount < self.step.steps.count {
             let currentStep = self.step.steps[stepCount]
@@ -473,11 +521,125 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
     }
     
+    
+    // MARK: 録音ボタンが押されたら呼ばれる
+    @objc func recordButtonTapped(sender: UIButton) {
+            
+            if audioEngine.isRunning {
+                audioEngine.stop()
+                recognitionRequest?.endAudio()
+                micButton.isEnabled = false
+                micButton.setTitle("Stopping", for: .disabled)
+                
+                //録音が停止した！
+                print("録音停止")
+                
+                //入力された文字列の入った文字列を表示
+                showStrAlert(str: self.voiceStr)
+
+            } else {
+                try? startRecording()
+                micButton.setTitle("Stop recording", for: [])
+            }
+        }
+    
+    //渡された文字列が入ったアラートを表示する
+        func showStrAlert(str: String){
+            
+            // UIAlertControllerを作成する.
+            let myAlert: UIAlertController = UIAlertController(title: "音声認識結果", message: str, preferredStyle: .alert)
+            
+            // OKのアクションを作成する.
+            let myOkAction = UIAlertAction(title: "OK", style: .default) { action in
+                print("Action OK!!")
+            }
+            
+            // OKのActionを追加する.
+            myAlert.addAction(myOkAction)
+            
+            // UIAlertを発動する.
+            present(myAlert, animated: true, completion: nil)
+        }
+    
+    //録音を開始する
+    private func startRecording() throws {
+        
+        // Cancel the previous task if it's running.
+        if let recognitionTask = recognitionTask {
+            recognitionTask.cancel()
+            self.recognitionTask = nil
+        }
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        try audioSession.setCategory(AVAudioSession.Category.record)
+        try audioSession.setMode(AVAudioSession.Mode.measurement)
+        try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        
+        recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
+        
+//        guard
+            let inputNode = audioEngine.inputNode
+        //else { fatalError("Audio engine has no input node") }
+        guard let recognitionRequest = recognitionRequest else { fatalError("Unable to created a SFSpeechAudioBufferRecognitionRequest object") }
+        
+        // Configure request so that results are returned before audio recording is finished
+        recognitionRequest.shouldReportPartialResults = true
+        
+        // A recognition task represents a speech recognition session.
+        // We keep a reference to the task so that it can be cancelled.
+        recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { result, error in
+            var isFinal = false
+            
+            if let result = result {
+                
+                //音声認識の区切りの良いところで実行される。
+                self.voiceStr = result.bestTranscription.formattedString
+                print(result.bestTranscription.formattedString)
+                isFinal = result.isFinal
+            }
+            
+            if error != nil || isFinal {
+                self.audioEngine.stop()
+                inputNode.removeTap(onBus: 0)
+                
+                self.recognitionRequest = nil
+                self.recognitionTask = nil
+                
+                self.micButton.isEnabled = true
+                self.micButton.setTitle("Start Recording", for: [])
+            }
+        }
+        
+        let recordingFormat = inputNode.outputFormat(forBus: 0)
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { (buffer: AVAudioPCMBuffer, when: AVAudioTime) in
+            self.recognitionRequest?.append(buffer)
+        }
+        
+        audioEngine.prepare()
+        
+        try audioEngine.start()
+    }
+    
+    // MARK: SFSpeechRecognizerDelegate
+        //speechRecognizerが使用可能かどうかでボタンのisEnabledを変更する
+        public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
+            if available {
+                micButton.isEnabled = true
+                micButton.setTitle("Start Recording", for: [])
+                
+            } else {
+                micButton.isEnabled = false
+                micButton.setTitle("Recognition not available", for: .disabled)
+            }
+        }
+    
 }
     // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
     // 認証の処理（ここで関数が呼び出されている）
+
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
+
 }
