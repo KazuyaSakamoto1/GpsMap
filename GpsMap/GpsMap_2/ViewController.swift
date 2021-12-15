@@ -311,8 +311,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
         _ = self.degToRad(degrees: (self.mapView.camera.heading))
-        print("カメラ角度")
-        print(mapView.camera.heading)
+//        print("カメラ角度")
+//        print(mapView.camera.heading)
     }
     
     // 座標から距離を求める関数（三角球面法）
