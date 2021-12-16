@@ -149,23 +149,23 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
     }
 
-    // メールを自動で送信する関数(動作確認用)
-    @objc func sendMail(_ sender: UIButton){
-        print("ボタンを押しました")
+    // メールを自動で送信する関数(到着時間を過ぎた時用)
+    @objc func sendAttentionMail(_ sender: UIButton){
+        print("メールの送信を行います")
         let smtp = SMTP(
             hostname: "smtp.gmail.com",     // SMTP server address
-            email: "@gmail.com",        // メールアドレスを入力
+            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
             password: ""            // password to login
         )
         
-        let drLight = Mail.User(name: "Dr. Light", email: "@gmail.com")
-        let megaman = Mail.User(name: "Megaman", email: "@yahoo.co.jp")
+        let drLight = Mail.User(name: "Dr. Light", email: "hiroto.0927.123@gmail.com")
+        let megaman = Mail.User(name: "Megaman", email: "hiroto_0927_123@yahoo.co.jp")
 
         let mail = Mail(
             from: drLight,
             to: [megaman],
             subject: "Humans and robots living together in harmony and equality.",
-            text: "That was my ultimate wish."
+            text: "到着予定時間を超えています。安否確認を行ってください。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
         )
 
         smtp.send(mail){ (error) in
@@ -174,37 +174,54 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
         }
     }
+
     
     //メールを自動で送信する関数 https://github.com/Kitura/Swift-SMTP
-    func sendMail() {
-        print("ボタンを押しました")
-        let smtp = SMTP(
-            hostname: "smtp.gmail.com",     // SMTP server address
-            email: "@gmail.com",        // メールアドレスを入力
-            password: ""            // password to login
-        )
-        
-        let drLight = Mail.User(name: "Dr. Light", email: "@gmail.com")
-        let megaman = Mail.User(name: "Megaman", email: "@yahoo.co.jp")
+       func sendArrivedMail(){
+           print("メールの送信を行います")
+           let smtp = SMTP(
+               hostname: "smtp.gmail.com",     // SMTP server address
+               email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
+               password: ""            // password to login
+           )
+           
+           var text = ""
+           let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
+           let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
+           
+           let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
+           CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+               guard let placemark = placemarks?.first, error == nil else { return }
+               text = placemark.name!
+           }
+           
+           print(text)
+           
+           let mail = Mail(
+               from: drLight,
+               to: [megaman],
+               subject: "Humans and robots living together in harmony and equality.",
+               text: "目的地:\(text)へ到着しました。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
+           )
 
-        let mail = Mail(
-            from: drLight,
-            to: [megaman],
-            subject: "Humans and robots living together in harmony and equality.",
-            text: "That was my ultimate wish."
-        )
+           smtp.send(mail){ (error) in
+               if let error = error {
+                   print("エラーがおきました\(error)")
+               }
+           }
+       }
 
-        smtp.send(mail) { (error) in
-            if let error = error {
-                print("エラーがおきました\(error)")
-            }
-        }
-    }
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         var Flag: Bool = false
         guard let location = locations.first else { return }
+        
+        // 到着予定時間を過ぎたら一度だけ実行される関数
+        if self.step != nil {
+            Timer.scheduledTimer(timeInterval: self.step.expectedTravelTime, target: self, selector: #selector(self.sendAttentionMail(_:)), userInfo: nil, repeats: false)
+        }
+
         
         self.currentCoordinate.latitude = location.coordinate.latitude
         self.currentCoordinate.longitude = location.coordinate.longitude
@@ -238,6 +255,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             mapView.removeAnnotations(searchAnnotationArray)
             // 現在表示されているルートを削除
             self.mapView.removeOverlays(self.mapView.overlays)
+            self.sendArrivedMail()
             self.step = nil
             return
         }
@@ -496,23 +514,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             self.speech.speak(speechUtterance)
             print("領域外：\(message)")
         } else {
-//            let message = "到着しました。お疲れ様でした。"
-//            let speechUtterance = AVSpeechUtterance(string: message)
-//            self.speech.speak(speechUtterance)
-//            print("領域外：\(message)")
-//            stepCount = 0
-//
-//            // 現在刺されているピンの削除
-//            mapView.removeAnnotations(searchAnnotationArray)
-//            // 現在表示されているルートを削除
-//            self.mapView.removeOverlays(self.mapView.overlays)
-//
             locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
         }
     }
     
     
-    // MARK: 録音ボタンが押されたら呼ばれる
+    // 録音ボタンが押されたら呼ばれる
     @objc func recordButtonTapped(sender: UIButton) {
             
             if audioEngine.isRunning {
@@ -556,16 +563,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
         
-//        guard
-            let inputNode = audioEngine.inputNode
-        // else { fatalError("Audio engine has no input node") }
+        let inputNode = audioEngine.inputNode
         guard let recognitionRequest = recognitionRequest else { fatalError("Unable to created a SFSpeechAudioBufferRecognitionRequest object") }
         
-        // Configure request so that results are returned before audio recording is finished
         recognitionRequest.shouldReportPartialResults = true
-        
-        // A recognition task represents a speech recognition session.
-        // We keep a reference to the task so that it can be cancelled.
         recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { result, error in
             var isFinal = false
             
