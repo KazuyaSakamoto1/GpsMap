@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import MapKit
 import AVFoundation
+import CoreMotion
 
 //　検索に関する処理
 extension ViewController: UISearchBarDelegate {

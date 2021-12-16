@@ -15,6 +15,7 @@ import Speech
 import AVFoundation
 import AudioToolbox
 import SwiftSMTP
+import CoreMotion
 
 class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate {
     var myLock = NSLock()
@@ -50,6 +51,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
+    
+    //加速度センサーの変数
+    var coreManager = CMMotionManager()
     
     // 位置情報の取得
     override func viewDidLoad() {
@@ -136,6 +140,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
         }
         
+        if coreManager.isAccelerometerAvailable {
+            // 加速度センサーの値取得間隔
+            coreManager.accelerometerUpdateInterval = 0.1
+            
+            // motionの取得を開始
+            coreManager.startAccelerometerUpdates(to: OperationQueue.current!, withHandler: { (data, error) in
+                // 取得した値をコンソールに表示
+                print("x: \(data?.acceleration.x) y: \(data?.acceleration.y) z: \(data?.acceleration.z)")
+            })
+        }
+        
+        
     }
     
     @objc func tapButton(_ sender: UIButton){
@@ -174,42 +190,42 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
         }
     }
-
     
-    //メールを自動で送信する関数 https://github.com/Kitura/Swift-SMTP
-       func sendArrivedMail(){
-           print("メールの送信を行います")
-           let smtp = SMTP(
-               hostname: "smtp.gmail.com",     // SMTP server address
-               email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-               password: ""            // password to login
-           )
-           
-           var text = ""
-           let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
-           let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
-           
-           let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
-           CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-               guard let placemark = placemarks?.first, error == nil else { return }
-               text = placemark.name!
-           }
-           
-           print(text)
-           
-           let mail = Mail(
-               from: drLight,
-               to: [megaman],
-               subject: "Humans and robots living together in harmony and equality.",
-               text: "目的地:\(text)へ到着しました。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
-           )
+    // メールを自動で送信する関数 https://github.com/Kitura/Swift-SMTP
+    func sendArrivedMail() {
+        print("メールの送信を行います")
+        let smtp = SMTP(
+            hostname: "smtp.gmail.com",     // SMTP server address
+            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
+            password: ""            // password to login
+        )
+        var text = ""
+        let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
+        let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
 
-           smtp.send(mail){ (error) in
-               if let error = error {
-                   print("エラーがおきました\(error)")
-               }
-           }
-       }
+        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
+        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+            guard let placemark = placemarks?.first, error == nil else { return }
+            text = placemark.name!
+            print("地名：\(text)")
+        }
+        // 0.5秒止める
+        Thread.sleep(forTimeInterval: 1.5)
+        
+        let mail = Mail(
+            from: drLight,
+            to: [megaman],
+            subject: "Humans and robots living together in harmony and equality.",
+            text: "目的地:\(text)へ到着しました。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
+        )
+
+        smtp.send(mail){ (error) in
+            if let error = error {
+                print("エラーがおきました\(error)")
+            }
+        }
+
+    }
 
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
