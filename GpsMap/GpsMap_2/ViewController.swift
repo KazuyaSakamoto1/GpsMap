@@ -73,6 +73,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     // 衝撃検知用のフラグ
     var fallFlag = false
+    var sendMail: SendMail!
     
     @IBOutlet weak var fallLabel: UILabel!
     
@@ -81,6 +82,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         super.viewDidLoad()
         
         fallLabel.text = "検知中"
+        fallLabel.backgroundColor = .green
         // 変数を初期化
         locationManager = CLLocationManager()
         camera = MKMapCamera()
@@ -223,6 +225,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             self.speech.speak(speechUtterance)
         }
     }
+<<<<<<< HEAD
 
     // メールを自動で送信する関数(到着時間を過ぎた時用)
     @objc func sendAttentionMail(_ sender: UIButton){
@@ -320,6 +323,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
         }
     }
+=======
+>>>>>>> e738f8c (Update: メールを別クラスに分ける)
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -328,7 +333,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         // 到着予定時間を過ぎたら一度だけ実行される関数
         if self.step != nil {
-            Timer.scheduledTimer(timeInterval: self.step.expectedTravelTime, target: self, selector: #selector(self.sendAttentionMail(_:)), userInfo: nil, repeats: false)
+            Timer.scheduledTimer(timeInterval: self.step.expectedTravelTime, target: self, selector: #selector(sendMail.sendAttentionMail(_:)), userInfo: nil, repeats: false)
         }
         
         self.currentCoordinate.latitude = location.coordinate.latitude
@@ -363,7 +368,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             mapView.removeAnnotations(searchAnnotationArray)
             // 現在表示されているルートを削除
             self.mapView.removeOverlays(self.mapView.overlays)
-            self.sendArrivedMail()
+            sendMail.sendArrivedMail()
             self.step = nil
             return
         }
@@ -455,7 +460,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         if fallFlag {
             print("Gyro: \(fallFlag)")
-            self.sendArrivedMail()
+            sendMail.sendArrivedMail()
             
         } else {
             
@@ -472,7 +477,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             // フラグの判定を元にメールを送るか否か判定する関数
             print("pressure: \(fallFlag)")
             fallFlag = false
-            self.sendFallMail()
+            sendMail.sendFallMail()
             fallLabel.text = "！！異常検知！！"
             return
         } else {

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		68841AA526F3DD9000BBFAB9 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68841AA426F3DD9000BBFAB9 /* Setting.swift */; };
+		68AC1BE5276CFDAB002581E9 /* SendMail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AC1BE4276CFDAB002581E9 /* SendMail.swift */; };
 		C567AA2327675EB3003336C0 /* SwiftSMTP in Frameworks */ = {isa = PBXBuildFile; productRef = C567AA2227675EB3003336C0 /* SwiftSMTP */; };
 		C5691A3526C5050500609600 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3426C5050500609600 /* AppDelegate.swift */; };
 		C5691A3726C5050500609600 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3626C5050500609600 /* SceneDelegate.swift */; };
@@ -41,6 +42,7 @@
 
 /* Begin PBXFileReference section */
 		68841AA426F3DD9000BBFAB9 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
+		68AC1BE4276CFDAB002581E9 /* SendMail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMail.swift; sourceTree = "<group>"; };
 		C566F3962716F284003C9B52 /* Miyadai2MaxValue.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Miyadai2MaxValue.gpx; sourceTree = "<group>"; };
 		C566F3972716FCFA003C9B52 /* miyadai.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = miyadai.gpx; sourceTree = "<group>"; };
 		C566F39827264C2D003C9B52 /* kibana2seven.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = kibana2seven.gpx; sourceTree = "<group>"; };
@@ -123,6 +125,7 @@
 				C5691A3626C5050500609600 /* SceneDelegate.swift */,
 				C5691A3826C5050500609600 /* ViewController.swift */,
 				68841AA426F3DD9000BBFAB9 /* Setting.swift */,
+				68AC1BE4276CFDAB002581E9 /* SendMail.swift */,
 				C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */,
 				C5691A3A26C5050500609600 /* Main.storyboard */,
 				C5691A4026C5050600609600 /* Assets.xcassets */,
@@ -322,6 +325,7 @@
 				C5691A3F26C5050500609600 /* GpsMap_2.xcdatamodeld in Sources */,
 				C582D5E82702CE6400497AA1 /* ViewControllerSearch.swift in Sources */,
 				C5691A3726C5050500609600 /* SceneDelegate.swift in Sources */,
+				68AC1BE5276CFDAB002581E9 /* SendMail.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -504,7 +508,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap1";
+				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -523,7 +527,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "hiroto.GpsMap1";
+				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
