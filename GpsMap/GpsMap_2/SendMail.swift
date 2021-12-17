@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 import SwiftSMTP
 
-class SendMail: ViewController {
-
+class SendMail {
+    
     // メールを自動で送信する関数(到着時間を過ぎた時用)
     @objc func sendAttentionMail(_ sender: UIButton){
         print("メールの送信を行います")
@@ -27,7 +27,7 @@ class SendMail: ViewController {
             from: drLight,
             to: [megaman],
             subject: "Humans and robots living together in harmony and equality.",
-            text: "到着予定時間を超えています。安否確認を行ってください。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
+            text: "到着予定時間を超えています。安否確認を行ってください)"
         )
 
         smtp.send(mail){ (error) in
@@ -62,7 +62,7 @@ class SendMail: ViewController {
             from: drLight,
             to: [megaman],
             subject: "Humans and robots living together in harmony and equality.",
-            text: "目的地:\(text)へ到着しました。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
+            text: "目的地:\(text)へ到着しました。)"
         )
 
         smtp.send(mail) { (error) in
@@ -98,7 +98,7 @@ class SendMail: ViewController {
             from: drLight,
             to: [megaman],
             subject: "Humans and robots living together in harmony and equality.",
-            text: "端末が衝撃を検知しました。安全確認のため連絡を行ってください。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
+            text: "端末が衝撃を検知しました。安全確認のため連絡を行ってください。)"
         )
 
         smtp.send(mail) { (error) in

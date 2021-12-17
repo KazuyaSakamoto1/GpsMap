@@ -73,7 +73,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     // 衝撃検知用のフラグ
     var fallFlag = false
-    var sendMail: SendMail!
+    var sendMail = SendMail()
     
     @IBOutlet weak var fallLabel: UILabel!
     
@@ -225,103 +225,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             self.speech.speak(speechUtterance)
         }
     }
-
-    // メールを自動で送信する関数(到着時間を過ぎた時用)
-    @objc func sendAttentionMail(_ sender: UIButton){
-        print("メールの送信を行います")
-        let smtp = SMTP(
-            hostname: "smtp.gmail.com",     // SMTP server address
-            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-            password: ""            // password to login
-        )
-        
-        let drLight = Mail.User(name: "Dr. Light", email: "hiroto.0927.123@gmail.com")
-        let megaman = Mail.User(name: "Megaman", email: "hiroto_0927_123@yahoo.co.jp")
-
-        let mail = Mail(
-            from: drLight,
-            to: [megaman],
-            subject: "Humans and robots living together in harmony and equality.",
-            text: "到着予定時間を超えています。安否確認を行ってください。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
-        )
-
-        smtp.send(mail){ (error) in
-            if let error = error {
-                print("エラーがおきました\(error)")
-            }
-        }
-    }
-    
-    // メールを自動で送信する関数 https://github.com/Kitura/Swift-SMTP
-    func sendArrivedMail() {
-        print("メールの送信を行います")
-        let smtp = SMTP(
-            hostname: "smtp.gmail.com",     // SMTP server address
-            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-            password: "tackgfoyvbjghzsl"            // password to login
-        )
-        var text = ""
-        let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
-        let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
-
-        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
-        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-            guard let placemark = placemarks?.first, error == nil else { return }
-            text = placemark.name!
-            print("地名：\(text)")
-        }
-        // 0.5秒止める
-        Thread.sleep(forTimeInterval: 1.5)
-        
-        let mail = Mail(
-            from: drLight,
-            to: [megaman],
-            subject: "Humans and robots living together in harmony and equality.",
-            text: "目的地:\(text)へ到着しました。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
-        )
-
-        smtp.send(mail) { (error) in
-            if let error = error {
-                print("エラーがおきました\(error)")
-            }
-        }
-
-    }
-    
-    // メールを自動で送信する関数(衝撃検知)
-    func sendFallMail() {
-        print("メールの送信を行います")
-        let smtp = SMTP(
-            hostname: "smtp.gmail.com",     // SMTP server address
-            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-            password: "tackgfoyvbjghzsl"            // password to login
-        )
-        var text = ""
-        let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
-        let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
-
-        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
-        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-            guard let placemark = placemarks?.first, error == nil else { return }
-            text = placemark.name!
-            print("地名：\(text)")
-        }
-        // 0.5秒止める
-        Thread.sleep(forTimeInterval: 1.5)
-        
-        let mail = Mail(
-            from: drLight,
-            to: [megaman],
-            subject: "Humans and robots living together in harmony and equality.",
-            text: "端末が衝撃を検知しました。安全確認のため連絡を行ってください。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
-        )
-
-        smtp.send(mail) { (error) in
-            if let error = error {
-                print("エラーがおきました\(error)")
-            }
-        }
-    }
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -443,12 +346,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         //        print(mapView.camera.heading)
         // 加速度の判定を行う
         fallFlag = self.fallDetectionAccel()
+        
         print("accel: \(fallFlag)")
         
         if fallFlag == false {
-
             fallLabel.text = "accel: 異常なし"
-
             return
         }
         
@@ -457,14 +359,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         if fallFlag {
             print("Gyro: \(fallFlag)")
-            sendMail.sendArrivedMail()
-            
         } else {
             
             print("Gyro: \(fallFlag)")
             fallLabel.text = "Gyro: 異常なし"
             return
-            
         }
         
         // 気圧の判定を行う
@@ -473,9 +372,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if fallFlag {
             // フラグの判定を元にメールを送るか否か判定する関数
             print("pressure: \(fallFlag)")
-            fallFlag = false
             sendMail.sendFallMail()
+            Thread.sleep(forTimeInterval: 3.0)
             fallLabel.text = "！！異常検知！！"
+            fallFlag = false
+            
             return
         } else {
             print("pressure: \(fallFlag)")
@@ -682,6 +583,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 
                 // 録音が停止した！
                 print("録音停止")
+                
+                let avSession = AVAudioSession.sharedInstance()
+                try? avSession.setCategory(.ambient)
                 
                 let searchRequest = MKLocalSearch.Request()
                 searchRequest.naturalLanguageQuery = self.voiceStr
