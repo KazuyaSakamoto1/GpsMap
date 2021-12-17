@@ -225,7 +225,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             self.speech.speak(speechUtterance)
         }
     }
-<<<<<<< HEAD
 
     // メールを自動で送信する関数(到着時間を過ぎた時用)
     @objc func sendAttentionMail(_ sender: UIButton){
@@ -323,8 +322,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
         }
     }
-=======
->>>>>>> e738f8c (Update: メールを別クラスに分ける)
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
