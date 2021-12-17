@@ -52,15 +52,35 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
     
-    //加速度センサーの変数
+    // 加速度センサーの変数
     var coreManager = CMMotionManager()
-    var xAxis = 0.0
-    var yAxis = 0.0
-    var zAxis = 0.0
+    var xAccel = 0.0
+    var yAccel = 0.0
+    var zAccel = 0.0
+    let contorlAccel = 0.98
+    var mixAccel = 0.0
+    
+    // ジャイロセンサーの変数
+    var roll = 0.0
+    var pitch = 0.0
+    var yaw = 0.0
+    
+    // 気圧センサーの変数
+    let altimeter = CMAltimeter()
+    var pressure = 0.0
+    var altitude = 0.0
+    var prePressure = 0.0
+    
+    // 衝撃検知用のフラグ
+    var fallFlag = false
+    
+    @IBOutlet weak var fallLabel: UILabel!
     
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        fallLabel.text = "検知中"
         // 変数を初期化
         locationManager = CLLocationManager()
         camera = MKMapCamera()
@@ -71,7 +91,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         locationManager.delegate = self
         // 何度動いたら更新するか（デフォルトは1度）
         locationManager.headingFilter = kCLHeadingFilterNone
-//        locationManager.headingOrientation = CLDeviceOrientation
+        //        locationManager.headingOrientation = CLDeviceOrientation
         serchBar?.delegate = self
         // GPSの使用を開始する
         locationManager.startUpdatingLocation()
@@ -106,7 +126,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.button2.isAccessibilityElement = true
         self.button2.accessibilityLabel = "現在地を示す"
         self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
-//
+        //
         // 音声テキストボタンを作成
         self.micButton = UIButton(type: .custom)
         self.micButton.setImage(self.image2, for: .normal)
@@ -141,8 +161,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                     self.micButton.setTitle("Speech recognition not yet authorized", for: .disabled)
                 }
             }
+            
         }
         
+        // 加速度センサーから値の取得
         if coreManager.isAccelerometerAvailable {
             // 加速度センサーの値取得間隔
             coreManager.accelerometerUpdateInterval = 0.1
@@ -150,16 +172,46 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             // motionの取得を開始
             coreManager.startAccelerometerUpdates(to: OperationQueue.current!, withHandler: { (data, error) in
                 // 取得した値をコンソールに表示
-                self.xAxis = (data?.acceleration.x)!
-                self.yAxis = (data?.acceleration.y)!
-                self.zAxis = (data?.acceleration.z)!
-//                print("x: \(data?.acceleration.x) y: \(data?.acceleration.y) z: \(data?.acceleration.z)")
-                print("X: \(self.xAxis),Y: \(self.yAxis),Z: \(self.zAxis)")
+                self.xAccel = (data?.acceleration.x)!
+                self.yAccel = (data?.acceleration.y)!
+                self.zAccel = (data?.acceleration.z)!
+               
             })
         }
+        // ジャイロセンサーから値の取得
+        if coreManager.isGyroAvailable {
+            // 加速度センサーの値取得間隔
+            coreManager.deviceMotionUpdateInterval = 0.1
+            
+            coreManager.startDeviceMotionUpdates(
+                to: OperationQueue.current!,
+                withHandler: { deviceManager, error in
+                    // オイラー角を取得
+                    let attitude: CMAttitude = deviceManager!.attitude
+                    self.roll = attitude.roll * 180 / Double.pi
+                    self.pitch = attitude.pitch * 180 / Double.pi
+                })
+        }
         
+        // 気圧センサーから値の取得
+        if CMAltimeter.isRelativeAltitudeAvailable() {
+            
+            coreManager.gyroUpdateInterval = 0.1
+            
+            altimeter.startRelativeAltitudeUpdates(to: OperationQueue.current!, withHandler:
+                                                    { data, error in
+                if error == nil {
+                    self.pressure = Double(truncating: data!.pressure)
+                    self.altitude = data?.relativeAltitude as! Double
+//                    print("pressure: \(self.pressure), altitude: \(self.altitude)")
+                }
+            })
+        } else {
+            print("not use altimeter")
+        }
         
     }
+    
     
     @objc func tapButton(_ sender: UIButton){
         self.mapView.userTrackingMode = .followWithHeading
@@ -204,7 +256,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let smtp = SMTP(
             hostname: "smtp.gmail.com",     // SMTP server address
             email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-            password: ""            // password to login
+            password: "tackgfoyvbjghzsl"            // password to login
         )
         var text = ""
         let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
@@ -226,14 +278,48 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             text: "目的地:\(text)へ到着しました。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
         )
 
-        smtp.send(mail){ (error) in
+        smtp.send(mail) { (error) in
             if let error = error {
                 print("エラーがおきました\(error)")
             }
         }
 
     }
+    
+    // メールを自動で送信する関数(衝撃検知)
+    func sendFallMail() {
+        print("メールの送信を行います")
+        let smtp = SMTP(
+            hostname: "smtp.gmail.com",     // SMTP server address
+            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
+            password: "tackgfoyvbjghzsl"            // password to login
+        )
+        var text = ""
+        let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
+        let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
 
+        let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
+        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+            guard let placemark = placemarks?.first, error == nil else { return }
+            text = placemark.name!
+            print("地名：\(text)")
+        }
+        // 0.5秒止める
+        Thread.sleep(forTimeInterval: 1.5)
+        
+        let mail = Mail(
+            from: drLight,
+            to: [megaman],
+            subject: "Humans and robots living together in harmony and equality.",
+            text: "端末が衝撃を検知しました。安全確認のため連絡を行ってください。位置座標：(緯度,経度)=( \(self.currentCoordinate.latitude), \(self.currentCoordinate.longitude))"
+        )
+
+        smtp.send(mail) { (error) in
+            if let error = error {
+                print("エラーがおきました\(error)")
+            }
+        }
+    }
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -244,19 +330,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if self.step != nil {
             Timer.scheduledTimer(timeInterval: self.step.expectedTravelTime, target: self, selector: #selector(self.sendAttentionMail(_:)), userInfo: nil, repeats: false)
         }
-
         
         self.currentCoordinate.latitude = location.coordinate.latitude
         self.currentCoordinate.longitude = location.coordinate.longitude
         print("緯度：\(self.currentCoordinate.longitude)")
         print("経度：\(self.currentCoordinate.latitude)")
         
-        //
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
             print("位置情報\(String(describing: prevCoordinateInfo))")
             return
         }
+        
         if self.step == nil {
             return
         }
@@ -352,8 +437,50 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
         _ = self.degToRad(degrees: (self.mapView.camera.heading))
-//        print("カメラ角度")
-//        print(mapView.camera.heading)
+        //        print("カメラ角度")
+        //        print(mapView.camera.heading)
+        // 加速度の判定を行う
+        fallFlag = self.fallDetectionAccel()
+        print("accel: \(fallFlag)")
+        
+        if fallFlag == false {
+
+            fallLabel.text = "accel: 異常なし"
+
+            return
+        }
+        
+        // ジャイロセンサの判定を行う
+        fallFlag = self.fallDetectionGyro()
+        
+        if fallFlag {
+            print("Gyro: \(fallFlag)")
+            self.sendArrivedMail()
+            
+        } else {
+            
+            print("Gyro: \(fallFlag)")
+            fallLabel.text = "Gyro: 異常なし"
+            return
+            
+        }
+        
+        // 気圧の判定を行う
+        fallFlag = self.fallDetectionPressure()
+        
+        if fallFlag {
+            // フラグの判定を元にメールを送るか否か判定する関数
+            print("pressure: \(fallFlag)")
+            fallFlag = false
+            self.sendFallMail()
+            fallLabel.text = "！！異常検知！！"
+            return
+        } else {
+            print("pressure: \(fallFlag)")
+            fallLabel.text = "pressure: 異常なし"
+            return
+        }
+        
     }
     
     // 座標から距離を求める関数（三角球面法）
@@ -634,6 +761,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 micButton.setTitle("Recognition not available", for: .disabled)
             }
         }
+
+    
     
 }
     // マイクに関する処理
