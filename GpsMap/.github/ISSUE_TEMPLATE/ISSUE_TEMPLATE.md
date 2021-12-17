@@ -1,8 +1,9 @@
 ---
 name: '通常issue'
 about: '質問などがある場合はこのissueテンプレートを使って下さい'
-labels: feature
+labels: question
 ---
+
 <!-- 一つのissueで一つの問題を書くようにしましょう -->
 <!-- 複数の問題を一つのissueに書かないようにしましょう -->
 
