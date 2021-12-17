@@ -54,6 +54,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     //加速度センサーの変数
     var coreManager = CMMotionManager()
+    var xAxis = 0.0
+    var yAxis = 0.0
+    var zAxis = 0.0
     
     // 位置情報の取得
     override func viewDidLoad() {
@@ -147,7 +150,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             // motionの取得を開始
             coreManager.startAccelerometerUpdates(to: OperationQueue.current!, withHandler: { (data, error) in
                 // 取得した値をコンソールに表示
-                print("x: \(data?.acceleration.x) y: \(data?.acceleration.y) z: \(data?.acceleration.z)")
+                self.xAxis = (data?.acceleration.x)!
+                self.yAxis = (data?.acceleration.y)!
+                self.zAxis = (data?.acceleration.z)!
+//                print("x: \(data?.acceleration.x) y: \(data?.acceleration.y) z: \(data?.acceleration.z)")
+                print("X: \(self.xAxis),Y: \(self.yAxis),Z: \(self.zAxis)")
             })
         }
         

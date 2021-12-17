@@ -25,7 +25,8 @@ opt_in_rules:
 severity: warning
 line_length: 250
 number_separator:
-  minimum_length: 5
+minimum_length: 5
+type_body_length: 400
 disabled_rules:
   - force_cast
   - identifier_name
