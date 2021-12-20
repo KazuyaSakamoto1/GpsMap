@@ -52,27 +52,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
     
-    // 加速度センサーの変数
+    // 衝撃検知関連
     var coreManager = CMMotionManager()
-    var xAccel = 0.0
-    var yAccel = 0.0
-    var zAccel = 0.0
-    let contorlAccel = 0.98
-    var mixAccel = 0.0
-    
-    // ジャイロセンサーの変数
-    var roll = 0.0
-    var pitch = 0.0
-    var yaw = 0.0
-    
-    // 気圧センサーの変数
     let altimeter = CMAltimeter()
-    var pressure = 0.0
-    var altitude = 0.0
-    var prePressure = 0.0
-    
-    // 衝撃検知用のフラグ
     var fallFlag = false
+    let impactDetection = ImpactDetection()
     var sendMail = SendMail()
     
     @IBOutlet weak var fallLabel: UILabel!
@@ -174,9 +158,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             // motionの取得を開始
             coreManager.startAccelerometerUpdates(to: OperationQueue.current!, withHandler: { (data, error) in
                 // 取得した値をコンソールに表示
-                self.xAccel = (data?.acceleration.x)!
-                self.yAccel = (data?.acceleration.y)!
-                self.zAccel = (data?.acceleration.z)!
+                self.impactDetection.xAccel = (data?.acceleration.x)!
+                self.impactDetection.yAccel = (data?.acceleration.y)!
+                self.impactDetection.zAccel = (data?.acceleration.z)!
                
             })
         }
@@ -190,8 +174,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 withHandler: { deviceManager, error in
                     // オイラー角を取得
                     let attitude: CMAttitude = deviceManager!.attitude
-                    self.roll = attitude.roll * 180 / Double.pi
-                    self.pitch = attitude.pitch * 180 / Double.pi
+                    self.impactDetection.roll = attitude.roll * 180 / Double.pi
+                    self.impactDetection.pitch = attitude.pitch * 180 / Double.pi
                 })
         }
         
@@ -203,8 +187,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             altimeter.startRelativeAltitudeUpdates(to: OperationQueue.current!, withHandler:
                                                     { data, error in
                 if error == nil {
-                    self.pressure = Double(truncating: data!.pressure)
-                    self.altitude = data?.relativeAltitude as! Double
+                    self.impactDetection.pressure = Double(truncating: data!.pressure)
+                    self.impactDetection.altitude = data?.relativeAltitude as! Double
 //                    print("pressure: \(self.pressure), altitude: \(self.altitude)")
                 }
             })
@@ -213,7 +197,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
     }
-    
     
     @objc func tapButton(_ sender: UIButton){
         self.mapView.userTrackingMode = .followWithHeading
@@ -345,7 +328,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         //        print("カメラ角度")
         //        print(mapView.camera.heading)
         // 加速度の判定を行う
-        fallFlag = self.fallDetectionAccel()
+        fallFlag = self.impactDetection.fallDetectionAccel()
         
         print("accel: \(fallFlag)")
         
@@ -355,7 +338,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
         // ジャイロセンサの判定を行う
-        fallFlag = self.fallDetectionGyro()
+        fallFlag = self.impactDetection.fallDetectionGyro()
         
         if fallFlag {
             print("Gyro: \(fallFlag)")
@@ -367,7 +350,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
         // 気圧の判定を行う
-        fallFlag = self.fallDetectionPressure()
+        fallFlag = self.impactDetection.fallDetectionPressure()
         
         if fallFlag {
             // フラグの判定を元にメールを送るか否か判定する関数
