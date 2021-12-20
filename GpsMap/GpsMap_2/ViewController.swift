@@ -251,7 +251,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             mapView.removeAnnotations(searchAnnotationArray)
             // 現在表示されているルートを削除
             self.mapView.removeOverlays(self.mapView.overlays)
-            sendMail.sendArrivedMail()
+            sendMail.sendArrivedMail(text: self.voiceStr)
             self.step = nil
             return
         }
@@ -355,7 +355,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if fallFlag {
             // フラグの判定を元にメールを送るか否か判定する関数
             print("pressure: \(fallFlag)")
-            sendMail.sendFallMail()
+            sendMail.sendFallMail(coordinate: self.currentCoordinate)
             Thread.sleep(forTimeInterval: 3.0)
             fallLabel.text = "！！異常検知！！"
             fallFlag = false
