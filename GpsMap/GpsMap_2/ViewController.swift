@@ -38,8 +38,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var prevCoordinateInfo: CLLocation? = nil
     let setAngle: Float = 15.0
     // 現在地ボタン
-    var button2 = UIButton()
-    let image = UIImage(named: "arrow")
+    var currentButton = UIButton()
+    let currentImage = UIImage(named: "arrow")
     // 音声テキストボタン
     var button3 = UIButton()
     let image2 = UIImage(named: "mic")
@@ -88,27 +88,45 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.serchBar!.accessibilityHint = "目的地の検索を行う"
         
         // 現在地ボタンを作成
-        self.button2 = UIButton(type: .custom)
-        self.button2.setImage(self.image, for: .normal)
-        self.view.addSubview(button2)
-        self.button2.frame = CGRect(x: 290, y: 500, width: 60, height: 60)
-        button2.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
+        self.currentButton = UIButton(type: .custom)
+        self.currentButton.translatesAutoresizingMaskIntoConstraints = false
+        self.currentButton.setImage(self.currentImage, for: .normal)
+        self.view.addSubview(currentButton)
+        self.currentButton.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
+        self.currentButton.layer.cornerRadius = 25
+        
+        // オートレイアウトの設定
+        self.currentButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -120).isActive = true
+        self.currentButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30).isActive = true
+        self.currentButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        self.currentButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
         
         // 現在地ボタンのアクセシビリティ
-        self.button2.isAccessibilityElement = true
-        self.button2.accessibilityLabel = "現在地を示す"
-        self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
-//
+        self.currentButton.isAccessibilityElement = true
+        self.currentButton.accessibilityLabel = "現在地を示す"
+        self.currentButton.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
+
         // 音声テキストボタンを作成
         self.button3 = UIButton(type: .custom)
+        self.button3.translatesAutoresizingMaskIntoConstraints = false
         self.button3.setImage(self.image2, for: .normal)
         self.view.addSubview(button3)
-        self.button3.frame = CGRect(x: 290, y: 430, width: 60, height: 60)
         button3.addTarget(self, action: #selector(self.sendMail(_:)), for: .touchUpInside)
+        self.button3.layer.cornerRadius = 25
         
+        // オートレイアウトの設定
+        self.button3.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -200).isActive = true
+        self.button3.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30).isActive = true
+        self.button3.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        self.button3.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        
+        // 音声テキストボタンのアクセシビリティ
+        self.button3.isAccessibilityElement = true
+        self.button3.accessibilityLabel = "音声検索を行う"
+        self.button3.accessibilityHint = "ボタンを押した後、目的地を言ってください。その後、ボタンを再度押すと場所を検索してくれます。"
     }
     
-    @objc func tapButton(_ sender: UIButton){
+    @objc func tapButton(_ sender: UIButton) {
         self.mapView.userTrackingMode = .followWithHeading
         let location = CLLocation(latitude: self.currentCoordinate.latitude, longitude: self.currentCoordinate.longitude)
         CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
@@ -120,7 +138,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     }
 
     // メールを自動で送信する関数
-    @objc func sendMail(_ sender: UIButton){
+    @objc func sendMail(_ sender: UIButton) {
         print("ボタンを押しました")
         let smtp = SMTP(
             hostname: "smtp.gmail.com",     // SMTP server address
