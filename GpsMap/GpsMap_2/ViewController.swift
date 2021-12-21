@@ -37,13 +37,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let speech = AVSpeechSynthesizer()
     var stepCount = 0
     var prevCoordinateInfo: CLLocation? = nil
-    let setAngle: Float = 15.0
     // 現在地ボタン
-    var button2 = UIButton()
-    let image = UIImage(named: "arrow")
+    var currentButton = UIButton()
+    let currentImage = UIImage(named: "arrow")
     // 音声テキストボタン
     var micButton = UIButton()
-    let image2 = UIImage(named: "mic")
+    let micImage = UIImage(named: "mic")
     var voiceStr = ""
 
     // マイクの変数
@@ -58,6 +57,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var fallFlag = false
     let impactDetection = ImpactDetection()
     var sendMail = SendMail()
+    
+    let directionJudge = DirectionJudge()
     
     @IBOutlet weak var fallLabel: UILabel!
     
@@ -102,25 +103,43 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.serchBar!.accessibilityHint = "目的地の検索を行う"
         
         // 現在地ボタンを作成
-        self.button2 = UIButton(type: .custom)
-        self.button2.setImage(self.image, for: .normal)
-        self.view.addSubview(button2)
-        self.button2.frame = CGRect(x: 290, y: 500, width: 60, height: 60)
-        button2.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
+        self.currentButton = UIButton(type: .custom)
+        self.currentButton.translatesAutoresizingMaskIntoConstraints = false
+        self.currentButton.setImage(self.currentImage, for: .normal)
+        self.view.addSubview(currentButton)
+        self.currentButton.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
+        self.currentButton.layer.cornerRadius = 25
+        
+        // 現在地ボタンのオートレイアウトの設定
+        self.currentButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -120).isActive = true
+        self.currentButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30).isActive = true
+        self.currentButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        self.currentButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
         
         // 現在地ボタンのアクセシビリティ
-        self.button2.isAccessibilityElement = true
-        self.button2.accessibilityLabel = "現在地を示す"
-        self.button2.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
+        self.currentButton.isAccessibilityElement = true
+        self.currentButton.accessibilityLabel = "現在地を示す"
+        self.currentButton.accessibilityHint = "ボタンを押すと音声で現在地を示します。"
         //
         // 音声テキストボタンを作成
         self.micButton = UIButton(type: .custom)
-        self.micButton.setImage(self.image2, for: .normal)
+        self.micButton.translatesAutoresizingMaskIntoConstraints = false
+        self.micButton.setImage(self.micImage, for: .normal)
         self.view.addSubview(micButton)
-        self.micButton.frame = CGRect(x: 290, y: 430, width: 60, height: 60)
         micButton.addTarget(self, action: #selector(self.recordButtonTapped(sender:)), for: .touchUpInside)
         micButton.setTitle("Start Recording", for: [])
         micButton.isEnabled = false
+        
+        // 音声テキストオートレイアウトの設定
+        self.micButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -200).isActive = true
+        self.micButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30).isActive = true
+        self.micButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        self.micButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        
+        // 音声テキストボタンのアクセシビリティ
+        self.micButton.isAccessibilityElement = true
+        self.micButton.accessibilityLabel = "音声検索を行う"
+        self.micButton.accessibilityHint = "ボタンを押した後、目的地を言ってください。その後、ボタンを再度押すと場所を検索してくれます。"
         
         // ユーザーに音声認識の許可を求める
         SFSpeechRecognizer.requestAuthorization { authStatus in
@@ -258,11 +277,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         let nextLocation = self.step.steps[self.stepCount]
         // 目標角度
-        let targetRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
-        let targetRadian2 = self.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
+        let targetRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
+        let targetRadian2 = directionJudge.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         // 実際に移動した角度
-        let userRadian = self.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate )
-        let userRadian2 = self.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
+        let userRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate )
+        let userRadian2 = directionJudge.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         
         print("前回の位置座標\(prevCoordinateInfo!.coordinate)")
         print("現在の位置座標\(locations.last!.coordinate)")
@@ -276,24 +295,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
         // 角度の評価を行う
-        if targetRadian - setAngle < 0 || targetRadian + setAngle > 360 {
+        if targetRadian - directionJudge.setAngle < 0 || targetRadian + directionJudge.setAngle > 360 {
             
-           Flag = Flag || self.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
-           Flag = Flag || self.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
+           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
+           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
         } else {
             
-           Flag = Flag || self.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
-           Flag = Flag || self.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
+           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
+           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
         }
         
-        if targetRadian2 - setAngle < 0 || targetRadian2 + setAngle > 360 {
+        if targetRadian2 - directionJudge.setAngle < 0 || targetRadian2 + directionJudge.setAngle > 360 {
             
-           Flag = Flag || self.compareAngle(targetRadian: targetRadian2, userRadian: userRadian2)
-            Flag = Flag || self.compareAngle(targetRadian: userRadian2, userRadian: targetRadian2)
+           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian2, userRadian: userRadian2)
+            Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian2, userRadian: targetRadian2)
         } else {
             
-           Flag = Flag || self.compareAngle2(targetRadian: targetRadian2, userRadian: userRadian2)
-           Flag = Flag || self.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
+           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian2, userRadian: userRadian2)
+           Flag = Flag || directionJudge.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
         }
         
         // 距離の評価を行う
@@ -324,7 +343,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
-        _ = self.degToRad(degrees: (self.mapView.camera.heading))
+        _ = directionJudge.degToRad(degrees: (self.mapView.camera.heading))
         //        print("カメラ角度")
         //        print(mapView.camera.heading)
         // 加速度の判定を行う
@@ -391,86 +410,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 角度に関する関数
     func rotateManager(heading: CLLocationDirection) {
         self.mapView.camera.heading = heading
-    }
-    
-    // 角度をラジアンに変換する
-    func degToRad(degrees: CGFloat) -> CGFloat {
-        return degrees * CGFloat.pi / 180
-    }
-    
-    // 各位を計算
-    func angle(coordinate: CLLocationCoordinate2D, coordinate2: CLLocationCoordinate2D) -> Float {
-        let currentLatitude     = degToRad(degrees: coordinate.latitude)
-        let currentLongitude    = degToRad(degrees: coordinate.longitude)
-        let targetLatitude      = degToRad(degrees: coordinate2.latitude)
-        let targetLongitude     = degToRad(degrees: coordinate2.longitude)
-        
-        let difLongitude = targetLongitude - currentLongitude
-        let y = sin(difLongitude)
-        let x = cos(currentLatitude) * tan(targetLatitude) - sin(currentLatitude) * cos(difLongitude)
-        let p = atan2(y, x) * 180 / CGFloat.pi
-        
-        if p < 0 {
-            return Float(360 + atan2(y, x) * 180 / CGFloat.pi)
-        }
-        return Float(atan2(y, x) * 180 / CGFloat.pi)
-    }
-    
-    // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたぐとき）
-    func compareAngle(targetRadian: Float, userRadian: Float) -> Bool {
-        // １つ目の計算用変数の角度調整
-        var calculationRadian = targetRadian + setAngle
-        
-        if calculationRadian > 360 {
-            calculationRadian -= 360
-        }
-        // ２つ目の計算用変数の角度調整
-        var calculationRadian2 = targetRadian - setAngle
-        
-        if calculationRadian2 < 0 {
-            calculationRadian2 += 360
-        }
-            
-        if userRadian < calculationRadian || userRadian > calculationRadian2 {
-            let a = true
-            return a
-        } else {
-            let a = false
-            return a
-        }
-    }
-    
-    // 角度を比較し、アナウンスするか否かの処理(０と３６０の間をまたがいないとき)
-    func compareAngle2(targetRadian: Float, userRadian: Float) -> Bool {
-     
-        // １つ目の計算用変数の角度調整
-        var calculationRadian = targetRadian + setAngle
-        
-        if calculationRadian > 360 {
-            
-            calculationRadian -= 360
-            
-        }
-        // ２つ目の計算用変数の角度調整
-        var calculationRadian2 = targetRadian - setAngle
-        
-        if calculationRadian2 < 0 {
-            
-            calculationRadian2 += 360
-            
-        }
-            
-        if userRadian < calculationRadian && userRadian > calculationRadian2 {
-            
-            let a = true
-            return a
-            
-        } else {
-            
-            let a = false
-            return a
-            
-        }
     }
     
     // 画面の初期位置の設定
