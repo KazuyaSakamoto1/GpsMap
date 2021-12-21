@@ -9,7 +9,9 @@ import Foundation
 import UIKit
 import MapKit
 import AVFoundation
+import CoreMotion
 
+import SwiftSMTP
 //　検索に関する処理
 extension ViewController: UISearchBarDelegate {
     // 検索ボタンがクリックされた際の処理内容
@@ -23,6 +25,7 @@ extension ViewController: UISearchBarDelegate {
         // 検索条件を作成する。
         let searchRequest = MKLocalSearch.Request()
         searchRequest.naturalLanguageQuery = searchBar.text
+        
         // 検索範囲はマップビューと同じにする。
         searchRequest.region = mapView.region
         // ローカル検索を実行する。
@@ -142,7 +145,7 @@ extension ViewController: UISearchBarDelegate {
                 print(step.distance)
                 print(step.notice  as Any)
                 print(step.polyline.coordinate)
-                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 45, identifier: "\(i)")
+                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 10, identifier: "\(i)")
                 self.locationManager.startMonitoring(for: region) // 引数で受け取った範囲を監視する
                 let circle = MKCircle(center: region.center, radius: region.radius)
                 self.mapView.addOverlay(circle)
@@ -195,4 +198,5 @@ extension ViewController: UISearchBarDelegate {
         }
         return MKOverlayRenderer()
     }
+
 }
