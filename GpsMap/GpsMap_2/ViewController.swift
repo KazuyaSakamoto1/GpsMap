@@ -240,8 +240,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         self.currentCoordinate.latitude = location.coordinate.latitude
         self.currentCoordinate.longitude = location.coordinate.longitude
-        print("緯度：\(self.currentCoordinate.longitude)")
-        print("経度：\(self.currentCoordinate.latitude)")
+//        print("緯度：\(self.currentCoordinate.longitude)")
+//        print("経度：\(self.currentCoordinate.latitude)")
         
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
@@ -340,12 +340,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
     }
+    
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
         _ = directionJudge.degToRad(degrees: (self.mapView.camera.heading))
-        //        print("カメラ角度")
-        //        print(mapView.camera.heading)
+        print("カメラ角度")
+        print(mapView.camera.heading)
+        
         // 加速度の判定を行う
         fallFlag = self.impactDetection.fallDetectionAccel()
         
@@ -374,10 +376,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if fallFlag {
             // フラグの判定を元にメールを送るか否か判定する関数
             print("pressure: \(fallFlag)")
-            sendMail.sendFallMail(coordinate: self.currentCoordinate)
-            Thread.sleep(forTimeInterval: 3.0)
-            fallLabel.text = "！！異常検知！！"
             fallFlag = false
+            print("--------\(fallFlag)--------")
+            sendMail.sendFallMail(coordinate: self.currentCoordinate)
+            fallLabel.text = "！！異常検知！！"
             
             return
         } else {
@@ -410,6 +412,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 角度に関する関数
     func rotateManager(heading: CLLocationDirection) {
         self.mapView.camera.heading = heading
+//        print("角度：\(self.mapView.camera.heading)")
     }
     
     // 画面の初期位置の設定
@@ -517,6 +520,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 // ローカル検索を実行する。
                 let localSerch: MKLocalSearch = MKLocalSearch(request: searchRequest)
                 localSerch.start(completionHandler: localSearchCompHandler(response:error:))
+                
+                let message = "\(self.voiceStr)を検索しました。"
+                let speechUtterance = AVSpeechUtterance(string: message)
+                self.speech.speak(speechUtterance)
                 
             } else {
                 try? startRecording()
