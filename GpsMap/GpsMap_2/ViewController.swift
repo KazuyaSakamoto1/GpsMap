@@ -57,8 +57,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var fallFlag = false
     let impactDetection = ImpactDetection()
     var sendMail = SendMail()
+    var impactTime = 0
     
     let directionJudge = DirectionJudge()
+    
     
     @IBOutlet weak var fallLabel: UILabel!
     
@@ -374,11 +376,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         fallFlag = self.impactDetection.fallDetectionPressure()
         
         if fallFlag {
+            let date = Date()
+            
+            if (Int(date.timeIntervalSince1970) - impactTime) < 60 {
+                return
+            }
+            
             // フラグの判定を元にメールを送るか否か判定する関数
             print("pressure: \(fallFlag)")
             fallFlag = false
             print("--------\(fallFlag)--------")
             sendMail.sendFallMail(coordinate: self.currentCoordinate)
+            impactTime = Int(date.timeIntervalSince1970)
             fallLabel.text = "！！異常検知！！"
             
             return
