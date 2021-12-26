@@ -279,67 +279,68 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         let nextLocation = self.step.steps[self.stepCount]
         // 目標角度
-        let targetRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
-        let targetRadian2 = directionJudge.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
+        let targetRadian = directionJudge.angle(coordinate: locations.last!.coordinate, coordinate2: nextLocation.polyline.coordinate)
+//        let targetRadian2 = directionJudge.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         // 実際に移動した角度
-        let userRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate )
-        let userRadian2 = directionJudge.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
+//        let userRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate )
+//        let userRadian2 = directionJudge.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         
-        print("前回の位置座標\(prevCoordinateInfo!.coordinate)")
+        let userRadian = self.mapView.camera.heading
+        
         print("現在の位置座標\(locations.last!.coordinate)")
         print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
-        print("ユーザの角度: \(userRadian)  目標角度: \(targetRadian)")
-        print("ユーザの角度: \(userRadian2)  目標角度: \(targetRadian2)")
+        print("目標角度: \(targetRadian), ユーザの角度: \(userRadian)")
+       
         
-        if userRadian == targetRadian {
-            print("位置が動いてません")
-            return
-        }
+//        if userRadian == targetRadian {
+//            print("位置が動いてません")
+//            return
+//        }
         
         // 角度の評価を行う
-        if targetRadian - directionJudge.setAngle < 0 || targetRadian + directionJudge.setAngle > 360 {
-            
-           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
-           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
-        } else {
-            
-           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
-           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
-        }
-        
-        if targetRadian2 - directionJudge.setAngle < 0 || targetRadian2 + directionJudge.setAngle > 360 {
-            
-           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian2, userRadian: userRadian2)
-            Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian2, userRadian: targetRadian2)
-        } else {
-            
-           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian2, userRadian: userRadian2)
-           Flag = Flag || directionJudge.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
-        }
-        
-        // 距離の評価を行う
-        let currentDistance = self.distance(current: ( currentCoordinate.latitude, currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude, nextLocation.polyline.coordinate.longitude))
-        var targetDistance = nextLocation.distance
-        
-        if currentDistance > targetDistance + 5.0 {
-            Flag = false
-            targetDistance = currentDistance
-        }
-        
-        print("現在地から次地点までの距離\(currentDistance)")
-        print("予測距離\(targetDistance)")
-        
-        // 判定を行う
-        if Flag {
-            print("正しい")
-        } else {
-            let message = "方向が違います。確認してください。"
-            print("違う")
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
-            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
-        }
+//        if targetRadian - directionJudge.setAngle < 0 || targetRadian + directionJudge.setAngle > 360 {
+//
+//           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
+//           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
+//        } else {
+//
+//           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
+//           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
+//        }
+//
+//        if targetRadian2 - directionJudge.setAngle < 0 || targetRadian2 + directionJudge.setAngle > 360 {
+//
+//           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian2, userRadian: userRadian2)
+//            Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian2, userRadian: targetRadian2)
+//        } else {
+//
+//           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian2, userRadian: userRadian2)
+//           Flag = Flag || directionJudge.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
+//        }
+//
+//        // 距離の評価を行う
+//        let currentDistance = self.distance(current: ( currentCoordinate.latitude, currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude, nextLocation.polyline.coordinate.longitude))
+//        var targetDistance = nextLocation.distance
+//
+//        if currentDistance > targetDistance + 5.0 {
+//            Flag = false
+//            targetDistance = currentDistance
+//        }
+//
+//        print("現在地から次地点までの距離\(currentDistance)")
+//        print("予測距離\(targetDistance)")
+//
+//        // 判定を行う
+//        if Flag {
+//            print("正しい")
+//        } else {
+//            let message = "方向が違います。確認してください。"
+//            print("違う")
+//            let speechUtterance = AVSpeechUtterance(string: message)
+//            self.speech.speak(speechUtterance)
+//            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
+//            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
+//        }
         
     }
     
