@@ -21,6 +21,7 @@
 		C5691A5A26C5050600609600 /* GpsMapUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A5926C5050600609600 /* GpsMapUITests.swift */; };
 		C5691A6926C50EFE00609600 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5691A6826C50EFE00609600 /* MapKit.framework */; };
 		C582D5E82702CE6400497AA1 /* ViewControllerSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */; };
+		C5836FCA2771DE6D005D6A16 /* DirectionJudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5836FC92771DE6D005D6A16 /* DirectionJudge.swift */; };
 		C5E8EC4427704D030097366D /* ImpactDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E8EC4327704D030097366D /* ImpactDetection.swift */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +66,7 @@
 		C5691A5B26C5050600609600 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5691A6826C50EFE00609600 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerSearch.swift; sourceTree = "<group>"; };
+		C5836FC92771DE6D005D6A16 /* DirectionJudge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionJudge.swift; sourceTree = "<group>"; };
 		C5E8EC4327704D030097366D /* ImpactDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactDetection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -129,6 +131,7 @@
 				68841AA426F3DD9000BBFAB9 /* Setting.swift */,
 				68AC1BE4276CFDAB002581E9 /* SendMail.swift */,
 				C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */,
+				C5836FC92771DE6D005D6A16 /* DirectionJudge.swift */,
 				C5E8EC4327704D030097366D /* ImpactDetection.swift */,
 				C5691A3A26C5050500609600 /* Main.storyboard */,
 				C5691A4026C5050600609600 /* Assets.xcassets */,
@@ -325,6 +328,7 @@
 				68841AA526F3DD9000BBFAB9 /* Setting.swift in Sources */,
 				C5691A3926C5050500609600 /* ViewController.swift in Sources */,
 				C5691A3526C5050500609600 /* AppDelegate.swift in Sources */,
+				C5836FCA2771DE6D005D6A16 /* DirectionJudge.swift in Sources */,
 				C5691A3F26C5050500609600 /* GpsMap_2.xcdatamodeld in Sources */,
 				C582D5E82702CE6400497AA1 /* ViewControllerSearch.swift in Sources */,
 				C5E8EC4427704D030097366D /* ImpactDetection.swift in Sources */,
