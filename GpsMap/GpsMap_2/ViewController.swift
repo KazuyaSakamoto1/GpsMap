@@ -92,6 +92,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         locationManager.startUpdatingHeading()
         // ナビゲーションアプリのための高い精度と追加のセンサーも使用する
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        locationManager.distanceFilter = 5
+        locationManager.allowsBackgroundLocationUpdates = true
+        
         mapView.delegate = self
         // 画面の初期設定
         self.initMap()
@@ -233,7 +236,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         var Flag: Bool = false
-        guard let location = locations.first else { return }
+        guard let location = locations.last else { return }
+        
+        let age = -location.timestamp.timeIntervalSinceNow
+        
+        if age > 10 {
+            print("古い位置情報です")
+            return
+        }
+        
+        if location.horizontalAccuracy < 0 {
+            print("error0:無効な位置情報です。")
+            return
+        }
+        
+        if location.horizontalAccuracy > 70 {
+            print("error100:無効な位置情報です。")
+            return
+        }
+        
+        print(location.horizontalAccuracy)
         
         // 到着予定時間を過ぎたら一度だけ実行される関数
         if self.step != nil {
@@ -242,9 +264,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         self.currentCoordinate.latitude = location.coordinate.latitude
         self.currentCoordinate.longitude = location.coordinate.longitude
-//        print("緯度：\(self.currentCoordinate.longitude)")
-//        print("経度：\(self.currentCoordinate.latitude)")
         
+        print(self.currentCoordinate)
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
             print("位置情報\(String(describing: prevCoordinateInfo))")
@@ -281,8 +302,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         // 目標角度
         let targetRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
         let targetRadian2 = directionJudge.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
+        
         // 実際に移動した角度
-        let userRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate )
+        let userRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate)
         let userRadian2 = directionJudge.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
         
         print("前回の位置座標\(prevCoordinateInfo!.coordinate)")
@@ -291,69 +313,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print("ユーザの角度: \(userRadian)  目標角度: \(targetRadian)")
         print("ユーザの角度: \(userRadian2)  目標角度: \(targetRadian2)")
         
-        if userRadian == targetRadian {
-            print("位置が動いてません")
-            return
-        }
-        
-        // 角度の評価を行う
-        if targetRadian - directionJudge.setAngle < 0 || targetRadian + directionJudge.setAngle > 360 {
-            
-           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian, userRadian: userRadian)
-           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
-        } else {
-            
-           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian, userRadian: userRadian)
-           Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian, userRadian: targetRadian)
-        }
-        
-        if targetRadian2 - directionJudge.setAngle < 0 || targetRadian2 + directionJudge.setAngle > 360 {
-            
-           Flag = Flag || directionJudge.compareAngle(targetRadian: targetRadian2, userRadian: userRadian2)
-            Flag = Flag || directionJudge.compareAngle(targetRadian: userRadian2, userRadian: targetRadian2)
-        } else {
-            
-           Flag = Flag || directionJudge.compareAngle2(targetRadian: targetRadian2, userRadian: userRadian2)
-           Flag = Flag || directionJudge.compareAngle2(targetRadian: userRadian2, userRadian: targetRadian2)
-        }
-        
-        // 距離の評価を行う
-        let currentDistance = self.distance(current: ( currentCoordinate.latitude, currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude, nextLocation.polyline.coordinate.longitude))
-        var targetDistance = nextLocation.distance
-        
-        if currentDistance > targetDistance + 5.0 {
-            Flag = false
-            targetDistance = currentDistance
-        }
-        
-        print("現在地から次地点までの距離\(currentDistance)")
-        print("予測距離\(targetDistance)")
-        
-        // 判定を行う
-        if Flag {
-            print("正しい")
-        } else {
-            let message = "方向が違います。確認してください。"
-            print("違う")
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
-            AudioServicesPlaySystemSound(UInt32(kSystemSoundID_Vibrate))
-        }
-        
     }
     
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
         _ = directionJudge.degToRad(degrees: (self.mapView.camera.heading))
-        print("カメラ角度")
-        print(mapView.camera.heading)
+//        print("カメラ角度")
+//        print(mapView.camera.heading)
         
         // 加速度の判定を行う
         fallFlag = self.impactDetection.fallDetectionAccel()
         
-        print("accel: \(fallFlag)")
+//        print("accel: \(fallFlag)")
         
         if fallFlag == false {
             fallLabel.text = "accel: 異常なし"
@@ -364,10 +336,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         fallFlag = self.impactDetection.fallDetectionGyro()
         
         if fallFlag {
-            print("Gyro: \(fallFlag)")
+//            print("Gyro: \(fallFlag)")
         } else {
             
-            print("Gyro: \(fallFlag)")
+//            print("Gyro: \(fallFlag)")
             fallLabel.text = "Gyro: 異常なし"
             return
         }
@@ -392,7 +364,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
             return
         } else {
-            print("pressure: \(fallFlag)")
+//            print("pressure: \(fallFlag)")
             fallLabel.text = "pressure: 異常なし"
             return
         }
