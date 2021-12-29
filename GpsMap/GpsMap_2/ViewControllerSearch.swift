@@ -16,6 +16,8 @@ import SwiftSMTP
 extension ViewController: UISearchBarDelegate {
     // 検索ボタンがクリックされた際の処理内容
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        self.stepCount = 0
         // トラッキングモードを無効化
         self.mapView.userTrackingMode = .none
         // 現在表示されているルートを削除

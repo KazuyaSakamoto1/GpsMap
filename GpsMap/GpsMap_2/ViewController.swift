@@ -60,6 +60,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var impactTime = 0
     
     let directionJudge = DirectionJudge()
+    @IBOutlet weak var checkLabel: UILabel!
     
     
     @IBOutlet weak var fallLabel: UILabel!
@@ -237,21 +238,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         var Flag: Bool = false
         guard let location = locations.last else { return }
-        
+        let message = "位置情報を取得中"
+        let speechUtterance = AVSpeechUtterance(string: message)
         let age = -location.timestamp.timeIntervalSinceNow
         
         if age > 10 {
             print("古い位置情報です")
+            
+            self.speech.speak(speechUtterance)
             return
         }
         
         if location.horizontalAccuracy < 0 {
             print("error0:無効な位置情報です。")
+            
+            self.speech.speak(speechUtterance)
             return
         }
         
         if location.horizontalAccuracy > 70 {
             print("error100:無効な位置情報です。")
+            
+            self.speech.speak(speechUtterance)
             return
         }
         
@@ -265,7 +273,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.currentCoordinate.latitude = location.coordinate.latitude
         self.currentCoordinate.longitude = location.coordinate.longitude
         
-        print(self.currentCoordinate)
         if prevCoordinateInfo == nil {
             prevCoordinateInfo = locations.last
             print("位置情報\(String(describing: prevCoordinateInfo))")
@@ -298,29 +305,30 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return
         }
         
-        let nextLocation = self.step.steps[self.stepCount]
-        // 目標角度
-        let targetRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: nextLocation.polyline.coordinate)
-        let targetRadian2 = directionJudge.angle(coordinate: nextLocation.polyline.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
-        
-        // 実際に移動した角度
-        let userRadian = directionJudge.angle(coordinate: prevCoordinateInfo!.coordinate, coordinate2: locations.last!.coordinate)
-        let userRadian2 = directionJudge.angle(coordinate: locations.last!.coordinate, coordinate2: prevCoordinateInfo!.coordinate)
-        
-        print("前回の位置座標\(prevCoordinateInfo!.coordinate)")
-        print("現在の位置座標\(locations.last!.coordinate)")
-        print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
-        print("ユーザの角度: \(userRadian)  目標角度: \(targetRadian)")
-        print("ユーザの角度: \(userRadian2)  目標角度: \(targetRadian2)")
-        
     }
     
     // 磁気センサからユーザーの角度を取得
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
         _ = directionJudge.degToRad(degrees: (self.mapView.camera.heading))
-//        print("カメラ角度")
-//        print(mapView.camera.heading)
+        
+        if self.step != nil {
+            let nextLocation = self.step.steps[self.stepCount]
+            let targetRadian = directionJudge.angle(coordinate: self.currentCoordinate, coordinate2: nextLocation.polyline.coordinate)
+
+            print("現在の位置座標\(self.currentCoordinate)")
+            print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
+            print("ユーザの角度: \(self.mapView.camera.heading)  目標角度: \(targetRadian)")
+
+            if targetRadian + directionJudge.setAngle > 360.0 || targetRadian - directionJudge.setAngle < 0 {
+                directionJudge.compareAngle(targetRadian: targetRadian, userRadian: self.mapView.camera.heading)
+            } else {
+                
+                directionJudge.compareAngle2(targetRadian: targetRadian, userRadian: self.mapView.camera.heading)
+                
+            }
+            
+        }
         
         // 加速度の判定を行う
         fallFlag = self.impactDetection.fallDetectionAccel()
@@ -405,17 +413,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         mapView.setRegion(region, animated: true)
     }
     
-    // setting画面遷移のコード
-//    @IBAction func nextSetting(_ sender: Any) {
-//        let storyboard: UIStoryboard = self.storyboard!
-//         // ②遷移先ViewControllerのインスタンス取得
-//        let nextView = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
-//        // ③画面遷移
-//       self.present(nextView!, animated: true, completion: nil)
-//        let nextVC = storyboard.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController
-//        navigationController?.pushViewController(nextVC! as UIViewController, animated: true)
-//    }
-    
     @IBAction func settingsButtonAction(_ sender: Any) {
         let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
@@ -429,8 +426,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
         print("Enter （領域内）\(self.stepCount)")
-    
-//
+
         if self.stepCount < self.step.steps.count {
             let currentStep = self.step.steps[stepCount]
             let message = "まもなく \(currentStep.instructions)　です。"
@@ -495,6 +491,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 
                 let searchRequest = MKLocalSearch.Request()
                 searchRequest.naturalLanguageQuery = self.voiceStr
+                self.stepCount = 0
                 
                 // 検索範囲はマップビューと同じにする。
                 searchRequest.region = mapView.region
@@ -577,9 +574,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 micButton.setTitle("Recognition not available", for: .disabled)
             }
         }
-
-    
-    
 }
     // マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
