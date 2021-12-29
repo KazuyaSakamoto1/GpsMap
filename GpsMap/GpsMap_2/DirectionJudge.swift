@@ -12,11 +12,11 @@ import AudioToolbox
 
 class DirectionJudge {
     
-    let setAngle = 15.0
+    let setAngle = 30.0
     
     // 角度をラジアンに変換する
-    func degToRad(degrees: CGFloat) -> CGFloat {
-        return degrees * CGFloat.pi / 180
+    func degToRad(degrees: Double) -> Double {
+        return degrees * Double.pi / 180
     }
     
     // 座標から距離を求める関数（三角球面法）
@@ -61,7 +61,7 @@ class DirectionJudge {
         // １つ目の計算用変数の角度調整
         var calculationRadian = targetRadian + setAngle
         
-        if calculationRadian > 360  {
+        if calculationRadian > 360 {
             
             calculationRadian -= 360
             
@@ -119,5 +119,24 @@ class DirectionJudge {
             
         }
     }
+    
+    // 座標から距離を求める関数（三角球面法）
+//    func distance(current: (la: Double, lo: Double), target: (la: Double, lo: Double)) -> Double {
+//
+//        // 緯度経度をラジアンに変換
+//        let currentLa   = current.la * Double.pi / 180
+//        let currentLo   = current.lo * Double.pi / 180
+//        let targetLa    = target.la * Double.pi / 180
+//        let targetLo    = target.lo * Double.pi / 180
+//
+//        // 赤道半径
+//        let equatorRadius = 6378137.0
+//
+//        // 算出
+//        let averageLat = (currentLa - targetLa) / 2
+//        let averageLon = (currentLo - targetLo) / 2
+//        let distance = equatorRadius * 2 * asin(sqrt(pow(sin(averageLat), 2) + cos(currentLa) * cos(targetLa) * pow(sin(averageLon), 2)))
+//        return distance
+//    }
     
 }
