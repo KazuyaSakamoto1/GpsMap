@@ -18,6 +18,7 @@ extension ViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         self.stepCount = 0
+        self.regionFlag = true
         // トラッキングモードを無効化
         self.mapView.userTrackingMode = .none
         // 現在表示されているルートを削除
@@ -107,6 +108,7 @@ extension ViewController: UISearchBarDelegate {
     // 目的地までのルートを取得
     func getRoute(goalCoordinate: CLLocationCoordinate2D!) {
         self.stepCount = 0
+        self.regionFlag = true
         self.mapView.removeOverlays(self.mapView.overlays)
         // 現在地と目的地のMKPlacemarkを生成
         let fromPlacemark = MKPlacemark(coordinate: locationManager.location!.coordinate, addressDictionary: nil)

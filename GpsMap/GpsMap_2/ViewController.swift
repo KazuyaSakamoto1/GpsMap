@@ -65,6 +65,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     @IBOutlet weak var fallLabel: UILabel!
     
+    // 領域検知用のフラグ
+    var regionDetection = RegionDetection()
+    var regionFlag = true
+    
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -114,7 +118,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.currentButton.setImage(self.currentImage, for: .normal)
         self.view.addSubview(currentButton)
         self.currentButton.addTarget(self, action: #selector(self.tapButton(_ :)), for: .touchUpInside)
-        self.currentButton.layer.cornerRadius = 25
+        self.currentButton.layer.cornerRadius = 40
         
         // 現在地ボタンのオートレイアウトの設定
         self.currentButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -120).isActive = true
@@ -243,7 +247,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        var Flag: Bool = false
+        
         guard let location = locations.last else { return }
         let message = "位置情報を取得中"
         let speechUtterance = AVSpeechUtterance(string: message)
@@ -280,24 +284,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.currentCoordinate.latitude = location.coordinate.latitude
         self.currentCoordinate.longitude = location.coordinate.longitude
         
-        if prevCoordinateInfo == nil {
-            prevCoordinateInfo = locations.last
-            print("位置情報\(String(describing: prevCoordinateInfo))")
-            return
-        }
-        
         if self.step == nil {
             return
         }
     
-        // 位置座標が変更していないとき
-        if prevCoordinateInfo?.coordinate.latitude == currentCoordinate.latitude && prevCoordinateInfo?.coordinate.longitude == currentCoordinate.longitude {
-            print("位置座標が変わってません")
-            return
-        }
-    
+        let nextLocation = self.step.steps[self.stepCount]
+        
         // 到着時のアナウンス
-        print("到着：count: \(self.step.steps.count)")
+        print("count: \(self.step.steps.count), selfCount: \(self.stepCount)")
         if self.step.steps.count == self.stepCount {
             self.stepCount = 0
             let message = "到着しました。お疲れさまでした。"
@@ -310,6 +304,50 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             sendMail.sendArrivedMail(text: self.voiceStr)
             self.step = nil
             return
+        }
+        
+        print(self.regionFlag)
+        
+        print(regionDetection.distance(current: (self.currentCoordinate.latitude,self.currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude,nextLocation.polyline.coordinate.longitude)))
+        
+        // 領域の判定
+        if self.regionFlag {
+            
+            self.regionFlag = regionDetection.regionTrueJudge(userLocation: self.currentCoordinate, targetLocation: nextLocation.polyline.coordinate)
+            
+            if self.regionFlag == false {
+                
+                let message = "まもなく \(nextLocation.instructions)　です。"
+                print("領域内に侵入：\(message)")
+                print(self.stepCount)
+                let speechUtterance = AVSpeechUtterance(string: message)
+                self.speech.speak(speechUtterance)
+
+                self.stepCount += 1
+            }
+            
+            return
+            
+        } else {
+            
+            if self.stepCount == 0 {
+                return
+            }
+            
+            self.regionFlag = regionDetection.regionFalseJudge(userLocation: self.currentCoordinate, targetLocation: self.step.polyline.coordinate)
+            
+            if self.regionFlag == true {
+                let preLocation = self.step.steps[self.stepCount - 1]
+                let message = "\(preLocation.instructions)です。その先、\(nextLocation.instructions)　です。"
+                print("領域外に出る：\(message)")
+                print(self.stepCount)
+                let speechUtterance = AVSpeechUtterance(string: message)
+                self.speech.speak(speechUtterance)
+                
+            }
+            
+            return
+    
         }
         
     }
@@ -409,44 +447,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         self.present(settingsViewController, animated: true, completion: nil)
     }
     
-    // 領域内に侵入した時
-    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        
-        if self.stepCount == 0 {
-            return
-        }
-        
-        print("Enter （領域内）\(self.stepCount)")
-        
-        let currentStep = self.step.steps[stepCount]
-        let message = "まもなく \(currentStep.instructions)　です。"
-        print("領域内に侵入：\(message)")
-        print(self.stepCount)
-        let speechUtterance = AVSpeechUtterance(string: message)
-        self.speech.speak(speechUtterance)
-        
-    }
-    
-    // 領域外に外れた時
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        if self.stepCount <= 1  {
-            return
-        }
-        print("Enter （領域外）\(self.stepCount)")
-        
-        if self.stepCount < self.step.steps.count { 
-            let currentStep = self.step.steps[stepCount]
-            let prevStep = self.step.steps[stepCount - 1]
-            let message = "\(prevStep.instructions)です。その先、\(round(currentStep.distance)) メートル先, \(currentStep.instructions)　です。"
-            let speechUtterance = AVSpeechUtterance(string: message)
-            self.speech.speak(speechUtterance)
-            print("領域外：\(message)")
-        } else {
-            locationManager.monitoredRegions.forEach ({ self.locationManager.stopMonitoring(for: $0)})
-        }
-    }
-    
-    
     // 録音ボタンが押されたら呼ばれる
     @objc func recordButtonTapped(sender: UIButton) {
             
@@ -465,6 +465,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 let searchRequest = MKLocalSearch.Request()
                 searchRequest.naturalLanguageQuery = self.voiceStr
                 self.stepCount = 0
+                self.regionFlag = true
                 
                 // 検索範囲はマップビューと同じにする。
                 searchRequest.region = mapView.region

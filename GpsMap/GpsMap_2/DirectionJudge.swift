@@ -19,24 +19,24 @@ class DirectionJudge {
         return degrees * Double.pi / 180
     }
     
-    // 座標から距離を求める関数（三角球面法）
-    func distance(current: (la: Double, lo: Double), target: (la: Double, lo: Double)) -> Double {
-        
-        // 緯度経度をラジアンに変換
-        let currentLa   = current.la * Double.pi / 180
-        let currentLo   = current.lo * Double.pi / 180
-        let targetLa    = target.la * Double.pi / 180
-        let targetLo    = target.lo * Double.pi / 180
-
-        // 赤道半径
-        let equatorRadius = 6378137.0
-        
-        // 算出
-        let averageLat = (currentLa - targetLa) / 2
-        let averageLon = (currentLo - targetLo) / 2
-        let distance = equatorRadius * 2 * asin(sqrt(pow(sin(averageLat), 2) + cos(currentLa) * cos(targetLa) * pow(sin(averageLon), 2)))
-        return distance
-    }
+//    // 座標から距離を求める関数（三角球面法）
+//    func distance(current: (la: Double, lo: Double), target: (la: Double, lo: Double)) -> Double {
+//
+//        // 緯度経度をラジアンに変換
+//        let currentLa   = current.la * Double.pi / 180
+//        let currentLo   = current.lo * Double.pi / 180
+//        let targetLa    = target.la * Double.pi / 180
+//        let targetLo    = target.lo * Double.pi / 180
+//
+//        // 赤道半径
+//        let equatorRadius = 6378137.0
+//
+//        // 算出
+//        let averageLat = (currentLa - targetLa) / 2
+//        let averageLon = (currentLo - targetLo) / 2
+//        let distance = equatorRadius * 2 * asin(sqrt(pow(sin(averageLat), 2) + cos(currentLa) * cos(targetLa) * pow(sin(averageLon), 2)))
+//        return distance
+//    }
     
     // 各位を計算
     func angle(coordinate: CLLocationCoordinate2D, coordinate2: CLLocationCoordinate2D) -> Double{
@@ -119,24 +119,5 @@ class DirectionJudge {
             
         }
     }
-    
-    // 座標から距離を求める関数（三角球面法）
-//    func distance(current: (la: Double, lo: Double), target: (la: Double, lo: Double)) -> Double {
-//
-//        // 緯度経度をラジアンに変換
-//        let currentLa   = current.la * Double.pi / 180
-//        let currentLo   = current.lo * Double.pi / 180
-//        let targetLa    = target.la * Double.pi / 180
-//        let targetLo    = target.lo * Double.pi / 180
-//
-//        // 赤道半径
-//        let equatorRadius = 6378137.0
-//
-//        // 算出
-//        let averageLat = (currentLa - targetLa) / 2
-//        let averageLon = (currentLo - targetLo) / 2
-//        let distance = equatorRadius * 2 * asin(sqrt(pow(sin(averageLat), 2) + cos(currentLa) * cos(targetLa) * pow(sin(averageLon), 2)))
-//        return distance
-//    }
     
 }
