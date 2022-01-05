@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		68841AA526F3DD9000BBFAB9 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68841AA426F3DD9000BBFAB9 /* Setting.swift */; };
+		68841AA526F3DD9000BBFAB9 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68841AA426F3DD9000BBFAB9 /* SettingViewController.swift */; };
 		68AC1BE5276CFDAB002581E9 /* SendMail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AC1BE4276CFDAB002581E9 /* SendMail.swift */; };
 		68B63CD2277F99A400E345DF /* RegionDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B63CD1277F99A400E345DF /* RegionDetection.swift */; };
 		C567AA2327675EB3003336C0 /* SwiftSMTP in Frameworks */ = {isa = PBXBuildFile; productRef = C567AA2227675EB3003336C0 /* SwiftSMTP */; };
@@ -44,7 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		68841AA426F3DD9000BBFAB9 /* Setting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
+		68841AA426F3DD9000BBFAB9 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		68AC1BE4276CFDAB002581E9 /* SendMail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMail.swift; sourceTree = "<group>"; };
 		68B63CD1277F99A400E345DF /* RegionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionDetection.swift; sourceTree = "<group>"; };
 		C566F3962716F284003C9B52 /* Miyadai2MaxValue.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Miyadai2MaxValue.gpx; sourceTree = "<group>"; };
@@ -130,7 +130,7 @@
 				C5691A3426C5050500609600 /* AppDelegate.swift */,
 				C5691A3626C5050500609600 /* SceneDelegate.swift */,
 				C5691A3826C5050500609600 /* ViewController.swift */,
-				68841AA426F3DD9000BBFAB9 /* Setting.swift */,
+				68841AA426F3DD9000BBFAB9 /* SettingViewController.swift */,
 				68AC1BE4276CFDAB002581E9 /* SendMail.swift */,
 				C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */,
 				68B63CD1277F99A400E345DF /* RegionDetection.swift */,
@@ -328,7 +328,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68841AA526F3DD9000BBFAB9 /* Setting.swift in Sources */,
+				68841AA526F3DD9000BBFAB9 /* SettingViewController.swift in Sources */,
 				C5691A3926C5050500609600 /* ViewController.swift in Sources */,
 				C5691A3526C5050500609600 /* AppDelegate.swift in Sources */,
 				68B63CD2277F99A400E345DF /* RegionDetection.swift in Sources */,

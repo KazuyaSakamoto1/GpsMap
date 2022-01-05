@@ -338,7 +338,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
             if self.regionFlag == true {
                 let preLocation = self.step.steps[self.stepCount - 1]
-                let message = "\(preLocation.instructions)です。その先、\(nextLocation.instructions)　です。"
+                let message = "\(preLocation.instructions)です。その先、\(nextLocation.distance)メートル先\(nextLocation.instructions)　です。"
                 print("領域外に出る：\(message)")
                 print(self.stepCount)
                 let speechUtterance = AVSpeechUtterance(string: message)
@@ -443,7 +443,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     }
     
     @IBAction func settingsButtonAction(_ sender: Any) {
-        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as! SettingsViewController
+        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "settingsViewController") as! SettingsViewController
         self.present(settingsViewController, animated: true, completion: nil)
     }
     
