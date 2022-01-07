@@ -16,6 +16,9 @@ import SwiftSMTP
 extension ViewController: UISearchBarDelegate {
     // 検索ボタンがクリックされた際の処理内容
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        self.stepCount = 0
+        self.regionFlag = true
         // トラッキングモードを無効化
         self.mapView.userTrackingMode = .none
         // 現在表示されているルートを削除
@@ -104,6 +107,8 @@ extension ViewController: UISearchBarDelegate {
     }
     // 目的地までのルートを取得
     func getRoute(goalCoordinate: CLLocationCoordinate2D!) {
+        self.stepCount = 0
+        self.regionFlag = true
         self.mapView.removeOverlays(self.mapView.overlays)
         // 現在地と目的地のMKPlacemarkを生成
         let fromPlacemark = MKPlacemark(coordinate: locationManager.location!.coordinate, addressDictionary: nil)
@@ -145,7 +150,7 @@ extension ViewController: UISearchBarDelegate {
                 print(step.distance)
                 print(step.notice  as Any)
                 print(step.polyline.coordinate)
-                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 10, identifier: "\(i)")
+                let region = CLCircularRegion(center: step.polyline.coordinate, radius: 5, identifier: "\(i)")
                 self.locationManager.startMonitoring(for: region) // 引数で受け取った範囲を監視する
                 let circle = MKCircle(center: region.center, radius: region.radius)
                 self.mapView.addOverlay(circle)

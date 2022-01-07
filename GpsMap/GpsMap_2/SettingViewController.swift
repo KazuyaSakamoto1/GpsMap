@@ -16,9 +16,9 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
     }
     // 仮のボタン
     @IBAction func example(_ sender: Any) {
-//        let mainViewController = self.storyboard?.instantiateViewController(withIdentifier: "main") as! ViewController
         print("-------------------------------------")
-//        print(mainViewController)
-        ViewController().mapView.mapType = .satellite // mapViewでnilが見つかると言われる。
+        let viewController = self.presentingViewController as! ViewController
+        
+        viewController.mapView.mapType = .satelliteFlyover
     }
 }

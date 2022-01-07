@@ -54,11 +54,19 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RfB-nw-7WI">
+                                <rect key="frame" x="20" y="675" width="274" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
+                        <outlet property="checkLabel" destination="RfB-nw-7WI" id="JPy-bT-VWi"/>
                         <outlet property="fallLabel" destination="Pfd-th-RWb" id="4ZU-SH-6lH"/>
                         <outlet property="mapView" destination="YAK-YV-gvO" id="jYh-q9-ZdJ"/>
                         <outlet property="serchBar" destination="Xnx-K6-Kax" id="v9D-Gw-XA7"/>
@@ -66,12 +74,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-13.043478260869566" y="114.50892857142857"/>
+            <point key="canvasLocation" x="-255.07246376811597" y="94.419642857142847"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="a4O-Aw-LBb">
             <objects>
-                <viewController storyboardIdentifier="SettingsViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="oak-8k-3CP" customClass="SettingsViewController" customModule="ブラインドマップ" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="settingsViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="oak-8k-3CP" customClass="SettingsViewController" customModule="ブラインドマップ" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8Nu-gx-DZE">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
