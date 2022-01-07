@@ -44,7 +44,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var micButton = UIButton()
     let micImage = UIImage(named: "mic")
     var voiceStr = ""
-
+    
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -62,12 +62,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let directionJudge = DirectionJudge()
     @IBOutlet weak var checkLabel: UILabel!
     
-    
     @IBOutlet weak var fallLabel: UILabel!
     
     // 領域検知用のフラグ
     var regionDetection = RegionDetection()
     var regionFlag = true
+    
+    // メール
+    var domain = ""
+    var sendAdress = ""
+    var sendPass = ""
+    var receiveAdress = ""
     
     // 位置情報の取得
     override func viewDidLoad() {
@@ -190,7 +195,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 self.impactDetection.xAccel = (data?.acceleration.x)!
                 self.impactDetection.yAccel = (data?.acceleration.y)!
                 self.impactDetection.zAccel = (data?.acceleration.z)!
-               
+                
             })
         }
         // ジャイロセンサーから値の取得
@@ -218,7 +223,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 if error == nil {
                     self.impactDetection.pressure = Double(truncating: data!.pressure)
                     self.impactDetection.altitude = data?.relativeAltitude as! Double
-//                    print("pressure: \(self.pressure), altitude: \(self.altitude)")
+                    //                    print("pressure: \(self.pressure), altitude: \(self.altitude)")
                 }
             })
         } else {
@@ -233,16 +238,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         print("現在のカウント\(self.stepCount)")
         if self.step != nil{
-        print("経路情報のカウント\(self.step.steps.count)")
+            print("経路情報のカウント\(self.step.steps.count)")
         } else {
-        print("経路情報なし")
+            print("経路情報なし")
         }
-//        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-//            guard let placemark = placemarks?.first, error == nil else { return }
-//            let message = placemark.name
-//            let speechUtterance = AVSpeechUtterance(string: message!)
-//            self.speech.speak(speechUtterance)
-//        }
+        
+        print("\(self.domain)/ \(self.sendAdress)/ \(self.sendPass)/ \(self.receiveAdress)")
+        
+//        sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendMail: self.sendAdress, pass: self.sendPass, toMail: self.receiveAdress)
+        
+        sendMail.sendArrivedMail(text: voiceStr,domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
+        //        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+        //            guard let placemark = placemarks?.first, error == nil else { return }
+        //            let message = placemark.name
+        //            let speechUtterance = AVSpeechUtterance(string: message!)
+        //            self.speech.speak(speechUtterance)
+        //        }
     }
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
@@ -287,7 +298,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if self.step == nil {
             return
         }
-    
+        
         let nextLocation = self.step.steps[self.stepCount]
         
         // 到着時のアナウンス
@@ -301,7 +312,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             mapView.removeAnnotations(searchAnnotationArray)
             // 現在表示されているルートを削除
             self.mapView.removeOverlays(self.mapView.overlays)
-            sendMail.sendArrivedMail(text: self.voiceStr)
+//            sendMail.sendArrivedMail(text: voiceStr, domain: self.domain, sendMail: self.sendAdress, pass: self.sendPass, toMail: self.receiveAdress)
             self.step = nil
             return
         }
@@ -322,7 +333,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                 print(self.stepCount)
                 let speechUtterance = AVSpeechUtterance(string: message)
                 self.speech.speak(speechUtterance)
-
+                
                 self.stepCount += 1
             }
             
@@ -347,7 +358,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
             
             return
-    
+            
         }
         
     }
@@ -360,16 +371,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if self.stepCount != 0 && self.mapView.userTrackingMode == .followWithHeading {
             let nextLocation = self.step.steps[self.stepCount]
             let targetRadian = directionJudge.angle(coordinate: self.currentCoordinate, coordinate2: nextLocation.polyline.coordinate)
-       
+            
             print("現在の位置座標\(self.currentCoordinate)")
             print("目標地点の座標\(self.step.steps[self.stepCount].polyline.coordinate)")
             print("ユーザの角度: \(self.mapView.camera.heading)  目標角度: \(targetRadian)")
             self.checkLabel.text = "ユーザ:\(Int(self.mapView.camera.heading))目標角度:\(Int(targetRadian))Count:\(self.stepCount)"
-
+            
             if targetRadian + directionJudge.setAngle > 360.0 || targetRadian - directionJudge.setAngle < 0 {
                 
                 directionJudge.compareAngle(targetRadian: targetRadian, userRadian: self.mapView.camera.heading)
-            
+                
             } else {
                 
                 directionJudge.compareAngle2(targetRadian: targetRadian, userRadian: self.mapView.camera.heading)
@@ -381,7 +392,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         // 加速度の判定を行う
         fallFlag = self.impactDetection.fallDetectionAccel()
         
-//        print("accel: \(fallFlag)")
+        //        print("accel: \(fallFlag)")
         
         if fallFlag == false {
             fallLabel.text = "accel: 異常なし"
@@ -392,10 +403,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         fallFlag = self.impactDetection.fallDetectionGyro()
         
         if fallFlag {
-//            print("Gyro: \(fallFlag)")
+            //            print("Gyro: \(fallFlag)")
         } else {
             
-//            print("Gyro: \(fallFlag)")
+            //            print("Gyro: \(fallFlag)")
             fallLabel.text = "Gyro: 異常なし"
             return
         }
@@ -414,13 +425,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             print("pressure: \(fallFlag)")
             fallFlag = false
             print("--------\(fallFlag)--------")
-            sendMail.sendFallMail(coordinate: self.currentCoordinate)
+            sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendMail: self.sendAdress, pass: self.sendPass, toMail: self.receiveAdress)
             impactTime = Int(date.timeIntervalSince1970)
             fallLabel.text = "！！異常検知！！"
             
             return
         } else {
-//            print("pressure: \(fallFlag)")
+            //            print("pressure: \(fallFlag)")
             fallLabel.text = "pressure: 異常なし"
             return
         }
@@ -430,7 +441,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 角度に関する関数
     func rotateManager(heading: CLLocationDirection) {
         self.mapView.camera.heading = heading
-//        print("角度：\(self.mapView.camera.heading)")
+        //        print("角度：\(self.mapView.camera.heading)")
     }
     
     // 画面の初期位置の設定
@@ -449,40 +460,40 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     
     // 録音ボタンが押されたら呼ばれる
     @objc func recordButtonTapped(sender: UIButton) {
+        
+        if audioEngine.isRunning {
+            audioEngine.stop()
+            recognitionRequest?.endAudio()
+            micButton.isEnabled = false
+            micButton.setTitle("Stopping", for: .disabled)
             
-            if audioEngine.isRunning {
-                audioEngine.stop()
-                recognitionRequest?.endAudio()
-                micButton.isEnabled = false
-                micButton.setTitle("Stopping", for: .disabled)
-                
-                // 録音が停止した！
-                print("録音停止")
-                
-                let avSession = AVAudioSession.sharedInstance()
-                try? avSession.setCategory(.ambient)
-                
-                let searchRequest = MKLocalSearch.Request()
-                searchRequest.naturalLanguageQuery = self.voiceStr
-                self.stepCount = 0
-                self.regionFlag = true
-                
-                // 検索範囲はマップビューと同じにする。
-                searchRequest.region = mapView.region
-                // ローカル検索を実行する。
-                let localSerch: MKLocalSearch = MKLocalSearch(request: searchRequest)
-                localSerch.start(completionHandler: localSearchCompHandler(response:error:))
-                
-                let message = "\(self.voiceStr)を検索しました。"
-                let speechUtterance = AVSpeechUtterance(string: message)
-                self.speech.speak(speechUtterance)
-                
-            } else {
-                try? startRecording()
-                micButton.setTitle("Stop recording", for: [])
-                
-            }
+            // 録音が停止した！
+            print("録音停止")
+            
+            let avSession = AVAudioSession.sharedInstance()
+            try? avSession.setCategory(.ambient)
+            
+            let searchRequest = MKLocalSearch.Request()
+            searchRequest.naturalLanguageQuery = self.voiceStr
+            self.stepCount = 0
+            self.regionFlag = true
+            
+            // 検索範囲はマップビューと同じにする。
+            searchRequest.region = mapView.region
+            // ローカル検索を実行する。
+            let localSerch: MKLocalSearch = MKLocalSearch(request: searchRequest)
+            localSerch.start(completionHandler: localSearchCompHandler(response:error:))
+            
+            let message = "\(self.voiceStr)を検索しました。"
+            let speechUtterance = AVSpeechUtterance(string: message)
+            self.speech.speak(speechUtterance)
+            
+        } else {
+            try? startRecording()
+            micButton.setTitle("Stop recording", for: [])
+            
         }
+    }
     
     // 録音を開始する
     private func startRecording() throws {
@@ -536,24 +547,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         try audioEngine.start()
     }
     
-    // MARK: SFSpeechRecognizerDelegate
-        // speechRecognizerが使用可能かどうかでボタンのisEnabledを変更する
-        public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
-            if available {
-                micButton.isEnabled = true
-                micButton.setTitle("Start Recording", for: [])
-                
-            } else {
-                micButton.isEnabled = false
-                micButton.setTitle("Recognition not available", for: .disabled)
-            }
+    // speechRecognizerが使用可能かどうかでボタンのisEnabledを変更する
+    public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
+        if available {
+            micButton.isEnabled = true
+            micButton.setTitle("Start Recording", for: [])
+            
+        } else {
+            micButton.isEnabled = false
+            micButton.setTitle("Recognition not available", for: .disabled)
         }
+    }
     
 }
-    // マイクに関する処理
+
+// マイクに関する処理
 extension ViewController: SFSpeechRecognizerDelegate {
     // 認証の処理（ここで関数が呼び出されている）
-
+    
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }

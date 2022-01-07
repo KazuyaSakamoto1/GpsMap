@@ -11,18 +11,19 @@ import SwiftSMTP
 import CoreLocation
 
 class SendMail {
-    
+        
     // メールを自動で送信する関数(到着時間を過ぎた時用)
     @objc func sendAttentionMail(_ sender: UIButton){
         print("メールの送信を行います")
         let smtp = SMTP(
-            hostname: "smtp.gmail.com",     // SMTP server address
-            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-            password: ""            // password to login
+//            hostname: "smtp.gmail.com",     // SMTP server address
+            hostname: "smtp.",     // SMTP server address
+            email: "",        // 送信側メールアドレスを入力
+            password: ""            // 送信側パスワード
         )
         
-        let drLight = Mail.User(name: "Dr. Light", email: "hiroto.0927.123@gmail.com")
-        let megaman = Mail.User(name: "Megaman", email: "hiroto_0927_123@yahoo.co.jp")
+        let drLight = Mail.User(name: "テストユーザ１", email: "")
+        let megaman = Mail.User(name: "テストユーザ２", email: "")
 
         let mail = Mail(
             from: drLight,
@@ -34,48 +35,51 @@ class SendMail {
         smtp.send(mail){ (error) in
             if let error = error {
                 print("エラーがおきました\(error)")
+                return
             }
         }
     }
     
     // メールを自動で送信する関数 https://github.com/Kitura/Swift-SMTP
-    func sendArrivedMail(text :String) {
+    func sendArrivedMail(text: String, domain: String, sendAdress: String, pass: String, toAdress: String) {
+        
         print("メールの送信を行います")
         let smtp = SMTP(
-            hostname: "smtp.gmail.com",     // SMTP server address
-            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-            password: ""            // password to login
+            hostname: "smtp.\(domain)",     // SMTP server address
+            email: "\(sendAdress)",        // 送信側メールアドレスを入力
+            password: "\(pass)"            // 送信側パスワード
         )
 
-        let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
-        let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
+        let drLight = Mail.User(name: "テストユーザ１", email: "\(sendAdress)")
+        let megaman = Mail.User(name: "テストユーザ２", email: "\(toAdress)")
         
         let mail = Mail(
             from: drLight,
             to: [megaman],
             subject: "Humans and robots living together in harmony and equality.",
-            text: "目的地:\(text)へ到着しました。"
+            text: "目的地\(text)へ到着しました。"
         )
 
         smtp.send(mail) { (error) in
             if let error = error {
                 print("エラーがおきました\(error)")
+                return
             }
         }
 
     }
     
     // メールを自動で送信する関数(衝撃検知)
-    func sendFallMail(coordinate: CLLocationCoordinate2D) {
+    func sendFallMail(coordinate: CLLocationCoordinate2D, domain: String, sendMail: String, pass: String, toMail: String) {
         print("メールの送信を行います")
         let smtp = SMTP(
-            hostname: "smtp.gmail.com",     // SMTP server address
-            email: "hiroto.0927.123@gmail.com",        // メールアドレスを入力
-            password: ""            // password to login
+            hostname: "smtp.\(domain)",     // SMTP server address
+            email: "\(sendMail)",        // メールアドレスを入力
+            password: "\(pass)"            // password to login
         )
         
-        let drLight = Mail.User(name: "テストユーザー１", email: "hiroto.0927.123@gmail.com")
-        let megaman = Mail.User(name: "テストユーザー２", email: "hiroto_0927_123@yahoo.co.jp")
+        let drLight = Mail.User(name: "テストユーザ１", email: "\(sendMail)")
+        let megaman = Mail.User(name: "テストユーザ２", email: "\(toMail)")
 
         let mail = Mail(
             from: drLight,
@@ -87,6 +91,7 @@ class SendMail {
         smtp.send(mail) { (error) in
             if let error = error {
                 print("エラーがおきました\(error)")
+                return
             }
         }
     }
