@@ -246,15 +246,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         }
         
         print("\(self.domain)/ \(self.sendAdress)/ \(self.sendPass)/ \(self.receiveAdress)")
-        
-        sendMail.sendArrivedMail(text: voiceStr,domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
-        sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
-        //        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-        //            guard let placemark = placemarks?.first, error == nil else { return }
-        //            let message = placemark.name
-        //            let speechUtterance = AVSpeechUtterance(string: message!)
-        //            self.speech.speak(speechUtterance)
-        //        }
+    
+                CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+                    guard let placemark = placemarks?.first, error == nil else { return }
+                    let message = placemark.name
+                    let speechUtterance = AVSpeechUtterance(string: message!)
+                    self.speech.speak(speechUtterance)
+                }
     }
     
     // アプリへの場所関連イベントの配信を開始および停止するために使用する
@@ -317,8 +315,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return
         }
         
-        let nextLocation = self.step.steps[self.stepCount]
-        
         // 到着時のアナウンス
         print("count: \(self.step.steps.count), selfCount: \(self.stepCount)")
         if self.step.steps.count == self.stepCount {
@@ -335,6 +331,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             return
         }
         
+        let nextLocation = self.step.steps[self.stepCount]
         print(self.regionFlag)
         
         print(regionDetection.distance(current: (self.currentCoordinate.latitude,self.currentCoordinate.longitude), target: (nextLocation.polyline.coordinate.latitude,nextLocation.polyline.coordinate.longitude)))
