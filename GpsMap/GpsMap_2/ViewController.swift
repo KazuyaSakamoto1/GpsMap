@@ -384,6 +384,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         _ = directionJudge.degToRad(degrees: (self.mapView.camera.heading))
         
         if self.stepCount != 0 && self.mapView.userTrackingMode == .followWithHeading {
+            if self.step.steps.count == self.stepCount {
+                print("注意喚起機能を終了")
+                return
+            }
             let nextLocation = self.step.steps[self.stepCount]
             let targetRadian = directionJudge.angle(coordinate: self.currentCoordinate, coordinate2: nextLocation.polyline.coordinate)
             
@@ -418,10 +422,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         fallFlag = self.impactDetection.fallDetectionGyro()
         
         if fallFlag {
-            //            print("Gyro: \(fallFlag)")
+                        print("Gyro: \(fallFlag)")
         } else {
-            
-            //            print("Gyro: \(fallFlag)")
             fallLabel.text = "Gyro: 異常なし"
             return
         }
@@ -446,7 +448,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
             return
         } else {
-            //            print("pressure: \(fallFlag)")
             fallLabel.text = "pressure: 異常なし"
             return
         }
@@ -456,7 +457,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 角度に関する関数
     func rotateManager(heading: CLLocationDirection) {
         self.mapView.camera.heading = heading
-        //        print("角度：\(self.mapView.camera.heading)")
     }
     
     // 画面の初期位置の設定

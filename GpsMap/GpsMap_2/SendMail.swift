@@ -11,34 +11,6 @@ import SwiftSMTP
 import CoreLocation
 
 class SendMail {
-        
-    // メールを自動で送信する関数(到着時間を過ぎた時用)
-//    @objc func sendAttentionMail(_ sender: UIButton){
-//        print("メールの送信を行います")
-//        let smtp = SMTP(
-////            hostname: "smtp.gmail.com",     // SMTP server address
-//            hostname: "smtp.",     // SMTP server address
-//            email: "",        // 送信側メールアドレスを入力
-//            password: ""            // 送信側パスワード
-//        )
-//
-//        let drLight = Mail.User(name: "テストユーザ１", email: "")
-//        let megaman = Mail.User(name: "テストユーザ２", email: "")
-//
-//        let mail = Mail(
-//            from: drLight,
-//            to: [megaman],
-//            subject: "Humans and robots living together in harmony and equality.",
-//            text: "到着予定時間を超えています。安否確認を行ってください"
-//        )
-//
-//        smtp.send(mail){ (error) in
-//            if let error = error {
-//                print("エラーがおきました\(error)")
-//                return
-//            }
-//        }
-//    }
     
     func sendAttentionMail(coordinate: CLLocationCoordinate2D, domain: String, sendAdress: String, pass: String, toAdress: String){
         print("メールの送信を行います")
