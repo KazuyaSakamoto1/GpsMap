@@ -73,6 +73,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     var sendAdress = ""
     var sendPass = ""
     var receiveAdress = ""
+    var attentionTime = 0
+    var mailFlag = true
     
     // 位置情報の取得
     override func viewDidLoad() {
@@ -245,9 +247,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         print("\(self.domain)/ \(self.sendAdress)/ \(self.sendPass)/ \(self.receiveAdress)")
         
-//        sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendMail: self.sendAdress, pass: self.sendPass, toMail: self.receiveAdress)
-        
         sendMail.sendArrivedMail(text: voiceStr,domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
+        sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
         //        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
         //            guard let placemark = placemarks?.first, error == nil else { return }
         //            let message = placemark.name
@@ -288,8 +289,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print(location.horizontalAccuracy)
         
         // 到着予定時間を過ぎたら一度だけ実行される関数
-        if self.step != nil {
-            Timer.scheduledTimer(timeInterval: self.step.expectedTravelTime, target: self, selector: #selector(sendMail.sendAttentionMail(_:)), userInfo: nil, repeats: false)
+        if self.stepCount != 0 {
+            //            Timer.scheduledTimer(timeInterval: self.step.expectedTravelTime, target: self, selector: #selector(), userInfo: nil, repeats: false)
+            let date = Date()
+            print("---------------------")
+            if attentionTime == 0 {
+                self.attentionTime = Int(date.timeIntervalSince1970)
+            }
+            
+            print("timer:\((Int(date.timeIntervalSince1970) - self.attentionTime))")
+            print("expect:\(self.step.expectedTravelTime)")
+            
+            if (Int(date.timeIntervalSince1970) - self.attentionTime) > Int(self.step.expectedTravelTime) && mailFlag == true {
+                sendMail.sendAttentionMail(coordinate: self.currentCoordinate, domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
+                mailFlag = false
+            }
+            
+        } else {
+            self.attentionTime = 0
+            mailFlag = true
         }
         
         self.currentCoordinate.latitude = location.coordinate.latitude
@@ -312,7 +330,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             mapView.removeAnnotations(searchAnnotationArray)
             // 現在表示されているルートを削除
             self.mapView.removeOverlays(self.mapView.overlays)
-//            sendMail.sendArrivedMail(text: voiceStr, domain: self.domain, sendMail: self.sendAdress, pass: self.sendPass, toMail: self.receiveAdress)
+            sendMail.sendArrivedMail(text: voiceStr, domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
             self.step = nil
             return
         }
@@ -349,7 +367,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             
             if self.regionFlag == true {
                 let preLocation = self.step.steps[self.stepCount - 1]
-                let message = "\(preLocation.instructions)です。その先、\(round(nextLocation.distance))メートル先\(nextLocation.instructions)　です。"
+                let message = "\(preLocation.instructions)です。その先、\(Int(nextLocation.distance))メートル先\(nextLocation.instructions)　です。"
                 print("領域外に出る：\(message)")
                 print(self.stepCount)
                 let speechUtterance = AVSpeechUtterance(string: message)
@@ -425,7 +443,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             print("pressure: \(fallFlag)")
             fallFlag = false
             print("--------\(fallFlag)--------")
-            sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendMail: self.sendAdress, pass: self.sendPass, toMail: self.receiveAdress)
+            sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
             impactTime = Int(date.timeIntervalSince1970)
             fallLabel.text = "！！異常検知！！"
             
