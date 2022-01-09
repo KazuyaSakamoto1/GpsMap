@@ -49,6 +49,8 @@ extension ViewController: UISearchBarDelegate {
         // 緯度と軽度の情報を格納する配列
         var longitude: [Double] = []
         var latitude: [Double] = []
+        var subCoordinate = CLLocationCoordinate2D()
+        
         // 検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
             if error == nil {
@@ -71,6 +73,12 @@ extension ViewController: UISearchBarDelegate {
                 // 緯度と経度の座標を格納
                 longitude.append(long)
                 latitude.append(lat)
+        
+                if longitude.count == 1 && latitude.count == 1 {
+                    subCoordinate.latitude = searchLocation.placemark.coordinate.latitude
+                    subCoordinate.longitude = searchLocation.placemark.coordinate.longitude
+                }
+                
                 if longitude.count == 13 && latitude.count == 13 {
                     break
                 }
@@ -103,6 +111,15 @@ extension ViewController: UISearchBarDelegate {
         let point: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLong + minLong) / 2)
         let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((maxLat - minLat)), longitudinalMeters: fabs((maxLong - minLong)) * 100000)
         // 横・縦
+        
+        if longitude.count == 1 && latitude.count == 1 {
+            
+            getRoute(goalCoordinate: subCoordinate)
+            mapView.userTrackingMode = .followWithHeading
+            
+            return
+        }
+        
         mapView.setRegion(mapView.regionThatFits(region), animated: true)
     }
     // 目的地までのルートを取得
@@ -142,7 +159,7 @@ extension ViewController: UISearchBarDelegate {
             self.mapView.addOverlay(route.polyline)
             print(route.polyline.coordinate)
             // 現在地と目的地を含む表示範囲を設定する
-            self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
+//            self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
             
             for i in 0..<self.step.steps.count {
                 let step = route.steps[i]

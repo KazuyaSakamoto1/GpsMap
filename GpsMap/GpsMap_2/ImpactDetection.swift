@@ -33,7 +33,7 @@ class ImpactDetection {
         // 加速度の合成値
         self.mixAccel = sqrt(pow(self.xAccel,2)+pow(self.yAccel,2)+pow(self.zAccel,2))
        
-        if self.mixAccel > contorlAccel + 0.1 || self.mixAccel < contorlAccel - 0.1 {
+        if self.mixAccel > contorlAccel + 0.05 || self.mixAccel < contorlAccel - 0.05 {
             let flag = false
             return flag
         } else {
@@ -83,7 +83,7 @@ class ImpactDetection {
             self.prePressure = self.pressure
         }
         
-        if fabs(self.pressure - self.prePressure) < 0.003 {
+        if fabs(self.pressure - self.prePressure) < 0.001 {
             let flag = false
             return flag
         } else {
