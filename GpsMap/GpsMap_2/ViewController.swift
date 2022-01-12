@@ -58,6 +58,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let impactDetection = ImpactDetection()
     var sendMail = SendMail()
     var impactTime = 0
+    var accelTime = 0
     
     let directionJudge = DirectionJudge()
     @IBOutlet weak var checkLabel: UILabel!
@@ -382,6 +383,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         // ユーザの向いている方向
         _ = directionJudge.degToRad(degrees: (self.mapView.camera.heading))
+        let date = Date()
         
         if self.stepCount != 0 && self.mapView.userTrackingMode == .followWithHeading {
             if self.step.steps.count == self.stepCount {
@@ -410,14 +412,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         
         // 加速度の判定を行う
         fallFlag = self.impactDetection.fallDetectionAccel()
-        
-        //        print("accel: \(fallFlag)")
+        if fallFlag == true && self.accelTime == 0 {
+            self.accelTime = Int(date.timeIntervalSince1970)
+        }
         
         if fallFlag == false {
             fallLabel.text = "accel: 異常なし"
+            self.accelTime = 0
             return
         }
         
+        if self.accelTime + 2 <= Int(date.timeIntervalSince1970) && self.accelTime != 0 {
         // ジャイロセンサの判定を行う
         fallFlag = self.impactDetection.fallDetectionGyro()
         
@@ -427,12 +432,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             fallLabel.text = "Gyro: 異常なし"
             return
         }
-        
         // 気圧の判定を行う
         fallFlag = self.impactDetection.fallDetectionPressure()
         
         if fallFlag {
-            let date = Date()
             
             if (Int(date.timeIntervalSince1970) - impactTime) < 60 {
                 return
@@ -450,6 +453,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         } else {
             fallLabel.text = "pressure: 異常なし"
             return
+        }
         }
         
     }

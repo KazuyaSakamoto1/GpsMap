@@ -159,7 +159,7 @@ extension ViewController: UISearchBarDelegate {
             self.mapView.addOverlay(route.polyline)
             print(route.polyline.coordinate)
             // 現在地と目的地を含む表示範囲を設定する
-//            self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
+            self.displaySearch2(goalLatitude: goalCoordinate!.latitude, goalLongitude: goalCoordinate!.longitude, parm: 250000)
             
             for i in 0..<self.step.steps.count {
                 let step = route.steps[i]
