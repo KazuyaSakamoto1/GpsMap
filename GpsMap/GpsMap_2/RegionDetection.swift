@@ -11,7 +11,7 @@ import CoreLocation
 class RegionDetection {
     
     var regionFlag = true
-    let setDistance = 8.0
+    let setDistance = 5.0
     
     // フラグがtrueの時の処理
     func regionTrueJudge(userLocation: CLLocationCoordinate2D, targetLocation: CLLocationCoordinate2D) -> Bool {
@@ -19,7 +19,7 @@ class RegionDetection {
         
         let judgeDistance = self.distance(current: ( userLocation.latitude, userLocation.longitude), target: ( targetLocation.latitude, targetLocation.longitude))
         
-        if judgeDistance <= setDistance {
+        if judgeDistance <= setDistance + 5.0 {
             return false
         }
         

@@ -32,7 +32,7 @@ class ImpactDetection {
        
         // 加速度の合成値
         self.mixAccel = sqrt(pow(self.xAccel,2)+pow(self.yAccel,2)+pow(self.zAccel,2))
-       
+        
         if self.mixAccel > contorlAccel + 0.05 || self.mixAccel < contorlAccel - 0.05 {
             let flag = false
             return flag
@@ -49,21 +49,25 @@ class ImpactDetection {
             if self.pitch < 30 &&  -30 < self.pitch {
                 
                 let flag = true
+                print("Gyro: \(flag)")
                 return flag
                 
             } else if self.pitch > 150 {
                 
                 let flag = true
+                print("Gyro: \(flag)")
                 return flag
                 
             } else if -180 < self.pitch && self.pitch < -150 {
                 
                 let flag = true
+                print("Gyro: \(flag)")
                 return flag
                 
             } else {
                 
                 let flag = false
+                print("Gyro: \(flag)")
                 return flag
                 
             }
@@ -71,6 +75,7 @@ class ImpactDetection {
         } else {
             
             let flag = false
+            print("Gyro: \(flag)")
             return flag
             
         }

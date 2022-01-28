@@ -46,6 +46,7 @@
 /* Begin PBXFileReference section */
 		68841AA426F3DD9000BBFAB9 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		68AC1BE4276CFDAB002581E9 /* SendMail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMail.swift; sourceTree = "<group>"; };
+		68B26E5D279FAE59008CFC73 /* Test.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Test.gpx; sourceTree = "<group>"; };
 		68B63CD1277F99A400E345DF /* RegionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionDetection.swift; sourceTree = "<group>"; };
 		C566F3962716F284003C9B52 /* Miyadai2MaxValue.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Miyadai2MaxValue.gpx; sourceTree = "<group>"; };
 		C566F3972716FCFA003C9B52 /* miyadai.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = miyadai.gpx; sourceTree = "<group>"; };
@@ -102,6 +103,7 @@
 		C5691A2826C5050500609600 = {
 			isa = PBXGroup;
 			children = (
+				68B26E5D279FAE59008CFC73 /* Test.gpx */,
 				C566F39927264C96003C9B52 /* kibana.gpx */,
 				C566F39827264C2D003C9B52 /* kibana2seven.gpx */,
 				C566F3972716FCFA003C9B52 /* miyadai.gpx */,

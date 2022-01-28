@@ -264,6 +264,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         let speechUtterance = AVSpeechUtterance(string: message)
         let age = -location.timestamp.timeIntervalSinceNow
         
+        print(self.micButton.isAccessibilityElement)
+        
         if age > 10 {
             print("古い位置情報です")
             
@@ -415,6 +417,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if fallFlag == true && self.accelTime == 0 {
             self.accelTime = Int(date.timeIntervalSince1970)
         }
+        print("Accel: \(fallFlag)")
         
         if fallFlag == false {
             fallLabel.text = "accel: 異常なし"
@@ -425,16 +428,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if self.accelTime + 2 <= Int(date.timeIntervalSince1970) && self.accelTime != 0 {
         // ジャイロセンサの判定を行う
         fallFlag = self.impactDetection.fallDetectionGyro()
-        
-        if fallFlag {
-                        print("Gyro: \(fallFlag)")
-        } else {
+            
+        if fallFlag == false {
             fallLabel.text = "Gyro: 異常なし"
             return
         }
         // 気圧の判定を行う
         fallFlag = self.impactDetection.fallDetectionPressure()
-        
+        print("pressure: \(fallFlag)")
         if fallFlag {
             
             if (Int(date.timeIntervalSince1970) - impactTime) < 60 {
@@ -442,9 +443,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
             
             // フラグの判定を元にメールを送るか否か判定する関数
-            print("pressure: \(fallFlag)")
             fallFlag = false
-            print("--------\(fallFlag)--------")
             sendMail.sendFallMail(coordinate: self.currentCoordinate, domain: self.domain, sendAdress: self.sendAdress, pass: self.sendPass, toAdress: self.receiveAdress)
             impactTime = Int(date.timeIntervalSince1970)
             fallLabel.text = "！！異常検知！！"
