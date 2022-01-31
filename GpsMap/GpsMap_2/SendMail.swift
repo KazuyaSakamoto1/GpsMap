@@ -28,7 +28,7 @@ class SendMail {
             from: drLight,
             to: [megaman],
             subject: "Humans and robots living together in harmony and equality.",
-            text: "到着予定時間を超えています。安否確認を行ってください (緯度: \(coordinate.latitude),経度: \(coordinate.longitude)"
+            text: "予想移動時間を超えています。安否確認を行ってください (緯度: \(coordinate.latitude),経度: \(coordinate.longitude)"
         )
 
         smtp.send(mail){ (error) in
@@ -38,6 +38,9 @@ class SendMail {
             }
         }
     }
+    
+    //hm18039@student.miyazaki-u.ac.jp
+    //hiroto.0927.123@gmail.com
     
     // メールを自動で送信する関数 https://github.com/Kitura/Swift-SMTP
     func sendArrivedMail(text: String, domain: String, sendAdress: String, pass: String, toAdress: String) {

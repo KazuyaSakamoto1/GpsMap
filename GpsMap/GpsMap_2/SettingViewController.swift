@@ -30,6 +30,15 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
         // 新しく追加したい処理を書く
         passEmail.textColor = .clear
         
+        self.sendEmail.layer.borderColor = UIColor.black.cgColor
+        self.sendEmail.layer.borderWidth = 2.0
+        
+        self.passEmail.layer.borderColor = UIColor.black.cgColor
+        self.passEmail.layer.borderWidth = 2.0
+        
+        self.receiveEmail.layer.borderColor = UIColor.black.cgColor
+        self.receiveEmail.layer.borderWidth = 2.0
+        
     }
     
     // 送信側メールアドレス

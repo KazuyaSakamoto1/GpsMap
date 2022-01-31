@@ -293,7 +293,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         if self.stepCount != 0 {
             //            Timer.scheduledTimer(timeInterval: self.step.expectedTravelTime, target: self, selector: #selector(), userInfo: nil, repeats: false)
             let date = Date()
-            print("---------------------")
+
             if attentionTime == 0 {
                 self.attentionTime = Int(date.timeIntervalSince1970)
             }
