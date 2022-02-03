@@ -242,6 +242,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         print("現在のカウント\(self.stepCount)")
         if self.step != nil{
             print("経路情報のカウント\(self.step.steps.count)")
+            
         } else {
             print("経路情報なし")
         }

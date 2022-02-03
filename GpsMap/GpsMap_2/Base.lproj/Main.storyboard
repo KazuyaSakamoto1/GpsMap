@@ -128,7 +128,7 @@
                             <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Pof-yn-WOc">
                                 <rect key="frame" x="20" y="158" width="286" height="34"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                                <accessibility key="accessibilityConfiguration" hint="送信側パスワードを入力後、決定ボタンを押してください。" label="送信側パスワード入力欄"/>
+                                <accessibility key="accessibilityConfiguration" hint="送信側アプリパスワードを入力後、決定ボタンを押してください。" label="送信側アプリパスワード入力欄"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
