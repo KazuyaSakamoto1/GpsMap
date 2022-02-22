@@ -49,6 +49,8 @@ extension ViewController: UISearchBarDelegate {
         // 緯度と軽度の情報を格納する配列
         var longitude: [Double] = []
         var latitude: [Double] = []
+        var subCoordinate = CLLocationCoordinate2D()
+        
         // 検索バーに文字が入力された時の処理
         for searchLocation in (response?.mapItems)! {
             if error == nil {
@@ -71,6 +73,12 @@ extension ViewController: UISearchBarDelegate {
                 // 緯度と経度の座標を格納
                 longitude.append(long)
                 latitude.append(lat)
+        
+                if longitude.count == 1 && latitude.count == 1 {
+                    subCoordinate.latitude = searchLocation.placemark.coordinate.latitude
+                    subCoordinate.longitude = searchLocation.placemark.coordinate.longitude
+                }
+                
                 if longitude.count == 13 && latitude.count == 13 {
                     break
                 }
@@ -103,6 +111,15 @@ extension ViewController: UISearchBarDelegate {
         let point: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: (maxLat + minLat) / 2, longitude: (maxLong + minLong) / 2)
         let region: MKCoordinateRegion = MKCoordinateRegion(center: point, latitudinalMeters: fabs((maxLat - minLat)), longitudinalMeters: fabs((maxLong - minLong)) * 100000)
         // 横・縦
+        
+        if longitude.count == 1 && latitude.count == 1 {
+            
+            getRoute(goalCoordinate: subCoordinate)
+            mapView.userTrackingMode = .followWithHeading
+            
+            return
+        }
+        
         mapView.setRegion(mapView.regionThatFits(region), animated: true)
     }
     // 目的地までのルートを取得
@@ -135,7 +152,7 @@ extension ViewController: UISearchBarDelegate {
             let time = route.expectedTravelTime
             let firstStep = self.step.steps[0]
             let secondStpes = self.step.steps[1]
-            let Message = "\(firstStep.instructions)。到着予定時間は約\(ceil(time/60))分です。\(secondStpes.instructions)です。"
+            let Message = "\(firstStep.instructions)。到着予定時間は約\(ceil(time/60))分です。\(Int(secondStpes.distance))メートル先、\(secondStpes.instructions)です。"
             let speech = AVSpeechUtterance(string: Message)
             self.speech.speak(speech)
             // 経路を描画

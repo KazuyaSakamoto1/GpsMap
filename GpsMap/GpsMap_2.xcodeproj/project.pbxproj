@@ -46,12 +46,13 @@
 /* Begin PBXFileReference section */
 		68841AA426F3DD9000BBFAB9 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		68AC1BE4276CFDAB002581E9 /* SendMail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMail.swift; sourceTree = "<group>"; };
+		68B26E5D279FAE59008CFC73 /* Test.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Test.gpx; sourceTree = "<group>"; };
 		68B63CD1277F99A400E345DF /* RegionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionDetection.swift; sourceTree = "<group>"; };
 		C566F3962716F284003C9B52 /* Miyadai2MaxValue.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Miyadai2MaxValue.gpx; sourceTree = "<group>"; };
 		C566F3972716FCFA003C9B52 /* miyadai.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = miyadai.gpx; sourceTree = "<group>"; };
 		C566F39827264C2D003C9B52 /* kibana2seven.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = kibana2seven.gpx; sourceTree = "<group>"; };
 		C566F39927264C96003C9B52 /* kibana.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = kibana.gpx; sourceTree = "<group>"; };
-		C5691A3126C5050500609600 /* ブラインドマップ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ブラインドマップ.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C5691A3126C5050500609600 /* LEAD WAY.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LEAD WAY.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C5691A3426C5050500609600 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5691A3626C5050500609600 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		C5691A3826C5050500609600 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -102,6 +103,7 @@
 		C5691A2826C5050500609600 = {
 			isa = PBXGroup;
 			children = (
+				68B26E5D279FAE59008CFC73 /* Test.gpx */,
 				C566F39927264C96003C9B52 /* kibana.gpx */,
 				C566F39827264C2D003C9B52 /* kibana2seven.gpx */,
 				C566F3972716FCFA003C9B52 /* miyadai.gpx */,
@@ -117,7 +119,7 @@
 		C5691A3226C5050500609600 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C5691A3126C5050500609600 /* ブラインドマップ.app */,
+				C5691A3126C5050500609600 /* LEAD WAY.app */,
 				C5691A4A26C5050600609600 /* GpsMap_2Tests.xctest */,
 				C5691A5526C5050600609600 /* GpsMap_2UITests.xctest */,
 			);
@@ -174,9 +176,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C5691A3026C5050500609600 /* ブラインドマップ */ = {
+		C5691A3026C5050500609600 /* LEAD WAY */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "ブラインドマップ" */;
+			buildConfigurationList = C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "LEAD WAY" */;
 			buildPhases = (
 				C5691A2D26C5050500609600 /* Sources */,
 				C5691A2E26C5050500609600 /* Frameworks */,
@@ -187,12 +189,12 @@
 			);
 			dependencies = (
 			);
-			name = "ブラインドマップ";
+			name = "LEAD WAY";
 			packageProductDependencies = (
 				C567AA2227675EB3003336C0 /* SwiftSMTP */,
 			);
 			productName = GpsMap_2;
-			productReference = C5691A3126C5050500609600 /* ブラインドマップ.app */;
+			productReference = C5691A3126C5050500609600 /* LEAD WAY.app */;
 			productType = "com.apple.product-type.application";
 		};
 		C5691A4926C5050600609600 /* GpsMap_2Tests */ = {
@@ -269,7 +271,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C5691A3026C5050500609600 /* ブラインドマップ */,
+				C5691A3026C5050500609600 /* LEAD WAY */,
 				C5691A4926C5050600609600 /* GpsMap_2Tests */,
 				C5691A5426C5050600609600 /* GpsMap_2UITests */,
 			);
@@ -362,12 +364,12 @@
 /* Begin PBXTargetDependency section */
 		C5691A4C26C5050600609600 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C5691A3026C5050500609600 /* ブラインドマップ */;
+			target = C5691A3026C5050500609600 /* LEAD WAY */;
 			targetProxy = C5691A4B26C5050600609600 /* PBXContainerItemProxy */;
 		};
 		C5691A5726C5050600609600 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C5691A3026C5050500609600 /* ブラインドマップ */;
+			target = C5691A3026C5050500609600 /* LEAD WAY */;
 			targetProxy = C5691A5626C5050600609600 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -638,7 +640,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "ブラインドマップ" */ = {
+		C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "LEAD WAY" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C5691A5F26C5050600609600 /* Debug */,
