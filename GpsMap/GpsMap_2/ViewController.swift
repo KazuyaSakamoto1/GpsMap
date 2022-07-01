@@ -45,6 +45,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     let micImage = UIImage(named: "mic")
     var voiceStr = ""
     
+    //カメラ切り替えボタン
+    var cameraButton = UIButton()
+    let cameraImage = UIImage(named:"camera")
+    
     // マイクの変数
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "ja-JP"))!
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
@@ -186,6 +190,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             }
             
         }
+        //カメラ切り替えボタンを作成
+        self.cameraButton = UIButton(type: .custom)
+        self.cameraButton.translatesAutoresizingMaskIntoConstraints = false
+        self.cameraButton.setImage(self.cameraImage, for: .normal)
+        self.view.addSubview(cameraButton)
+        cameraButton.addTarget(self, action: #selector(cameraButtonTapped), for: .touchUpInside)
+        cameraButton.setTitle("カメラ切り替え", for: [])
+        self.cameraButton.layer.cornerRadius = 40
+        
+        //ボタンのオートレイアウト設定
+        self.cameraButton.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -280).isActive = true
+        self.cameraButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -30).isActive = true
+        self.cameraButton.heightAnchor.constraint(equalToConstant: 60).isActive = true
+        self.cameraButton.widthAnchor.constraint(equalToConstant: 60).isActive = true
+        
         
         // 加速度センサーから値の取得
         if coreManager.isAccelerometerAvailable {
@@ -472,10 +491,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
         mapView.setRegion(region, animated: true)
     }
     
+    
+    //設定の画面へ遷移
     @IBAction func settingsButtonAction(_ sender: Any) {
-        let settingsViewController = self.storyboard?.instantiateViewController(withIdentifier: "settingsViewController") as! SettingsViewController
-        self.present(settingsViewController, animated: true, completion: nil)
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let settingsViewController = storyboard.instantiateViewController(withIdentifier: "settingsViewController") as! SettingsViewController
+        present(settingsViewController, animated: true, completion: nil)
     }
+    
+    //カメラボタンが押されたら呼ばれる
+    @objc func cameraButtonTapped(_ sender: Any) {
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let ObjectViewController = storyboard.instantiateViewController(withIdentifier: "ObjectViewController") as! ObjectViewController
+        present(ObjectViewController, animated: true, completion: nil)
+    }
+    
     
     // 録音ボタンが押されたら呼ばれる
     @objc func recordButtonTapped(sender: UIButton) {
