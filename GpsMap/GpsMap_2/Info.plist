@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSCameraUsageDescription</key>
-	<string>物体検知のみカメラを使用します。</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>ja_JP</string>
+	<key>CFBundleDisplayName</key>
+	<string></string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleGetInfoString</key>
@@ -20,8 +20,6 @@
 	</array>
 	<key>CFBundleName</key>
 	<string>ブラインドマップ</string>
-	<key>CFBundleDisplayName</key>
-	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
@@ -32,6 +30,8 @@
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>物体検知のみカメラを使用します。</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>常に位置情報の利用を許可する</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

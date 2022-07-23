@@ -8,8 +8,13 @@
 import UIKit
 import Vision
 
+
+
 class ObjectDetection {
     private var objectDetectionLayer: CALayer!
+    
+    var detection = Detection(wall: Date(), white: Date(), cone: Date(), person: Date(), block: Date())
+    let detectionclass = Detectionclass()
 
     init(_ viewLayer: CALayer, videoFrameSize: CGSize) {
         self.setupObjectDetectionLayer(viewLayer, videoFrameSize)
@@ -36,11 +41,12 @@ class ObjectDetection {
             objectRecognition.imageCropAndScaleOption = .scaleFill
             return objectRecognition
         } catch let error as NSError {
-            print("Model loading error: \(error)")
+            print("モデルの読み込みに失敗しました: \(error)")
             return nil
         }
     }
     
+    //レイヤーの構築
     private func setupObjectDetectionLayer(_ viewLayer: CALayer, _ videoFrameSize: CGSize) {
         self.objectDetectionLayer = CALayer() // container layer that has all the renderings of the observations
         self.objectDetectionLayer.name = "ObjectDetectionLayer"
@@ -70,6 +76,8 @@ class ObjectDetection {
         CATransaction.commit()
     }
     
+    //バウンディングボックスの作成
+    //音声案内(未実装)
     private func createBoundingBoxLayer(_ bounds: CGRect, identifier: String, confidence: VNConfidence) -> CALayer {
         let path = UIBezierPath(rect: bounds)
         
@@ -88,6 +96,8 @@ class ObjectDetection {
         let textLayer = CATextLayer()
         textLayer.name = "Detected Object Label"
         
+        // confidence=適合率 0.80など
+        // identifier=識別子　信号機など
         textLayer.string = String(format: "\(identifier)\n(%.2f)", confidence)
         textLayer.fontSize = CGFloat(16.0)
         
@@ -110,22 +120,50 @@ class ObjectDetection {
         CATransaction.begin()
         CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
         
+        let speechService = SpeechService()
+        
+        let detectionstruct = ObjectViewController()
+        
         self.objectDetectionLayer.sublayers = nil // remove all previously detected objects
         for observation in results where observation is VNRecognizedObjectObservation {
             guard let objectObservation = observation as? VNRecognizedObjectObservation else {
                 continue
             }
-            
             // Select only the label with the highest confidence.
             let topLabelObservation = objectObservation.labels[0]
             let objectBounds = VNImageRectForNormalizedRect(
                 objectObservation.boundingBox,
                 Int(self.objectDetectionLayer.bounds.width), Int(self.objectDetectionLayer.bounds.height))
+            //実装したいもの
+            //白線　信号機　人　壁　点字ブロック　カラーコーン
+            if topLabelObservation.confidence >= 0.80 {
+                let date = Date()
+                //５秒に一回壁を音声案内できる機能（何度も音声案内するとうるさいから）
+                if topLabelObservation.identifier == "wall" {
+                    //１回目
+                    if(detectionclass.flag == 0){
+                        let span = detectionstruct.detection.wall.timeIntervalSince(date)
+                        speechService.say("壁があります")
+                        detectionclass.flag = 1
+                        detection.wall = Date()
+                    }else{//１回目以降
+                        let span = detection.wall.timeIntervalSince(date)
+                        print(span)
+                        if span < -5{
+                            speechService.say("壁があります")
+                            detection.wall = Date()
+                        }
+                    }
+                }else if(topLabelObservation.identifier == "white_line"){
+                    speechService.say("横断歩道があります")
+                }
+            }
             
             let bbLayer = self.createBoundingBoxLayer(objectBounds, identifier: topLabelObservation.identifier, confidence: topLabelObservation.confidence)
             self.objectDetectionLayer.addSublayer(bbLayer)
         }
-        
+    
         CATransaction.commit()
     }
 }
+

@@ -11,6 +11,7 @@
 		68AC1BE5276CFDAB002581E9 /* SendMail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AC1BE4276CFDAB002581E9 /* SendMail.swift */; };
 		68B63CD2277F99A400E345DF /* RegionDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B63CD1277F99A400E345DF /* RegionDetection.swift */; };
 		B71F87BF28693D590074F36E /* vidvip_20210521.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B71F87BE28693D590074F36E /* vidvip_20210521.mlmodel */; };
+		B76AAB5928862AA1002E4EFB /* SpeechService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76AAB5828862AA1002E4EFB /* SpeechService.swift */; };
 		B76D991C28669BFE00E0ED3A /* ObjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76D991B28669BFE00E0ED3A /* ObjectViewController.swift */; };
 		B76D991E2866A03300E0ED3A /* VideoCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76D991D2866A03300E0ED3A /* VideoCapture.swift */; };
 		B76D99202866A0E100E0ED3A /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76D991F2866A0E100E0ED3A /* ObjectDetection.swift */; };
@@ -53,6 +54,7 @@
 		68B26E5D279FAE59008CFC73 /* Test.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Test.gpx; sourceTree = "<group>"; };
 		68B63CD1277F99A400E345DF /* RegionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionDetection.swift; sourceTree = "<group>"; };
 		B71F87BE28693D590074F36E /* vidvip_20210521.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = vidvip_20210521.mlmodel; path = ../../../../vidvip_20210521.mlmodel; sourceTree = "<group>"; };
+		B76AAB5828862AA1002E4EFB /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		B76D991B28669BFE00E0ED3A /* ObjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectViewController.swift; sourceTree = "<group>"; };
 		B76D991D2866A03300E0ED3A /* VideoCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCapture.swift; sourceTree = "<group>"; };
 		B76D991F2866A0E100E0ED3A /* ObjectDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectDetection.swift; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				B76D991B28669BFE00E0ED3A /* ObjectViewController.swift */,
 				B76D991D2866A03300E0ED3A /* VideoCapture.swift */,
 				B76D991F2866A0E100E0ED3A /* ObjectDetection.swift */,
+				B76AAB5828862AA1002E4EFB /* SpeechService.swift */,
 				B71F87BE28693D590074F36E /* vidvip_20210521.mlmodel */,
 				C5691A4026C5050600609600 /* Assets.xcassets */,
 				C5691A4226C5050600609600 /* LaunchScreen.storyboard */,
@@ -344,6 +347,7 @@
 			files = (
 				68841AA526F3DD9000BBFAB9 /* SettingViewController.swift in Sources */,
 				C5691A3926C5050500609600 /* ViewController.swift in Sources */,
+				B76AAB5928862AA1002E4EFB /* SpeechService.swift in Sources */,
 				B71F87BF28693D590074F36E /* vidvip_20210521.mlmodel in Sources */,
 				C5691A3526C5050500609600 /* AppDelegate.swift in Sources */,
 				B76D99202866A0E100E0ED3A /* ObjectDetection.swift in Sources */,
@@ -538,7 +542,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap1;
+				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap0722;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -557,7 +561,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap1;
+				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap0722;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
