@@ -141,10 +141,10 @@ class ObjectDetection {
                 //５秒に一回壁を音声案内できる機能（何度も音声案内するとうるさいから）
                 if topLabelObservation.identifier == "wall" {
                     //１回目
-                    if(detectionclass.flag == 0){
+                    if(detectionclass.wallflag == 0){
                         let span = detectionstruct.detection.wall.timeIntervalSince(date)
                         speechService.say("壁があります")
-                        detectionclass.flag = 1
+                        detectionclass.wallflag = 1
                         detection.wall = Date()
                     }else{//１回目以降
                         let span = detection.wall.timeIntervalSince(date)
@@ -154,8 +154,66 @@ class ObjectDetection {
                             detection.wall = Date()
                         }
                     }
-                }else if(topLabelObservation.identifier == "white_line"){
-                    speechService.say("横断歩道があります")
+                }else if(topLabelObservation.identifier == "white_line"){//横断歩道
+                    //１回目
+                    if(detectionclass.whiteflag == 0){
+                        let span = detectionstruct.detection.white.timeIntervalSince(date)
+                        speechService.say("横断歩道があります")
+                        detectionclass.whiteflag = 1
+                        detection.white = Date()
+                    }else{//１回目以降
+                        let span = detection.white.timeIntervalSince(date)
+                        print(span)
+                        if span < -5{
+                            speechService.say("横断歩道があります")
+                            detection.white = Date()
+                        }
+                    }
+                }else if(topLabelObservation.identifier == "safety-cone"){//コーン
+                    //１回目
+                    if(detectionclass.coneflag == 0){
+                        let span = detectionstruct.detection.cone.timeIntervalSince(date)
+                        speechService.say("コーンがあります")
+                        detectionclass.coneflag = 1
+                        detection.cone = Date()
+                    }else{//１回目以降
+                        let span = detection.cone.timeIntervalSince(date)
+                        print(span)
+                        if span < -5{
+                            speechService.say("コーンがあります")
+                            detection.cone = Date()
+                        }
+                    }
+                }else if(topLabelObservation.identifier == "person"){//人
+                    //１回目
+                    if(detectionclass.personflag == 0){
+                        let span = detectionstruct.detection.person.timeIntervalSince(date)
+                        speechService.say("前方に人がいます")
+                        detectionclass.personflag = 1
+                        detection.person = Date()
+                    }else{//１回目以降
+                        let span = detection.person.timeIntervalSince(date)
+                        print(span)
+                        if span < -5{
+                            speechService.say("前方に人がいます")
+                            detection.person = Date()
+                        }
+                    }
+                }else{//点字ブロックif(topLabelObservation.identifier == "braille_block")
+                    //１回目
+                    if(detectionclass.blockflag == 0){
+                        let span = detectionstruct.detection.block.timeIntervalSince(date)
+                        speechService.say("前方に人がいます")
+                        detectionclass.blockflag = 1
+                        detection.block = Date()
+                    }else{//１回目以降
+                        let span = detection.block.timeIntervalSince(date)
+                        print(span)
+                        if span < -5{
+                            speechService.say("前方に人がいます")
+                            detection.block = Date()
+                        }
+                    }
                 }
             }
             

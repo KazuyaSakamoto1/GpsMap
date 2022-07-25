@@ -33,7 +33,11 @@ class Detectionclass{
     var cone: Date = Date()
     var person: Date = Date()
     var block: Date = Date()
-    var flag: Int = 0
+    var wallflag: Int = 0
+    var whiteflag: Int = 0
+    var coneflag: Int = 0
+    var personflag: Int = 0
+    var blockflag: Int = 0
 }
 
 class ObjectViewController: UIViewController {
