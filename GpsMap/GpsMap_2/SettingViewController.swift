@@ -9,6 +9,14 @@ import Foundation
 import UIKit
 import MapKit
 
+class objectswitch{
+    var wall:Bool = true
+    var person:Bool = true
+    var block:Bool = true
+    var white:Bool = true
+    var cone:Bool = true
+}
+
 class SettingsViewController: UIViewController, MKMapViewDelegate {
 //    @IBOutlet weak var switchLabel: UILabel!
     
@@ -16,12 +24,22 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var sendEmail: UITextField!
     @IBOutlet weak var passEmail: UITextField!
     @IBOutlet weak var receiveEmail: UITextField!
+    
+    @IBOutlet weak var wallswitch: UISwitch!
+    @IBOutlet weak var personswitch: UISwitch!
+    @IBOutlet weak var blockswitch: UISwitch!
+    @IBOutlet weak var whiteswitch: UISwitch!
+    @IBOutlet weak var coneswitch: UISwitch!
+    
     let mailController = SendMail()
+    let Switch = objectswitch()
     
     var sendDomain = ""
     var sendEmailAdress = ""
     var password = ""
     var receiveEmailAdress = ""
+    
+    
     
     //hiroto.0927.123@gmail.com
 
@@ -39,7 +57,76 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
         self.receiveEmail.layer.borderColor = UIColor.black.cgColor
         self.receiveEmail.layer.borderWidth = 2.0
         
+        Switch.wall   = UserDefaults.standard.bool(forKey: "wall")
+        Switch.person = UserDefaults.standard.bool(forKey: "person")
+        Switch.block  = UserDefaults.standard.bool(forKey: "block")
+        Switch.white  = UserDefaults.standard.bool(forKey: "white")
+        Switch.cone   = UserDefaults.standard.bool(forKey: "cone")
+        
+        wallswitch.setOn(Switch.wall, animated: false)
+        personswitch.setOn(Switch.person, animated: false)
+        blockswitch.setOn(Switch.block, animated: false)
+        whiteswitch.setOn(Switch.white, animated: false)
+        coneswitch.setOn(Switch.cone, animated: false)
     }
+    
+    
+    @IBAction func wallSwitch(_ sender: UISwitch) {
+        let objectswitch = objectswitch()
+        if(sender.isOn){
+            objectswitch.wall = true
+            UserDefaults.standard.set(objectswitch.wall, forKey: "wall")
+        }else{
+            objectswitch.wall = false
+            UserDefaults.standard.set(objectswitch.wall, forKey: "wall")
+        }
+    }
+    
+    @IBAction func personSwitch(_ sender: UISwitch) {
+        let objectswitch = objectswitch()
+        if(sender.isOn){
+            objectswitch.person = true
+            UserDefaults.standard.set(objectswitch.person, forKey: "person")
+        }else{
+            objectswitch.person = false
+            UserDefaults.standard.set(objectswitch.person, forKey: "person")
+        }
+    }
+    
+    @IBAction func blockSwitch(_ sender: UISwitch) {
+        let objectswitch = objectswitch()
+        if(sender.isOn){
+            objectswitch.block = true
+            UserDefaults.standard.set(objectswitch.block, forKey: "block")
+        }else{
+            objectswitch.block = false
+            UserDefaults.standard.set(objectswitch.block, forKey: "block")
+        }
+    }
+    
+    
+    @IBAction func whiteSwitch(_ sender: UISwitch) {
+        let objectswitch = objectswitch()
+        if(sender.isOn){
+            objectswitch.white = true
+            UserDefaults.standard.set(objectswitch.white, forKey: "white")
+        }else{
+            objectswitch.white = false
+            UserDefaults.standard.set(objectswitch.white, forKey: "white")
+        }
+    }
+    
+    @IBAction func coneSwitch(_ sender: UISwitch) {
+        let objectswitch = objectswitch()
+        if(sender.isOn){
+            objectswitch.cone = true
+            UserDefaults.standard.set(objectswitch.cone, forKey: "cone")
+        }else{
+            objectswitch.cone = false
+            UserDefaults.standard.set(objectswitch.cone, forKey: "cone")
+        }
+    }
+    
     
     // 送信側メールアドレス
     @IBAction func sendClick(_ sender: Any) {

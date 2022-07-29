@@ -15,6 +15,7 @@ struct Detection{
     var cone: Date
     var person: Date
     var block: Date
+    var blue: Date
     /*
     init(wall: Date, white: Date, cone: Date, person: Date, block: Date){
         self.wall = Date()
@@ -33,11 +34,14 @@ class Detectionclass{
     var cone: Date = Date()
     var person: Date = Date()
     var block: Date = Date()
+    var blue: Date = Date()
     var wallflag: Int = 0
     var whiteflag: Int = 0
     var coneflag: Int = 0
     var personflag: Int = 0
     var blockflag: Int = 0
+    var blueflag: Int = 0
+    var dspan:Date = Date()
 }
 
 class ObjectViewController: UIViewController {
