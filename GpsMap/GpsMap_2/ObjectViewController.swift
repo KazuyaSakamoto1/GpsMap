@@ -16,6 +16,7 @@ struct Detection{
     var person: Date
     var block: Date
     var blue: Date
+    var red: Date
     /*
     init(wall: Date, white: Date, cone: Date, person: Date, block: Date){
         self.wall = Date()
@@ -35,13 +36,16 @@ class Detectionclass{
     var person: Date = Date()
     var block: Date = Date()
     var blue: Date = Date()
+    var red:Date = Date()
     var wallflag: Int = 0
     var whiteflag: Int = 0
     var coneflag: Int = 0
     var personflag: Int = 0
     var blockflag: Int = 0
     var blueflag: Int = 0
+    var redflag: Int = 0
     var dspan:Date = Date()
+    var signalspan:Date = Date()
 }
 
 class ObjectViewController: UIViewController {
@@ -50,7 +54,7 @@ class ObjectViewController: UIViewController {
     var videoCapture: VideoCapture!
     var objectDetection: ObjectDetection!
     
-    var detection = Detection(wall: Date(), white: Date(), cone: Date(), person: Date(), block: Date())
+    var detection = Detection(wall: Date(), white: Date(), cone: Date(), person: Date(), block: Date(),blue: Date(),red: Date())
     
     override func viewDidLoad() {
         super.viewDidLoad()

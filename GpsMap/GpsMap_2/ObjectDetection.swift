@@ -14,7 +14,7 @@ class ObjectDetection {
     
     
     
-    var detection = Detection(wall: Date(), white: Date(), cone: Date(), person: Date(), block: Date())
+    var detection = Detection(wall: Date(), white: Date(), cone: Date(), person: Date(), block: Date(), blue: Date(), red: Date())
     let detectionclass = Detectionclass()
 
     init(_ viewLayer: CALayer, videoFrameSize: CGSize) {
@@ -141,13 +141,61 @@ class ObjectDetection {
             if topLabelObservation.confidence >= 0.85 {
                 let date = Date()
                 let dspan = detectionclass.dspan.timeIntervalSince(date)
+                let signalspan = detectionclass.signalspan.timeIntervalSince(date)
+                
+                if(signalspan < -3){
+                    if(topLabelObservation.identifier == "signal_blue"){
+                        //１回目
+                        if(detectionclass.blueflag == 0){
+                            //let span = detectionstruct.detection.block.timeIntervalSince(date)
+                            speechService.say("歩行者信号が青です")
+                            detectionclass.blueflag = 1
+                            detection.blue = Date()
+                            detectionclass.signalspan = Date()
+                        }else{//１回目以降
+                            let span = detection.blue.timeIntervalSince(date)
+                            print(span)
+                            if span < -3{
+                                speechService.say("歩行者信号が青です")
+                                detection.blue = Date()
+                                detectionclass.signalspan = Date()
+                            }//５秒以上経過せず
+                        }//1回目以降
+                        
+                    }else if(topLabelObservation.identifier == "signal_red"){
+                        if(detectionclass.redflag == 0){
+                            //let span = detectionstruct.detection.block.timeIntervalSince(date)
+                            speechService.say("歩行者信号が赤です")
+                            detectionclass.redflag = 1
+                            detection.red = Date()
+                            detectionclass.signalspan = Date()
+                        }else{//１回目以降
+                            let span = detection.red.timeIntervalSince(date)
+                            print(span)
+                            if span < -3{
+                                speechService.say("歩行者信号が赤です")
+                                detection.red = Date()
+                                detectionclass.signalspan = Date()
+                            }//５秒以上経過せず
+                        }//1回目以降
+                    }
+                }
+                
+                
+                
                 if(dspan < -2){
                     //？秒に一回壁を音声案内できる機能（何度も音声案内するとうるさいから）
                     if(topLabelObservation.identifier == "wall" && UserDefaults.standard.bool(forKey: "wall") == true){//&& wallSwich.isOn
                         //１回目
                         if(detectionclass.wallflag == 0){
                             //let span = detectionstruct.detection.wall.timeIntervalSince(date)
-                            speechService.say("壁があります")
+                            if(objectBounds.midX < 160){
+                                speechService.say("左側に壁があります")
+                            }else if(objectBounds.midX >= 160 && objectBounds.midX < 240){
+                                speechService.say("前方に壁があります")
+                            }else{
+                                speechService.say("右側に壁があります")
+                            }
                             detectionclass.wallflag = 1
                             detection.wall = Date()
                             detectionclass.dspan = Date()
@@ -177,7 +225,7 @@ class ObjectDetection {
                         }else{//１回目以降
                             let span = detection.white.timeIntervalSince(date)
                             print(span)
-                            if span < -5{
+                            if span < -4{
                                 speechService.say("横断歩道があります")
                                 detection.white = Date()
                                 detectionclass.dspan = Date()
@@ -228,31 +276,13 @@ class ObjectDetection {
                         }else{//１回目以降
                             let span = detection.block.timeIntervalSince(date)
                             print(span)
-                            if span < -5{
+                            if span < -2{
                                 speechService.say("点字ブロックがあります")
                                 detection.block = Date()
                                 detectionclass.dspan = Date()
                             }//５秒以上経過せず
                         }//1回目以降
-                    }else if(topLabelObservation.identifier == "signal_blue"){
-                        //１回目
-                        if(detectionclass.blueflag == 0){
-                            //let span = detectionstruct.detection.block.timeIntervalSince(date)
-                            speechService.say("歩行者信号が青です")
-                            detectionclass.blueflag = 1
-                            detection.blue = Date()
-                            detectionclass.dspan = Date()
-                        }else{//１回目以降
-                            let span = detection.blue.timeIntervalSince(date)
-                            print(span)
-                            if span < -5{
-                                speechService.say("歩行者信号が青です")
-                                detection.blue = Date()
-                                detectionclass.dspan = Date()
-                            }//５秒以上経過せず
-                        }//1回目以降
-                        
-                    }//物体ごと
+                     }//物体ごと
                 }//２秒間隔で音声案内
             }//0.85適合率以上の検知
                 
