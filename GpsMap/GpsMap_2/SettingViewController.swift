@@ -13,8 +13,9 @@ class objectswitch{
     var wall:Bool = true
     var person:Bool = true
     var block:Bool = true
-    var white:Bool = true
+    var cross:Bool = true
     var cone:Bool = true
+    var car:Bool = true
 }
 
 class SettingsViewController: UIViewController, MKMapViewDelegate {
@@ -28,8 +29,9 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
     @IBOutlet weak var wallswitch: UISwitch!
     @IBOutlet weak var personswitch: UISwitch!
     @IBOutlet weak var blockswitch: UISwitch!
-    @IBOutlet weak var whiteswitch: UISwitch!
+    @IBOutlet weak var crossswitch: UISwitch!
     @IBOutlet weak var coneswitch: UISwitch!
+    @IBOutlet weak var carswitch: UISwitch!
     
     let mailController = SendMail()
     let Switch = objectswitch()
@@ -60,14 +62,16 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
         Switch.wall   = UserDefaults.standard.bool(forKey: "wall")
         Switch.person = UserDefaults.standard.bool(forKey: "person")
         Switch.block  = UserDefaults.standard.bool(forKey: "block")
-        Switch.white  = UserDefaults.standard.bool(forKey: "white")
+        Switch.cross  = UserDefaults.standard.bool(forKey: "cross")
         Switch.cone   = UserDefaults.standard.bool(forKey: "cone")
+        Switch.car   = UserDefaults.standard.bool(forKey: "car")
         
         wallswitch.setOn(Switch.wall, animated: false)
         personswitch.setOn(Switch.person, animated: false)
         blockswitch.setOn(Switch.block, animated: false)
-        whiteswitch.setOn(Switch.white, animated: false)
+        crossswitch.setOn(Switch.cross, animated: false)
         coneswitch.setOn(Switch.cone, animated: false)
+        carswitch.setOn(Switch.car, animated: false)
     }
     
     
@@ -105,14 +109,14 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
     }
     
     
-    @IBAction func whiteSwitch(_ sender: UISwitch) {
+    @IBAction func crossSwitch(_ sender: UISwitch) {
         let objectswitch = objectswitch()
         if(sender.isOn){
-            objectswitch.white = true
-            UserDefaults.standard.set(objectswitch.white, forKey: "white")
+            objectswitch.cross = true
+            UserDefaults.standard.set(objectswitch.cross, forKey: "cross")
         }else{
-            objectswitch.white = false
-            UserDefaults.standard.set(objectswitch.white, forKey: "white")
+            objectswitch.cross = false
+            UserDefaults.standard.set(objectswitch.cross, forKey: "cross")
         }
     }
     
@@ -124,6 +128,17 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
         }else{
             objectswitch.cone = false
             UserDefaults.standard.set(objectswitch.cone, forKey: "cone")
+        }
+    }
+    
+    @IBAction func carSwitch(_ sender: UISwitch) {
+        let objectswitch = objectswitch()
+        if(sender.isOn){
+            objectswitch.car = true
+            UserDefaults.standard.set(objectswitch.car, forKey: "car")
+        }else{
+            objectswitch.car = false
+            UserDefaults.standard.set(objectswitch.car, forKey: "car")
         }
     }
     
@@ -154,7 +169,7 @@ class SettingsViewController: UIViewController, MKMapViewDelegate {
             print("メールアドレスが入力されました。")
             
         } else {
-            print("\(str)：正しく入力してください")
+            print("\(str!)：正しく入力してください")
             sendEmail.text = ""
             
             return

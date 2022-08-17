@@ -186,6 +186,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
                     // ユーザが音声認識をまだ認証していない時
                     self.micButton.isEnabled = false
                     self.micButton.setTitle("Speech recognition not yet authorized", for: .disabled)
+                    
+                @unknown default:fatalError()
                 }
             }
             

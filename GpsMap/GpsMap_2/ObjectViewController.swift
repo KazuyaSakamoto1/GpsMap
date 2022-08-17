@@ -11,12 +11,13 @@ import Vision
 
 struct Detection{
     var wall: Date
-    var white: Date
+    var cross: Date
     var cone: Date
     var person: Date
     var block: Date
     var blue: Date
     var red: Date
+    var car: Date
     /*
     init(wall: Date, white: Date, cone: Date, person: Date, block: Date){
         self.wall = Date()
@@ -31,19 +32,21 @@ struct Detection{
 
 class Detectionclass{
     var wall: Date = Date()
-    var white: Date = Date()
+    var cross: Date = Date()
     var cone: Date = Date()
     var person: Date = Date()
     var block: Date = Date()
     var blue: Date = Date()
     var red:Date = Date()
+    var car:Date = Date()
     var wallflag: Int = 0
-    var whiteflag: Int = 0
+    var crossflag: Int = 0
     var coneflag: Int = 0
     var personflag: Int = 0
     var blockflag: Int = 0
     var blueflag: Int = 0
     var redflag: Int = 0
+    var carflag: Int = 0
     var dspan:Date = Date()
     var signalspan:Date = Date()
 }
@@ -54,7 +57,7 @@ class ObjectViewController: UIViewController {
     var videoCapture: VideoCapture!
     var objectDetection: ObjectDetection!
     
-    var detection = Detection(wall: Date(), white: Date(), cone: Date(), person: Date(), block: Date(),blue: Date(),red: Date())
+    var detection = Detection(wall: Date(), cross: Date(), cone: Date(), person: Date(), block: Date(),blue: Date(),red: Date(),car: Date())
     
     override func viewDidLoad() {
         super.viewDidLoad()

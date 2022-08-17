@@ -14,7 +14,7 @@ class ObjectDetection {
     
     
     
-    var detection = Detection(wall: Date(), white: Date(), cone: Date(), person: Date(), block: Date(), blue: Date(), red: Date())
+    var detection = Detection(wall: Date(), cross: Date(), cone: Date(), person: Date(), block: Date(), blue: Date(), red: Date(), car: Date())
     let detectionclass = Detectionclass()
 
     init(_ viewLayer: CALayer, videoFrameSize: CGSize) {
@@ -122,7 +122,6 @@ class ObjectDetection {
         CATransaction.setValue(kCFBooleanTrue, forKey: kCATransactionDisableActions)
         
         let speechService = SpeechService()
-        let objectswitch = objectswitch()
         
         //let detectionstruct = ObjectViewController()
         
@@ -138,7 +137,7 @@ class ObjectDetection {
                 Int(self.objectDetectionLayer.bounds.width), Int(self.objectDetectionLayer.bounds.height))
             //実装したいもの
             //白線　信号機　人　壁　点字ブロック　カラーコーン
-            if topLabelObservation.confidence >= 0.85 {
+            if topLabelObservation.confidence >= 0.90 {
                 let date = Date()
                 let dspan = detectionclass.dspan.timeIntervalSince(date)
                 let signalspan = detectionclass.signalspan.timeIntervalSince(date)
@@ -185,13 +184,13 @@ class ObjectDetection {
                 
                 if(dspan < -2){
                     //？秒に一回壁を音声案内できる機能（何度も音声案内するとうるさいから）
-                    if(topLabelObservation.identifier == "wall" && UserDefaults.standard.bool(forKey: "wall") == true){//&& wallSwich.isOn
+                    if(topLabelObservation.identifier == "wall" && UserDefaults.standard.bool(forKey: "wall") == true){
                         //１回目
                         if(detectionclass.wallflag == 0){
                             //let span = detectionstruct.detection.wall.timeIntervalSince(date)
-                            if(objectBounds.midX < 160){
+                            if(objectBounds.midX < 180){
                                 speechService.say("左側に壁があります")
-                            }else if(objectBounds.midX >= 160 && objectBounds.midX < 240){
+                            }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
                                 speechService.say("前方に壁があります")
                             }else{
                                 speechService.say("右側に壁があります")
@@ -203,9 +202,9 @@ class ObjectDetection {
                             let span = detection.wall.timeIntervalSince(date)
                             print(span)
                             if span < -4{
-                                if(objectBounds.midX < 160){
+                                if(objectBounds.midX < 180){
                                     speechService.say("左側に壁があります")
-                                }else if(objectBounds.midX >= 160 && objectBounds.midX < 240){
+                                }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
                                     speechService.say("前方に壁があります")
                                 }else{
                                     speechService.say("右側に壁があります")
@@ -214,20 +213,32 @@ class ObjectDetection {
                                 detectionclass.dspan = Date()
                             }
                         }
-                    }else if(topLabelObservation.identifier == "white_line" && UserDefaults.standard.bool(forKey: "white") == true){//横断歩道
+                    }else if(topLabelObservation.identifier == "crosswalk" && UserDefaults.standard.bool(forKey: "cross") == true){//横断歩道
                         //１回目
-                        if(detectionclass.whiteflag == 0){
+                        if(detectionclass.crossflag == 0){
                             //let span = detectionstruct.detection.white.timeIntervalSince(date)
-                            speechService.say("横断歩道があります")
-                            detectionclass.whiteflag = 1
-                            detection.white = Date()
+                            if(objectBounds.midX < 180){
+                                speechService.say("左前方に横断歩道があります")
+                            }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
+                                speechService.say("前方に横断歩道があります")
+                            }else{
+                                speechService.say("右前方に横断歩道があります")
+                            }
+                            detectionclass.crossflag = 1
+                            detection.cross = Date()
                             detectionclass.dspan = Date()
                         }else{//１回目以降
-                            let span = detection.white.timeIntervalSince(date)
+                            let span = detection.cross.timeIntervalSince(date)
                             print(span)
                             if span < -4{
-                                speechService.say("横断歩道があります")
-                                detection.white = Date()
+                                if(objectBounds.midX < 180){
+                                    speechService.say("左前方に横断歩道があります")
+                                }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
+                                    speechService.say("前方に横断歩道があります")
+                                }else{
+                                    speechService.say("右前方に横断歩道があります")
+                                }
+                                detection.cross = Date()
                                 detectionclass.dspan = Date()
                             }
                         }
@@ -259,7 +270,7 @@ class ObjectDetection {
                         }else{//１回目以降
                             let span = detection.person.timeIntervalSince(date)
                             print(span)
-                            if span < -3{
+                            if span < -4{
                                 speechService.say("前方に人がいます")
                                 detection.person = Date()
                                 detectionclass.dspan = Date()
@@ -269,23 +280,54 @@ class ObjectDetection {
                         //１回目
                         if(detectionclass.blockflag == 0){
                             //let span = detectionstruct.detection.block.timeIntervalSince(date)
-                            speechService.say("点字ブロックがあります")
+                            if(objectBounds.midX < 180){
+                                speechService.say("左前方に点字ブロックがあります")
+                            }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
+                                speechService.say("前方に点字ブロックがあります")
+                            }else{
+                                speechService.say("右前方に点字ブロックがあります")
+                            }
                             detectionclass.blockflag = 1
                             detection.block = Date()
                             detectionclass.dspan = Date()
                         }else{//１回目以降
                             let span = detection.block.timeIntervalSince(date)
                             print(span)
-                            if span < -2{
-                                speechService.say("点字ブロックがあります")
+                            if span < -8{
+                                if(objectBounds.midX < 180){
+                                    speechService.say("左前方に点字ブロックがあります")
+                                }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
+                                    speechService.say("前方に点字ブロックがあります")
+                                }else{
+                                    speechService.say("右前方に点字ブロックがあります")
+                                }
                                 detection.block = Date()
                                 detectionclass.dspan = Date()
                             }//５秒以上経過せず
                         }//1回目以降
+                     }else if(topLabelObservation.identifier == "car" && UserDefaults.standard.bool(forKey: "car") == true){
+                         //１回目
+                         if(objectBounds.midX >= 180 && objectBounds.midX < 260){
+                             if(detectionclass.carflag == 0){
+                                 //let span = detectionstruct.detection.wall.timeIntervalSince(date)
+                                 speechService.say("前方に壁があります")
+                                 detectionclass.wallflag = 1
+                                 detection.wall = Date()
+                                 detectionclass.dspan = Date()
+                             }else{//１回目以降
+                                 let span = detection.wall.timeIntervalSince(date)
+                                 print(span)
+                                 if span < -4{
+                                     speechService.say("前方に壁があります")
+                                     detection.wall = Date()
+                                     detectionclass.dspan = Date()
+                                 }
+                             }
+                         }
+                         
                      }//物体ごと
                 }//２秒間隔で音声案内
             }//0.85適合率以上の検知
-                
             
             let bbLayer = self.createBoundingBoxLayer(objectBounds, identifier: topLabelObservation.identifier, confidence: topLabelObservation.confidence)
             self.objectDetectionLayer.addSublayer(bbLayer)

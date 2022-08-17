@@ -237,7 +237,16 @@
                                 <color key="onTintColor" name="AccentColor"/>
                                 <color key="thumbTintColor" systemColor="systemOrangeColor"/>
                                 <connections>
-                                    <action selector="whiteSwitch:" destination="oak-8k-3CP" eventType="valueChanged" id="2s4-9b-gZH"/>
+                                    <action selector="crossSwitch:" destination="oak-8k-3CP" eventType="valueChanged" id="gJj-qP-LSv"/>
+                                </connections>
+                            </switch>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="INh-jn-dqN" userLabel="車スイッチ">
+                                <rect key="frame" x="259" y="522" width="49" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="onTintColor" name="AccentColor"/>
+                                <color key="thumbTintColor" systemColor="systemOrangeColor"/>
+                                <connections>
+                                    <action selector="carSwitch:" destination="oak-8k-3CP" eventType="valueChanged" id="YJO-bo-JC0"/>
                                 </connections>
                             </switch>
                             <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ifT-wi-6h8" userLabel="コーンスイッチ">
@@ -249,19 +258,27 @@
                                     <action selector="coneSwitch:" destination="oak-8k-3CP" eventType="valueChanged" id="djA-C1-dqy"/>
                                 </connections>
                             </switch>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="車（前方）" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KrI-4q-6z1">
+                                <rect key="frame" x="238" y="485" width="104" height="29"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="tPc-ma-ARt"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <connections>
                         <outlet property="blockswitch" destination="9tj-84-iip" id="fGd-zF-PTF"/>
+                        <outlet property="carswitch" destination="INh-jn-dqN" id="fRL-WP-1oH"/>
                         <outlet property="coneswitch" destination="ifT-wi-6h8" id="HDb-wv-WVI"/>
+                        <outlet property="crossswitch" destination="tEe-au-UQM" id="ZD1-a4-JWN"/>
                         <outlet property="passEmail" destination="Pof-yn-WOc" id="I8P-sH-KM8"/>
                         <outlet property="personswitch" destination="Jxh-QT-Wuk" id="lqZ-x1-DS8"/>
                         <outlet property="receiveEmail" destination="Pyg-wl-XFA" id="sHH-qK-WEv"/>
                         <outlet property="sendEmail" destination="Zpd-2x-OHF" id="VQq-di-49K"/>
                         <outlet property="wallswitch" destination="dBi-fL-F96" id="VP7-bR-hQd"/>
-                        <outlet property="whiteswitch" destination="tEe-au-UQM" id="hku-0k-d62"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="g1c-c5-2hx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
