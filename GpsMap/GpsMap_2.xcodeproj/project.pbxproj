@@ -15,6 +15,7 @@
 		B76D991C28669BFE00E0ED3A /* ObjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76D991B28669BFE00E0ED3A /* ObjectViewController.swift */; };
 		B76D991E2866A03300E0ED3A /* VideoCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76D991D2866A03300E0ED3A /* VideoCapture.swift */; };
 		B76D99202866A0E100E0ED3A /* ObjectDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76D991F2866A0E100E0ED3A /* ObjectDetection.swift */; };
+		B785C6FE28D1639D0057ED79 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5691A6826C50EFE00609600 /* MapKit.framework */; };
 		C567AA2327675EB3003336C0 /* SwiftSMTP in Frameworks */ = {isa = PBXBuildFile; productRef = C567AA2227675EB3003336C0 /* SwiftSMTP */; };
 		C5691A3526C5050500609600 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3426C5050500609600 /* AppDelegate.swift */; };
 		C5691A3726C5050500609600 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A3626C5050500609600 /* SceneDelegate.swift */; };
@@ -25,10 +26,10 @@
 		C5691A4426C5050600609600 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C5691A4226C5050600609600 /* LaunchScreen.storyboard */; };
 		C5691A4F26C5050600609600 /* GpsMapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A4E26C5050600609600 /* GpsMapTests.swift */; };
 		C5691A5A26C5050600609600 /* GpsMapUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5691A5926C5050600609600 /* GpsMapUITests.swift */; };
-		C5691A6926C50EFE00609600 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C5691A6826C50EFE00609600 /* MapKit.framework */; };
 		C582D5E82702CE6400497AA1 /* ViewControllerSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */; };
 		C5836FCA2771DE6D005D6A16 /* DirectionJudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5836FC92771DE6D005D6A16 /* DirectionJudge.swift */; };
 		C5E8EC4427704D030097366D /* ImpactDetection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5E8EC4327704D030097366D /* ImpactDetection.swift */; };
+		DB68BB7DA2BB0F7BAFC9FD2C /* Pods_LEAD_WAY.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 208F2157FAA4CA3884B85FBC /* Pods_LEAD_WAY.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,11 +50,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		208F2157FAA4CA3884B85FBC /* Pods_LEAD_WAY.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LEAD_WAY.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D96FF93719556264249B644 /* Pods-LEAD WAY.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LEAD WAY.release.xcconfig"; path = "Target Support Files/Pods-LEAD WAY/Pods-LEAD WAY.release.xcconfig"; sourceTree = "<group>"; };
 		68841AA426F3DD9000BBFAB9 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		68AC1BE4276CFDAB002581E9 /* SendMail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendMail.swift; sourceTree = "<group>"; };
 		68B26E5D279FAE59008CFC73 /* Test.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Test.gpx; sourceTree = "<group>"; };
 		68B63CD1277F99A400E345DF /* RegionDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionDetection.swift; sourceTree = "<group>"; };
 		B71F87BE28693D590074F36E /* vidvip_20210521.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = vidvip_20210521.mlmodel; path = ../../../../vidvip_20210521.mlmodel; sourceTree = "<group>"; };
+		B72940AD28E27ED9007C0C56 /* BridgeAnnotation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgeAnnotation.h; sourceTree = "<group>"; };
 		B76AAB5828862AA1002E4EFB /* SpeechService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechService.swift; sourceTree = "<group>"; };
 		B76D991B28669BFE00E0ED3A /* ObjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectViewController.swift; sourceTree = "<group>"; };
 		B76D991D2866A03300E0ED3A /* VideoCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCapture.swift; sourceTree = "<group>"; };
@@ -81,6 +85,7 @@
 		C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerSearch.swift; sourceTree = "<group>"; };
 		C5836FC92771DE6D005D6A16 /* DirectionJudge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectionJudge.swift; sourceTree = "<group>"; };
 		C5E8EC4327704D030097366D /* ImpactDetection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactDetection.swift; sourceTree = "<group>"; };
+		EF859A6BD65C2879AE32003F /* Pods-LEAD WAY.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LEAD WAY.debug.xcconfig"; path = "Target Support Files/Pods-LEAD WAY/Pods-LEAD WAY.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,8 +93,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B785C6FE28D1639D0057ED79 /* MapKit.framework in Frameworks */,
 				C567AA2327675EB3003336C0 /* SwiftSMTP in Frameworks */,
-				C5691A6926C50EFE00609600 /* MapKit.framework in Frameworks */,
+				DB68BB7DA2BB0F7BAFC9FD2C /* Pods_LEAD_WAY.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,6 +116,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9D9B8DAD1B540E92C213A41E /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				EF859A6BD65C2879AE32003F /* Pods-LEAD WAY.debug.xcconfig */,
+				5D96FF93719556264249B644 /* Pods-LEAD WAY.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		C5691A2826C5050500609600 = {
 			isa = PBXGroup;
 			children = (
@@ -123,6 +138,7 @@
 				C5691A5826C5050600609600 /* GpsMap_2UITests */,
 				C5691A3226C5050500609600 /* Products */,
 				C5691A6726C50EFE00609600 /* Frameworks */,
+				9D9B8DAD1B540E92C213A41E /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -142,6 +158,7 @@
 				C5691A3426C5050500609600 /* AppDelegate.swift */,
 				C5691A3626C5050500609600 /* SceneDelegate.swift */,
 				C5691A3826C5050500609600 /* ViewController.swift */,
+				B72940AD28E27ED9007C0C56 /* BridgeAnnotation.h */,
 				68841AA426F3DD9000BBFAB9 /* SettingViewController.swift */,
 				68AC1BE4276CFDAB002581E9 /* SendMail.swift */,
 				C582D5E72702CE6400497AA1 /* ViewControllerSearch.swift */,
@@ -184,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				C5691A6826C50EFE00609600 /* MapKit.framework */,
+				208F2157FAA4CA3884B85FBC /* Pods_LEAD_WAY.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -195,6 +213,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C5691A5E26C5050600609600 /* Build configuration list for PBXNativeTarget "LEAD WAY" */;
 			buildPhases = (
+				D4613DAD0AD81E3295A62BE3 /* [CP] Check Pods Manifest.lock */,
 				C5691A2D26C5050500609600 /* Sources */,
 				C5691A2E26C5050500609600 /* Frameworks */,
 				C5691A2F26C5050500609600 /* Resources */,
@@ -337,6 +356,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nif which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		D4613DAD0AD81E3295A62BE3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-LEAD WAY-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -532,10 +573,12 @@
 		};
 		C5691A5F26C5050600609600 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = EF859A6BD65C2879AE32003F /* Pods-LEAD WAY.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = F68CQYDUHC;
 				INFOPLIST_FILE = GpsMap_2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -544,6 +587,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap0722;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = GpsMap_2/BridgeAnnotation.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -551,10 +595,12 @@
 		};
 		C5691A6026C5050600609600 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D96FF93719556264249B644 /* Pods-LEAD WAY.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = F68CQYDUHC;
 				INFOPLIST_FILE = GpsMap_2/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -563,6 +609,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = hiroto.GpsMap0722;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = GpsMap_2/BridgeAnnotation.h;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

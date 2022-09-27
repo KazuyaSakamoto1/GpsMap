@@ -1,0 +1,6 @@
+framework module Pods_LEAD_WAY {
+  umbrella header "Pods-LEAD WAY-umbrella.h"
+
+  export *
+  module * { export * }
+}

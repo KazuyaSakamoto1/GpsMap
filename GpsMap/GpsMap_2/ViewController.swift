@@ -17,9 +17,13 @@ import AudioToolbox
 import SwiftSMTP
 import CoreMotion
 
-class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate {
+
+
+class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate, MKMapViewDelegate{
     var myLock = NSLock()
+    
     @IBOutlet var mapView: MKMapView!
+    
     // 検索バー
     @IBOutlet weak var serchBar = UISearchBar()
     var locationManager: CLLocationManager!
@@ -84,6 +88,56 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
     // 位置情報の取得
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        //_ mapView: MKMapView, viewFor annotation: MKAnnotation)->MKAnnotationView?
+        func configureCustomRotors() {
+          let favoritesRotor = UIAccessibilityCustomRotor(name: "Bridges") { predicate in
+            let forward = (predicate.searchDirection == .next)
+            // which element is currently highlighted
+            let currentAnnotationView = predicate.currentItem.targetElement as? MKPinAnnotationView
+              
+              let currentAnnotation = (currentAnnotationView?.annotation as? BridgeAnnotation)
+
+            // easy reference to all possible annotations
+            let allAnnotations = self.mapView.annotations.filter { $0 is BridgeAnnotation }
+
+            // we'll start our index either 1 less or 1 more, so we enter at either 0 or last element
+            var currentIndex = forward ? -1 : allAnnotations.count
+
+            // set our index to currentAnnotation's index if we can find it in allAnnotations
+            if let currentAnnotation = currentAnnotation {
+              if let index = allAnnotations.index(where: { (annotation) -> Bool in
+                return (annotation.coordinate.latitude == currentAnnotation.coordinate.latitude) &&
+            (annotation.coordinate.longitude == currentAnnotation.coordinate.longitude)
+                }) {
+                  currentIndex = index
+              }
+            }
+
+            // now that we have our currentIndex, here's a helper to give us the next element
+            // the user is requesting
+            let nextIndex = {(index:Int) -> Int in forward ? index + 1 : index - 1}
+
+            currentIndex = nextIndex(currentIndex)
+
+            while currentIndex >= 0 && currentIndex < allAnnotations.count {
+              let requestedAnnotation = allAnnotations[currentIndex]
+
+              // i can't stress how important it is to have animated set to false. save yourself the 10 hours i burnt, and just go with it. if you set it to true, the map starts moving to the annotation, but there's no guarantee the annotation has an associated view yet, because it could still be animating. in which case the line below this one will be nil, and you'll have a whole bunch of annotations that can't be navigated to
+              self.mapView.setCenter(requestedAnnotation.coordinate, animated: false)
+              if let annotationView = self.mapView.view(for: requestedAnnotation) {
+                return UIAccessibilityCustomRotorItemResult(targetElement: annotationView, targetRange: nil)
+              }
+
+              currentIndex = nextIndex(currentIndex)
+            }
+
+            return nil
+          }
+
+          self.accessibilityCustomRotors = [favoritesRotor]
+        }
+        
         
         fallLabel.text = "検知中"
         fallLabel.backgroundColor = .green
@@ -610,7 +664,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDe
             micButton.setTitle("Recognition not available", for: .disabled)
         }
     }
-    
 }
 
 // マイクに関する処理
@@ -619,5 +672,7 @@ extension ViewController: SFSpeechRecognizerDelegate {
     
     public override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-    }
+        
+        //mapView.accessibilityElementsHidden = true
+        }
 }

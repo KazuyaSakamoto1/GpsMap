@@ -137,12 +137,12 @@ class ObjectDetection {
                 Int(self.objectDetectionLayer.bounds.width), Int(self.objectDetectionLayer.bounds.height))
             //実装したいもの
             //白線　信号機　人　壁　点字ブロック　カラーコーン
-            if topLabelObservation.confidence >= 0.90 {
+            if topLabelObservation.confidence >= 0.95 {
                 let date = Date()
                 let dspan = detectionclass.dspan.timeIntervalSince(date)
                 let signalspan = detectionclass.signalspan.timeIntervalSince(date)
                 
-                if(signalspan < -3){
+                if(signalspan < -6){
                     if(topLabelObservation.identifier == "signal_blue"){
                         //１回目
                         if(detectionclass.blueflag == 0){
@@ -182,7 +182,7 @@ class ObjectDetection {
                 
                 
                 
-                if(dspan < -2){
+                if(dspan < -3){
                     //？秒に一回壁を音声案内できる機能（何度も音声案内するとうるさいから）
                     if(topLabelObservation.identifier == "wall" && UserDefaults.standard.bool(forKey: "wall") == true){
                         //１回目
@@ -201,7 +201,7 @@ class ObjectDetection {
                         }else{//１回目以降
                             let span = detection.wall.timeIntervalSince(date)
                             print(span)
-                            if span < -4{
+                            if span < -6{
                                 if(objectBounds.midX < 180){
                                     speechService.say("左側に壁があります")
                                 }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
@@ -230,7 +230,7 @@ class ObjectDetection {
                         }else{//１回目以降
                             let span = detection.cross.timeIntervalSince(date)
                             print(span)
-                            if span < -4{
+                            if span < -9{
                                 if(objectBounds.midX < 180){
                                     speechService.say("左前方に横断歩道があります")
                                 }else if(objectBounds.midX >= 180 && objectBounds.midX < 260){
@@ -270,7 +270,7 @@ class ObjectDetection {
                         }else{//１回目以降
                             let span = detection.person.timeIntervalSince(date)
                             print(span)
-                            if span < -4{
+                            if span < -6{
                                 speechService.say("前方に人がいます")
                                 detection.person = Date()
                                 detectionclass.dspan = Date()
@@ -310,15 +310,15 @@ class ObjectDetection {
                          if(objectBounds.midX >= 180 && objectBounds.midX < 260){
                              if(detectionclass.carflag == 0){
                                  //let span = detectionstruct.detection.wall.timeIntervalSince(date)
-                                 speechService.say("前方に壁があります")
+                                 speechService.say("前方に車があります")
                                  detectionclass.wallflag = 1
                                  detection.wall = Date()
                                  detectionclass.dspan = Date()
                              }else{//１回目以降
                                  let span = detection.wall.timeIntervalSince(date)
                                  print(span)
-                                 if span < -4{
-                                     speechService.say("前方に壁があります")
+                                 if span < -8{
+                                     speechService.say("前方に車があります")
                                      detection.wall = Date()
                                      detectionclass.dspan = Date()
                                  }
@@ -326,8 +326,8 @@ class ObjectDetection {
                          }
                          
                      }//物体ごと
-                }//２秒間隔で音声案内
-            }//0.85適合率以上の検知
+                }//3秒間隔で音声案内
+            }//0.95適合率以上の検知
             
             let bbLayer = self.createBoundingBoxLayer(objectBounds, identifier: topLabelObservation.identifier, confidence: topLabelObservation.confidence)
             self.objectDetectionLayer.addSublayer(bbLayer)
